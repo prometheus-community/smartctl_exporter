@@ -1,0 +1,12 @@
+smartctl_exporter:
+  bind_to: "[::1]:9631"
+  url_path: "/metrics"
+  fake_json: no
+  smartctl_location: /usr/sbin/smartctl
+  devices:
+  - /dev/sda
+  - /dev/sdb
+  - /dev/sdc
+  - /dev/sdd
+  - /dev/sde
+  - /dev/sdf
