@@ -16,7 +16,7 @@ Export smartctl statistics to prometheus
 Example content:
 ```
 smartctl_exporter:
-  bind_to: "[::1]:9631"
+  bind_to: "[::1]:9633"
   url_path: "/metrics"
   fake_json: no
   smartctl_location: /usr/sbin/smartctl

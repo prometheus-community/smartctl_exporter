@@ -50,7 +50,7 @@ func loadOptions() Options {
 
 	opts := Options{
 		SMARTOptions{
-			BindTo:           "9631",
+			BindTo:           "9633",
 			URLPath:          "/metrics",
 			FakeJSON:         false,
 			SMARTctlLocation: "/usr/sbin/smartctl",
