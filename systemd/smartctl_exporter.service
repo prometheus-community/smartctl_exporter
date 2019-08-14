@@ -1,0 +1,19 @@
+[Unit]
+Description=smartctl exporter service
+After=network-online.target
+
+[Service]
+Type=simple
+PIDFile=/run/smartctl_exporter.pid
+ExecStart=/usr/bin/smartctl_exporter
+User=root
+Group=root
+SyslogIdentifier=smartctl_exporter
+Restart=on-failure
+RemainAfterExit=no
+RestartSec=100ms
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

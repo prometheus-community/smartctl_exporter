@@ -23,7 +23,7 @@ type SMARTctl struct {
 	device SMARTDevice
 }
 
-// NewSMARTctl is NFTables constructor
+// NewSMARTctl is smartctl constructor
 func NewSMARTctl(json gjson.Result, ch chan<- prometheus.Metric) SMARTctl {
 	smart := SMARTctl{}
 	smart.ch = ch
