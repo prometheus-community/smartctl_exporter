@@ -20,6 +20,7 @@ smartctl_exporter:
   url_path: "/metrics"
   fake_json: no
   smartctl_location: /usr/sbin/smartctl
+  collect_not_more_than_period: 120s
   devices:
   - /dev/sda
   - /dev/sdb
