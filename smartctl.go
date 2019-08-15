@@ -39,8 +39,8 @@ func NewSMARTctl(json gjson.Result, ch chan<- prometheus.Metric) SMARTctl {
 }
 
 // Collect metrics
-func (smart SMARTctl) Collect() {
-	// smart.mineVersion()
+func (smart *SMARTctl) Collect() {
+	smart.mineExitStatus()
 	smart.mineDevice()
 	smart.mineCapacity()
 	smart.mineInterfaceSpeed()
@@ -48,24 +48,22 @@ func (smart SMARTctl) Collect() {
 	smart.minePowerOnSeconds()
 	smart.mineRotationRate()
 	smart.mineTemperatures()
+	smart.minePowerCycleCount()
 }
 
-func (smart SMARTctl) mineVersion() {
-	jsonVersion := smart.json.Get("json_format_version").Array()
-	smartctlJSON := smart.json.Get("smartctl")
-	smartctlVersion := smartctlJSON.Get("version").Array()
+func (smart *SMARTctl) mineExitStatus() {
 	smart.ch <- prometheus.MustNewConstMetric(
-		metricSmartctlVersion,
+		metricDeviceExitStatus,
 		prometheus.GaugeValue,
-		1,
-		fmt.Sprintf("%d.%d", jsonVersion[0].Int(), jsonVersion[1].Int()),
-		fmt.Sprintf("%d.%d", smartctlVersion[0].Int(), smartctlVersion[1].Int()),
-		smartctlJSON.Get("svn_revision").String(),
-		smartctlJSON.Get("build_info").String(),
+		smart.json.Get("smartctl.exit_status").Float(),
+		smart.device.device,
+		smart.device.family,
+		smart.device.model,
+		smart.device.serial,
 	)
 }
 
-func (smart SMARTctl) mineDevice() {
+func (smart *SMARTctl) mineDevice() {
 	device := smart.json.Get("device")
 	smart.ch <- prometheus.MustNewConstMetric(
 		metricDeviceModel,
@@ -84,7 +82,7 @@ func (smart SMARTctl) mineDevice() {
 	)
 }
 
-func (smart SMARTctl) mineCapacity() {
+func (smart *SMARTctl) mineCapacity() {
 	capacity := smart.json.Get("user_capacity")
 	smart.ch <- prometheus.MustNewConstMetric(
 		metricDeviceCapacityBlocks,
@@ -118,7 +116,7 @@ func (smart SMARTctl) mineCapacity() {
 	}
 }
 
-func (smart SMARTctl) mineInterfaceSpeed() {
+func (smart *SMARTctl) mineInterfaceSpeed() {
 	iSpeed := smart.json.Get("interface_speed")
 	for _, speedType := range []string{"max", "current"} {
 		tSpeed := iSpeed.Get(speedType)
@@ -135,7 +133,7 @@ func (smart SMARTctl) mineInterfaceSpeed() {
 	}
 }
 
-func (smart SMARTctl) mineDeviceAttribute() {
+func (smart *SMARTctl) mineDeviceAttribute() {
 	for _, attribute := range smart.json.Get("ata_smart_attributes.table").Array() {
 		name := strings.TrimSpace(attribute.Get("name").String())
 		flags := strings.TrimSpace(attribute.Get("flags.string").String())
@@ -163,7 +161,7 @@ func (smart SMARTctl) mineDeviceAttribute() {
 	}
 }
 
-func (smart SMARTctl) minePowerOnSeconds() {
+func (smart *SMARTctl) minePowerOnSeconds() {
 	pot := smart.json.Get("power_on_time")
 	smart.ch <- prometheus.MustNewConstMetric(
 		metricDevicePowerOnSeconds,
@@ -176,7 +174,7 @@ func (smart SMARTctl) minePowerOnSeconds() {
 	)
 }
 
-func (smart SMARTctl) mineRotationRate() {
+func (smart *SMARTctl) mineRotationRate() {
 	rRate := GetFloatIfExists(smart.json, "rotation_rate", 0)
 	if rRate > 0 {
 		smart.ch <- prometheus.MustNewConstMetric(
@@ -191,7 +189,7 @@ func (smart SMARTctl) mineRotationRate() {
 	}
 }
 
-func (smart SMARTctl) mineTemperatures() {
+func (smart *SMARTctl) mineTemperatures() {
 	temperatures := smart.json.Get("temperature")
 	if temperatures.Exists() {
 		temperatures.ForEach(func(key, value gjson.Result) bool {
@@ -210,7 +208,7 @@ func (smart SMARTctl) mineTemperatures() {
 	}
 }
 
-func (smart SMARTctl) minePowerCycleCount() {
+func (smart *SMARTctl) minePowerCycleCount() {
 	smart.ch <- prometheus.MustNewConstMetric(
 		metricDevicePowerCycleCount,
 		prometheus.CounterValue,

@@ -24,15 +24,14 @@ func (i SMARTctlManagerCollector) Describe(ch chan<- *prometheus.Desc) {
 
 // Collect is called by the Prometheus registry when collecting metrics.
 func (i SMARTctlManagerCollector) Collect(ch chan<- prometheus.Metric) {
+	info := NewSMARTctlInfo(ch)
 	for _, device := range options.SMARTctl.Devices {
-		json, err := readData(device)
-		if err != nil {
-			logger.Error("Failed parsing SMARTctl data: %s", err)
-		} else {
-			smart := NewSMARTctl(json, ch)
-			smart.Collect()
-		}
+		json := readData(device)
+		info.SetJSON(json)
+		smart := NewSMARTctl(json, ch)
+		smart.Collect()
 	}
+	info.Collect()
 }
 
 func init() {

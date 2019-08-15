@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"time"
 
 	yaml "gopkg.in/yaml.v2"
 )
@@ -15,11 +16,13 @@ var (
 
 // SMARTOptions is a inner representation of a options
 type SMARTOptions struct {
-	BindTo           string   `yaml:"bind_to"`
-	URLPath          string   `yaml:"url_path"`
-	FakeJSON         bool     `yaml:"fake_json"`
-	SMARTctlLocation string   `yaml:"smartctl_location"`
-	Devices          []string `yaml:"devices"`
+	BindTo                string `yaml:"bind_to"`
+	URLPath               string `yaml:"url_path"`
+	FakeJSON              bool   `yaml:"fake_json"`
+	SMARTctlLocation      string `yaml:"smartctl_location"`
+	CollectPeriod         string `yaml:"collect_not_more_than_period"`
+	CollectPeriodDuration time.Duration
+	Devices               []string `yaml:"devices"`
 }
 
 // Options is a representation of a options
@@ -54,6 +57,7 @@ func loadOptions() Options {
 			URLPath:          "/metrics",
 			FakeJSON:         false,
 			SMARTctlLocation: "/usr/sbin/smartctl",
+			CollectPeriod:    "60s",
 			Devices:          []string{},
 		},
 	}
@@ -61,6 +65,14 @@ func loadOptions() Options {
 	if yaml.Unmarshal(yamlFile, &opts) != nil {
 		logger.Panic("Failed parse %s: %s", configFile, err)
 	}
+
+	d, err := time.ParseDuration(opts.SMARTctl.CollectPeriod)
+	if err != nil {
+		logger.Panic("Failed read collect_not_more_than_period (%s): %s", opts.SMARTctl.CollectPeriod, err)
+	}
+
+	opts.SMARTctl.CollectPeriodDuration = d
+
 	logger.Debug("Parsed options: %s", opts)
 	return opts
 }
