@@ -12,3 +12,6 @@ jobs:
       - run:
           name: build
           command: make build
+      - store_artifacts:
+          path: bin/smartctl_exporter
+          destination: smartctl_exporter
