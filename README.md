@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/Sheridan/smartctl_exporter.svg?style=svg)](https://circleci.com/gh/Sheridan/smartctl_exporter)
+
 # smartctl_exporter
 Export smartctl statistics to prometheus
 
