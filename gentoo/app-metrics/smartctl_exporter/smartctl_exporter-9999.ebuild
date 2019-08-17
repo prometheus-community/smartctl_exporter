@@ -9,7 +9,7 @@ DESCRIPTION="Exporting S.M.A.R.T. metrics"
 HOMEPAGE="https://github.com/Sheridan/smartctl_exporter"
 LICENSE="GPL-3"
 SLOT="0"
-RDEPEND=""
+RDEPEND="sys-apps/smartmontools"
 DEPEND="dev-lang/go"
 
 src_unpack() {
