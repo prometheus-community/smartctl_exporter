@@ -87,10 +87,11 @@ var (
 			"model_family",
 			"model_name",
 			"serial_number",
-			"name",
-			"flags",
-			"value_type",
-			"id",
+			"attribute_name",
+			"attribute_flags_short",
+			"attribute_flags_long",
+			"attribute_value_type",
+			"attribute_id",
 		},
 		nil,
 	)
@@ -147,6 +148,21 @@ var (
 			"model_family",
 			"model_name",
 			"serial_number",
+		},
+		nil,
+	)
+	metricDeviceStatistics = prometheus.NewDesc(
+		"smartctl_device_statistics",
+		"Device statistics",
+		[]string{
+			"device",
+			"model_family",
+			"model_name",
+			"serial_number",
+			"statistic_table",
+			"statistic_name",
+			"statistic_flags_short",
+			"statistic_flags_long",
 		},
 		nil,
 	)

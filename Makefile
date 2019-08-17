@@ -20,23 +20,15 @@ run: build
 run-sudo: build
 	sudo bin/$(GONAME) --config=$(shell pwd)/smartctl_exporter.yaml --debug --verbose
 
-watch:
-	@$(MAKE) restart &
-	@fswatch -o . -e 'bin/.*' | xargs -n1 -I{}  make restart
-
-restart: clear stop clean build start
-
-start: build
-	@echo "Starting bin/$(GONAME)"
-	@./bin/$(GONAME) & echo $$! > $(PID)
-
-stop:
-	@echo "Stopping bin/$(GONAME) if it's running"
-	@-kill `[[ -f $(PID) ]] && cat $(PID)` 2>/dev/null || true
-
 clear:
 	@clear
 
 clean:
 	@echo "Cleaning"
 	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go clean
+
+example:
+	@echo "# Example output" > EXAMPLE.md
+	@echo "'''" >> EXAMPLE.md
+	@curl -s localhost:9633/metrics | grep smartctl >> EXAMPLE.md
+	@echo "'''" >> EXAMPLE.md

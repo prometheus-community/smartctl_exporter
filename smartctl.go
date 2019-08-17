@@ -49,6 +49,7 @@ func (smart *SMARTctl) Collect() {
 	smart.mineRotationRate()
 	smart.mineTemperatures()
 	smart.minePowerCycleCount()
+	smart.mineDeviceStatistics()
 }
 
 func (smart *SMARTctl) mineExitStatus() {
@@ -136,7 +137,15 @@ func (smart *SMARTctl) mineInterfaceSpeed() {
 func (smart *SMARTctl) mineDeviceAttribute() {
 	for _, attribute := range smart.json.Get("ata_smart_attributes.table").Array() {
 		name := strings.TrimSpace(attribute.Get("name").String())
-		flags := strings.TrimSpace(attribute.Get("flags.string").String())
+		flagsShort := strings.TrimSpace(attribute.Get("flags.string").String())
+		flagsLong := smart.mineLongFlags(attribute.Get("flags"), []string{
+			"prefailure",
+			"updated_online",
+			"performance",
+			"error_rate",
+			"event_count",
+			"auto_keep",
+		})
 		id := attribute.Get("id").String()
 		for key, path := range map[string]string{
 			"value":  "value",
@@ -153,7 +162,8 @@ func (smart *SMARTctl) mineDeviceAttribute() {
 				smart.device.model,
 				smart.device.serial,
 				name,
-				flags,
+				flagsShort,
+				flagsLong,
 				key,
 				id,
 			)
@@ -218,4 +228,41 @@ func (smart *SMARTctl) minePowerCycleCount() {
 		smart.device.model,
 		smart.device.serial,
 	)
+}
+
+func (smart *SMARTctl) mineDeviceStatistics() {
+	for _, page := range smart.json.Get("ata_device_statistics.pages").Array() {
+		table := strings.TrimSpace(page.Get("name").String())
+		for _, statistic := range page.Get("table").Array() {
+			smart.ch <- prometheus.MustNewConstMetric(
+				metricDeviceStatistics,
+				prometheus.GaugeValue,
+				statistic.Get("value").Float(),
+				smart.device.device,
+				smart.device.family,
+				smart.device.model,
+				smart.device.serial,
+				table,
+				strings.TrimSpace(statistic.Get("name").String()),
+				strings.TrimSpace(statistic.Get("flags.string").String()),
+				smart.mineLongFlags(statistic.Get("flags"), []string{
+					"valid",
+					"normalized",
+					"supports_dsn",
+					"monitored_condition_met",
+				}),
+			)
+		}
+	}
+}
+
+func (smart *SMARTctl) mineLongFlags(json gjson.Result, flags []string) string {
+	var result []string
+	for _, flag := range flags {
+		jFlag := json.Get(flag)
+		if jFlag.Exists() && jFlag.Bool() {
+			result = append(result, flag)
+		}
+	}
+	return strings.Join(result, ",")
 }
