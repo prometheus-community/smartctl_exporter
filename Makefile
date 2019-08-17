@@ -29,6 +29,6 @@ clean:
 
 example:
 	@echo "# Example output" > EXAMPLE.md
-	@echo "'''" >> EXAMPLE.md
+	@echo '```' >> EXAMPLE.md
 	@curl -s localhost:9633/metrics | grep smartctl >> EXAMPLE.md
-	@echo "'''" >> EXAMPLE.md
+	@echo '```' >> EXAMPLE.md
