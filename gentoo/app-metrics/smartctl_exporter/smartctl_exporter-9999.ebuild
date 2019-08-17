@@ -11,6 +11,7 @@ LICENSE="GPL-3"
 SLOT="0"
 RDEPEND="sys-apps/smartmontools"
 DEPEND="dev-lang/go"
+KEYWORDS="~amd64 ~ppc ~x86 ~arm"
 
 src_unpack() {
         git-r3_src_unpack
