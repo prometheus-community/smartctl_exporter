@@ -3,7 +3,7 @@
 # smartctl_exporter
 Export smartctl statistics to prometheus
 
-Example output you can show in EXAMPLE.md
+Example output you can show in [EXAMPLE.md](EXAMPLE.md)
 
 ## Need more?
 **If you need additional metrics - contact me :)**
