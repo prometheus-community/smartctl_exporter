@@ -9,6 +9,9 @@ Example output you can show in [EXAMPLE.md](EXAMPLE.md)
 **If you need additional metrics - contact me :)**
 **Create a feature request, describe the metric that you would like to have and attach exported from smartctl json file**
 
+# Requirements
+smartmontools >= 7.0, because export to json [released in 7.0](https://www.smartmontools.org/browser/tags/RELEASE_7_0/smartmontools/NEWS#L11)
+
 # Configuration
 ## Command line options
 * `--config=/path/to/file.yaml`: Path to configuration file, defaulr `/etc/smartctl_exporter.yaml`
