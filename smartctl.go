@@ -289,26 +289,26 @@ func (smart *SMARTctl) mineNvmeSmartHealthInformationLog() {
 		smart.device.model,
 		smart.device.serial,
 	)
-        smart.ch <- prometheus.MustNewConstMetric(
-                metricMediaErrors,
-                prometheus.GaugeValue,
-                iHealth.Get("media_errors").Float(),
-                smart.device.device,
-                smart.device.family,
-                smart.device.model,
-                smart.device.serial,
-        )
+	smart.ch <- prometheus.MustNewConstMetric(
+		metricMediaErrors,
+		prometheus.GaugeValue,
+		iHealth.Get("media_errors").Float(),
+		smart.device.device,
+		smart.device.family,
+		smart.device.model,
+		smart.device.serial,
+	)
 }
 
 func (smart *SMARTctl) mineNvmeSmartStatus() {
-        iStatus := smart.json.Get("smart_status")
-        smart.ch <- prometheus.MustNewConstMetric(
-                metricSmartStatus,
-                prometheus.GaugeValue,
-                iStatus.Get("passed").Float(),
-                smart.device.device,
-                smart.device.family,
-                smart.device.model,
-                smart.device.serial,
-        )
+	iStatus := smart.json.Get("smart_status")
+	smart.ch <- prometheus.MustNewConstMetric(
+		metricSmartStatus,
+		prometheus.GaugeValue,
+		iStatus.Get("passed").Float(),
+		smart.device.device,
+		smart.device.family,
+		smart.device.model,
+		smart.device.serial,
+	)
 }
