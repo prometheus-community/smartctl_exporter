@@ -271,6 +271,22 @@ func (smart *SMARTctl) mineDeviceStatistics() {
 			)
 		}
 	}
+
+	for _, statistic := range smart.json.Get("sata_phy_event_counters.table").Array() {
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricDeviceStatistics,
+			prometheus.GaugeValue,
+			statistic.Get("value").Float(),
+			smart.device.device,
+			smart.device.family,
+			smart.device.model,
+			smart.device.serial,
+			"SATA PHY Event Counters",
+			strings.TrimSpace(statistic.Get("name").String()),
+			"",
+			"",
+		)
+	}
 }
 
 func (smart *SMARTctl) mineLongFlags(json gjson.Result, flags []string) string {
