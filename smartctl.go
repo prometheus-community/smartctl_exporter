@@ -54,6 +54,7 @@ func (smart *SMARTctl) Collect() {
 	smart.mineDeviceStatus()
 	smart.mineDeviceErrorLog()
 	smart.mineDeviceSelfTestLog()
+	smart.mineDeviceERC()
 }
 
 func (smart *SMARTctl) mineExitStatus() {
@@ -351,6 +352,21 @@ func (smart *SMARTctl) mineDeviceSelfTestLog() {
 			smart.device.model,
 			smart.device.serial,
 			logType,
+		)
+	}
+}
+
+func (smart *SMARTctl) mineDeviceERC() {
+	for ercType, status := range smart.json.Get("ata_sct_erc").Map() {
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricDeviceERCSeconds,
+			prometheus.GaugeValue,
+			status.Get("deciseconds").Float()/10.0,
+			smart.device.device,
+			smart.device.family,
+			smart.device.model,
+			smart.device.serial,
+			ercType,
 		)
 	}
 }

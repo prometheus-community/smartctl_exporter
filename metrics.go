@@ -224,4 +224,16 @@ var (
 		},
 		nil,
 	)
+	metricDeviceERCSeconds = prometheus.NewDesc(
+		"smartctl_device_erc_seconds",
+		"Device SMART Error Recovery Control Seconds",
+		[]string{
+			"device",
+			"model_family",
+			"model_name",
+			"serial_number",
+			"op_type",
+		},
+		nil,
+	)
 )
