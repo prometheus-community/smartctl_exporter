@@ -151,6 +151,17 @@ var (
 		},
 		nil,
 	)
+	metricDeviceState = prometheus.NewDesc(
+		"smartctl_device_state",
+		"Device state (0=active, 1=standby, 2=sleep, 3=dst, 4=offline, 5=sct)",
+		[]string{
+			"device",
+			"model_family",
+			"model_name",
+			"serial_number",
+		},
+		nil,
+	)
 	metricDeviceStatistics = prometheus.NewDesc(
 		"smartctl_device_statistics",
 		"Device statistics",

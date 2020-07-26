@@ -49,6 +49,7 @@ func (smart *SMARTctl) Collect() {
 	smart.mineRotationRate()
 	smart.mineTemperatures()
 	smart.minePowerCycleCount()
+	smart.mineDeviceSCTStatus()
 	smart.mineDeviceStatistics()
 	smart.mineDeviceStatus()
 }
@@ -229,6 +230,21 @@ func (smart *SMARTctl) minePowerCycleCount() {
 		smart.device.model,
 		smart.device.serial,
 	)
+}
+
+func (smart *SMARTctl) mineDeviceSCTStatus() {
+	status := smart.json.Get("ata_sct_status")
+	if status.Exists() {
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricDeviceState,
+			prometheus.GaugeValue,
+			status.Get("device_state").Float(),
+			smart.device.device,
+			smart.device.family,
+			smart.device.model,
+			smart.device.serial,
+		)
+	}
 }
 
 func (smart *SMARTctl) mineDeviceStatistics() {
