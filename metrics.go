@@ -188,4 +188,16 @@ var (
 		},
 		nil,
 	)
+	metricDeviceErrorLogCount = prometheus.NewDesc(
+		"smartctl_device_error_log_count",
+		"Device SMART error log count",
+		[]string{
+			"device",
+			"model_family",
+			"model_name",
+			"serial_number",
+			"error_log_type",
+		},
+		nil,
+	)
 )
