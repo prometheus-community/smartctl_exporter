@@ -50,6 +50,7 @@ func (smart *SMARTctl) Collect() {
 	smart.mineTemperatures()
 	smart.minePowerCycleCount()
 	smart.mineDeviceStatistics()
+	smart.mineDeviceStatus()
 }
 
 func (smart *SMARTctl) mineExitStatus() {
@@ -265,4 +266,17 @@ func (smart *SMARTctl) mineLongFlags(json gjson.Result, flags []string) string {
 		}
 	}
 	return strings.Join(result, ",")
+}
+
+func (smart *SMARTctl) mineDeviceStatus() {
+	status := smart.json.Get("smart_status")
+	smart.ch <- prometheus.MustNewConstMetric(
+		metricDeviceStatus,
+		prometheus.GaugeValue,
+		status.Get("passed").Float(),
+		smart.device.device,
+		smart.device.family,
+		smart.device.model,
+		smart.device.serial,
+	)
 }

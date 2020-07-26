@@ -166,4 +166,15 @@ var (
 		},
 		nil,
 	)
+	metricDeviceStatus = prometheus.NewDesc(
+		"smartctl_device_status",
+		"Device status",
+		[]string{
+			"device",
+			"model_family",
+			"model_name",
+			"serial_number",
+		},
+		nil,
+	)
 )
