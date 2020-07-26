@@ -286,8 +286,8 @@ func (smart *SMARTctl) mineDeviceStatistics() {
 			smart.device.serial,
 			"SATA PHY Event Counters",
 			strings.TrimSpace(statistic.Get("name").String()),
-			"",
-			"",
+			"V---",
+			"valid",
 		)
 	}
 }
