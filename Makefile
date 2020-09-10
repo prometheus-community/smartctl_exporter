@@ -16,11 +16,11 @@ build-win:
 build-linux:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GOBUILD) -o $(BINARY_DIR)/$(BINARY_NAME)-linux
 # FreeBSD
-build-freeBSD:
-	CGO_ENABLED=0 GOOS=freeBSD GOARCH=amd64 $(GOBUILD) -o $(BINARY_DIR)/$(BINARY_NAME)-freeBSD
+build-freebsd:
+	CGO_ENABLED=0 GOOS=freebsd GOARCH=amd64 $(GOBUILD) -o $(BINARY_DIR)/$(BINARY_NAME)-freebsd
 # 全平台
 build-all:
 	make build
 	make build-win
 	make build-linux
-	make build-freeBSD
+	make build-freebsd

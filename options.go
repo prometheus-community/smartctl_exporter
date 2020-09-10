@@ -4,14 +4,18 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
+	"os/exec"
+	"strings"
 	"time"
 
 	yaml "gopkg.in/yaml.v2"
 )
 
 var (
-	exporterVersion = "0.5"
+	exporterVersion = "v0.1"
+	OSCommand string
 )
 
 // SMARTOptions is a inner representation of a options
@@ -19,7 +23,7 @@ type SMARTOptions struct {
 	BindTo                string `yaml:"bind_to"`
 	URLPath               string `yaml:"url_path"`
 	FakeJSON              bool   `yaml:"fake_json"`
-	SMARTctlLocation      string `yaml:"smartctl_location"`
+	//SMARTctlLocation      string `yaml:"smartctl_location"`
 	CollectPeriod         string `yaml:"collect_not_more_than_period"`
 	CollectPeriodDuration time.Duration
 	Devices               []string `yaml:"devices"`
@@ -30,6 +34,15 @@ type Options struct {
 	SMARTctl SMARTOptions `yaml:"smartctl_exporter"`
 }
 
+func GetOSCommand()  {
+	cmd,err:=exec.Command("which","smartctl").Output()
+	if err!=nil {
+		log.Panic("系统为安装命令")
+	}
+
+
+	OSCommand=strings.Split(string(cmd),"\n")[0]
+}
 // Parse options from yaml config file
 func loadOptions() Options {
 	configFile := flag.String("config", "/etc/smartctl_exporter.yaml", "Path to smartctl_exporter config file")
@@ -56,7 +69,7 @@ func loadOptions() Options {
 			BindTo:           "9633",
 			URLPath:          "/metrics",
 			FakeJSON:         false,
-			SMARTctlLocation: "/usr/sbin/smartctl",
+			//SMARTctlLocation: OSCommand,
 			CollectPeriod:    "60s",
 			Devices:          []string{},
 		},

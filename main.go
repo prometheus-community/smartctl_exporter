@@ -36,6 +36,7 @@ func (i SMARTctlManagerCollector) Collect(ch chan<- prometheus.Metric) {
 
 func init() {
 	options = loadOptions()
+	GetOSCommand()
 }
 
 func main() {

@@ -48,7 +48,7 @@ func readFakeSMARTctl(device string) gjson.Result {
 // Get json from smartctl and parse it
 func readSMARTctl(device string) gjson.Result {
 	logger.Debug("Collecting S.M.A.R.T. counters, device: %s", device)
-	out, err := exec.Command(options.SMARTctl.SMARTctlLocation, "--json", "--xall", device).Output()
+	out, err := exec.Command(OSCommand, "--json", "--xall", device).Output()
 	if err != nil {
 		logger.Warning("S.M.A.R.T. output reading error: %s", err)
 	}
