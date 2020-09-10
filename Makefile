@@ -1,33 +1,26 @@
-GOPATH=$(shell pwd)/vendor:$(shell pwd)
-GOBIN=$(shell pwd)/bin
-GOFILES=$(wildcard *.go)
-GONAME=$(shell basename "$(PWD)")
+GOCMD:=$(shell which go)
+GOBUILD:=$(GOCMD) build
 
-build: get
-	@echo "Building $(GOFILES) to ./bin"
-	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go build -v -o bin/$(GONAME) $(GOFILES)
+PACKAGES_URL:=$(github.com/YouCD/smartctl_exporter)
 
-get:
-	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go get -v .
+BINARY_DIR=bin
+BINARY_NAME:=smartctl_exporter
 
-install:
-	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go install $(GOFILES)
-
-run: build
-	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go run $(GOFILES) --config=$(shell pwd)/smartctl_exporter.yaml --debug --verbose
-
-run-sudo: build
-	sudo bin/$(GONAME) --config=$(shell pwd)/smartctl_exporter.yaml --debug --verbose
-
-clear:
-	@clear
-
-clean:
-	@echo "Cleaning"
-	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go clean
-
-example:
-	@echo "# Example output" > EXAMPLE.md
-	@echo '```' >> EXAMPLE.md
-	@curl -s localhost:9633/metrics | grep smartctl >> EXAMPLE.md
-	@echo '```' >> EXAMPLE.md
+#mac
+build:
+	CGO_ENABLED=0 $(GOBUILD) -o $(BINARY_DIR)/$(BINARY_NAME)-mac
+# windows
+build-win:
+	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 $(GOBUILD) -o $(BINARY_DIR)/$(BINARY_NAME)-win.exe
+# linux
+build-linux:
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GOBUILD) -o $(BINARY_DIR)/$(BINARY_NAME)-linux
+# FreeBSD
+build-freeBSD:
+	CGO_ENABLED=0 GOOS=freeBSD GOARCH=amd64 $(GOBUILD) -o $(BINARY_DIR)/$(BINARY_NAME)-freeBSD
+# 全平台
+build-all:
+	make build
+	make build-win
+	make build-linux
+	make build-freeBSD

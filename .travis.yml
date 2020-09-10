@@ -1,0 +1,19 @@
+language: go
+
+go:
+  - 1.13.x
+env:
+  - GO111MODULE=on # 启用Go mod
+install:
+  - go get -v
+before_deploy: make build-all # 发布前执行生成二进制文件的命令
+deploy:
+  provider: releases
+  api_key: ${GITHUB_TOKEN}
+  file_glob: true
+  file: bin/*
+  skip_cleanup: true
+  on:
+    repo: YouCD/smartctl_exporter
+    # tag才触发发布
+    tags: true
