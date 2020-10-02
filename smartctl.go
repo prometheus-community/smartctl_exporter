@@ -56,8 +56,8 @@ func (smart *SMARTctl) Collect() {
 	smart.mineCriticalWarning()
 	smart.mineMediaErrors()
 	smart.mineNumErrLogEntries()
-	smart.mineDataUnitsRead()
-	smart.mineDataUnitsWritten()
+	smart.mineBytesRead()
+	smart.mineBytesWritten()
 	smart.mineSmartStatus()
 
 }
@@ -312,10 +312,10 @@ func (smart *SMARTctl) mineNumErrLogEntries() {
 	)
 }
 
-func (smart *SMARTctl) mineDataUnitsRead() {
-	blockSize := smart.json.Get("logical_block_size").Float()
+func (smart *SMARTctl) mineBytesRead() {
+	blockSize := smart.json.Get("logical_block_size").Float() * 1024
 	smart.ch <- prometheus.MustNewConstMetric(
-		metricDeviceDataUnitsRead,
+		metricDeviceBytesRead,
 		prometheus.CounterValue,
 		smart.json.Get("nvme_smart_health_information_log.data_units_read").Float() * blockSize,
 		smart.device.device,
@@ -325,10 +325,10 @@ func (smart *SMARTctl) mineDataUnitsRead() {
 	)
 }
 
-func (smart *SMARTctl) mineDataUnitsWritten() {
-	blockSize := smart.json.Get("logical_block_size").Float()
+func (smart *SMARTctl) mineBytesWritten() {
+	blockSize := smart.json.Get("logical_block_size").Float() * 1024
 	smart.ch <- prometheus.MustNewConstMetric(
-		metricDeviceDataUnitsWritten,
+		metricDeviceBytesWritten,
 		prometheus.CounterValue,
 		smart.json.Get("nvme_smart_health_information_log.data_units_written").Float() * blockSize,
 		smart.device.device,

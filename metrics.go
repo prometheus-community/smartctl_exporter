@@ -206,8 +206,8 @@ var (
 		},
 		nil,
 	)
-	metricDeviceDataUnitsRead = prometheus.NewDesc(
-		"smartctl_device_data_units_read",
+	metricDeviceBytesRead = prometheus.NewDesc(
+		"smartctl_device_bytes_read",
 		"",
 		[]string{
 			"device",
@@ -217,8 +217,8 @@ var (
 		},
 		nil,
 	)
-	metricDeviceDataUnitsWritten = prometheus.NewDesc(
-		"smartctl_device_data_units_written",
+	metricDeviceBytesWritten = prometheus.NewDesc(
+		"smartctl_device_bytes_written",
 		"",
 		[]string{
 			"device",
