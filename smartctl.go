@@ -50,6 +50,8 @@ func (smart *SMARTctl) Collect() {
 	smart.mineTemperatures()
 	smart.minePowerCycleCount()
 	smart.mineDeviceStatistics()
+	smart.mineNvmeSmartHealthInformationLog()
+	smart.mineNvmeSmartStatus()
 }
 
 func (smart *SMARTctl) mineExitStatus() {
@@ -265,4 +267,48 @@ func (smart *SMARTctl) mineLongFlags(json gjson.Result, flags []string) string {
 		}
 	}
 	return strings.Join(result, ",")
+}
+
+func (smart *SMARTctl) mineNvmeSmartHealthInformationLog() {
+	iHealth := smart.json.Get("nvme_smart_health_information_log")
+	smart.ch <- prometheus.MustNewConstMetric(
+		metricCriticalWarning,
+		prometheus.GaugeValue,
+		iHealth.Get("critical_warning").Float(),
+		smart.device.device,
+		smart.device.family,
+		smart.device.model,
+		smart.device.serial,
+	)
+	smart.ch <- prometheus.MustNewConstMetric(
+		metricAvailableSpare,
+		prometheus.GaugeValue,
+		iHealth.Get("available_spare").Float(),
+		smart.device.device,
+		smart.device.family,
+		smart.device.model,
+		smart.device.serial,
+	)
+	smart.ch <- prometheus.MustNewConstMetric(
+		metricMediaErrors,
+		prometheus.GaugeValue,
+		iHealth.Get("media_errors").Float(),
+		smart.device.device,
+		smart.device.family,
+		smart.device.model,
+		smart.device.serial,
+	)
+}
+
+func (smart *SMARTctl) mineNvmeSmartStatus() {
+	iStatus := smart.json.Get("smart_status")
+	smart.ch <- prometheus.MustNewConstMetric(
+		metricSmartStatus,
+		prometheus.GaugeValue,
+		iStatus.Get("passed").Float(),
+		smart.device.device,
+		smart.device.family,
+		smart.device.model,
+		smart.device.serial,
+	)
 }

@@ -166,4 +166,48 @@ var (
 		},
 		nil,
 	)
+	metricCriticalWarning = prometheus.NewDesc(
+		"critical_warning",
+		"Critical warning counter",
+		[]string{
+			"device",
+			"model_family",
+			"model_name",
+			"serial_number",
+		},
+		nil,
+	)
+	metricAvailableSpare = prometheus.NewDesc(
+		"available_spare",
+		"Available spare",
+		[]string{
+			"device",
+			"model_family",
+			"model_name",
+			"serial_number",
+		},
+		nil,
+	)
+	metricMediaErrors = prometheus.NewDesc(
+		"media_errors",
+		"Media errors counter",
+		[]string{
+			"device",
+			"model_family",
+			"model_name",
+			"serial_number",
+		},
+		nil,
+	)
+	metricSmartStatus = prometheus.NewDesc(
+		"smart_status",
+		"Smart status",
+		[]string{
+			"device",
+			"model_family",
+			"model_name",
+			"serial_number",
+		},
+		nil,
+	)
 )
