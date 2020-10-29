@@ -31,3 +31,8 @@ example:
 	@echo '```' >> EXAMPLE.md
 	@curl -s localhost:9633/metrics | grep smartctl >> EXAMPLE.md
 	@echo '```' >> EXAMPLE.md
+
+collect_fake_json:
+	-mkdir debug
+	-rm -f debug/*json
+	sudo ./collect_fake_json.sh

@@ -34,12 +34,12 @@ func NewSMARTctl(json gjson.Result, ch chan<- prometheus.Metric) SMARTctl {
 		family: strings.TrimSpace(smart.json.Get("model_family").String()),
 		model:  strings.TrimSpace(smart.json.Get("model_name").String()),
 	}
-	logger.Verbose("Collecting metrics from %s: %s, %s", smart.device.device, smart.device.family, smart.device.model)
 	return smart
 }
 
 // Collect metrics
 func (smart *SMARTctl) Collect() {
+	logger.Verbose("Collecting metrics from %s: %s, %s", smart.device.device, smart.device.family, smart.device.model)
 	smart.mineExitStatus()
 	smart.mineDevice()
 	smart.mineCapacity()

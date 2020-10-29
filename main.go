@@ -26,10 +26,13 @@ func (i SMARTctlManagerCollector) Describe(ch chan<- *prometheus.Desc) {
 func (i SMARTctlManagerCollector) Collect(ch chan<- prometheus.Metric) {
 	info := NewSMARTctlInfo(ch)
 	for _, device := range options.SMARTctl.Devices {
-		json := readData(device)
-		info.SetJSON(json)
-		smart := NewSMARTctl(json, ch)
-		smart.Collect()
+		if json, err := readData(device); err == nil {
+			info.SetJSON(json)
+			smart := NewSMARTctl(json, ch)
+			smart.Collect()
+		} else {
+			logger.Error(err.Error())
+		}
 	}
 	info.Collect()
 }
