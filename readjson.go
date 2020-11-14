@@ -59,6 +59,15 @@ func readSMARTctl(device string) (gjson.Result, bool) {
 	return json, rcOk && jsonOk
 }
 
+func readSMARTctlDevices() gjson.Result {
+	logger.Debug("Collecting devices")
+	out, err := exec.Command(options.SMARTctl.SMARTctlLocation, "--json", "--scan-open").Output()
+	if err != nil {
+		logger.Warning("S.M.A.R.T. output reading error: %s", err)
+	}
+	return parseJSON(string(out))
+}
+
 // Select json source and parse
 func readData(device string) (gjson.Result, error) {
 	if options.SMARTctl.FakeJSON {

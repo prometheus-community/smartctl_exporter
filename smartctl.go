@@ -49,9 +49,24 @@ func (smart *SMARTctl) Collect() {
 	smart.mineRotationRate()
 	smart.mineTemperatures()
 	smart.minePowerCycleCount()
+	smart.mineDeviceSCTStatus()
 	smart.mineDeviceStatistics()
 	smart.mineNvmeSmartHealthInformationLog()
 	smart.mineNvmeSmartStatus()
+	smart.mineDeviceStatus()
+	smart.mineDeviceErrorLog()
+	smart.mineDeviceSelfTestLog()
+	smart.mineDeviceERC()
+	smart.minePercentageUsed()
+	smart.mineAvailableSpare()
+	smart.mineAvailableSpareThreshold()
+	smart.mineCriticalWarning()
+	smart.mineMediaErrors()
+	smart.mineNumErrLogEntries()
+	smart.mineBytesRead()
+	smart.mineBytesWritten()
+	smart.mineSmartStatus()
+
 }
 
 func (smart *SMARTctl) mineExitStatus() {
@@ -232,6 +247,131 @@ func (smart *SMARTctl) minePowerCycleCount() {
 	)
 }
 
+func (smart *SMARTctl) mineDeviceSCTStatus() {
+	status := smart.json.Get("ata_sct_status")
+	if status.Exists() {
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricDeviceState,
+			prometheus.GaugeValue,
+			status.Get("device_state").Float(),
+			smart.device.device,
+			smart.device.family,
+			smart.device.model,
+			smart.device.serial,
+		)
+	}
+}
+
+func (smart *SMARTctl) minePercentageUsed() {
+	smart.ch <- prometheus.MustNewConstMetric(
+		metricDevicePercentageUsed,
+		prometheus.CounterValue,
+		smart.json.Get("nvme_smart_health_information_log.percentage_used").Float(),
+		smart.device.device,
+		smart.device.family,
+		smart.device.model,
+		smart.device.serial,
+	)
+}
+
+func (smart *SMARTctl) mineAvailableSpare() {
+	smart.ch <- prometheus.MustNewConstMetric(
+		metricDeviceAvailableSpare,
+		prometheus.CounterValue,
+		smart.json.Get("nvme_smart_health_information_log.available_spare").Float(),
+		smart.device.device,
+		smart.device.family,
+		smart.device.model,
+		smart.device.serial,
+	)
+}
+
+func (smart *SMARTctl) mineAvailableSpareThreshold() {
+	smart.ch <- prometheus.MustNewConstMetric(
+		metricDeviceAvailableSpareThreshold,
+		prometheus.CounterValue,
+		smart.json.Get("nvme_smart_health_information_log.available_spare_threshold").Float(),
+		smart.device.device,
+		smart.device.family,
+		smart.device.model,
+		smart.device.serial,
+	)
+}
+
+func (smart *SMARTctl) mineCriticalWarning() {
+	smart.ch <- prometheus.MustNewConstMetric(
+		metricDeviceCriticalWarning,
+		prometheus.CounterValue,
+		smart.json.Get("nvme_smart_health_information_log.critical_warning").Float(),
+		smart.device.device,
+		smart.device.family,
+		smart.device.model,
+		smart.device.serial,
+	)
+}
+
+func (smart *SMARTctl) mineMediaErrors() {
+	smart.ch <- prometheus.MustNewConstMetric(
+		metricDeviceMediaErrors,
+		prometheus.CounterValue,
+		smart.json.Get("nvme_smart_health_information_log.media_errors").Float(),
+		smart.device.device,
+		smart.device.family,
+		smart.device.model,
+		smart.device.serial,
+	)
+}
+
+func (smart *SMARTctl) mineNumErrLogEntries() {
+	smart.ch <- prometheus.MustNewConstMetric(
+		metricDeviceNumErrLogEntries,
+		prometheus.CounterValue,
+		smart.json.Get("nvme_smart_health_information_log.num_err_log_entries").Float(),
+		smart.device.device,
+		smart.device.family,
+		smart.device.model,
+		smart.device.serial,
+	)
+}
+
+func (smart *SMARTctl) mineBytesRead() {
+	blockSize := smart.json.Get("logical_block_size").Float() * 1024
+	smart.ch <- prometheus.MustNewConstMetric(
+		metricDeviceBytesRead,
+		prometheus.CounterValue,
+		smart.json.Get("nvme_smart_health_information_log.data_units_read").Float()*blockSize,
+		smart.device.device,
+		smart.device.family,
+		smart.device.model,
+		smart.device.serial,
+	)
+}
+
+func (smart *SMARTctl) mineBytesWritten() {
+	blockSize := smart.json.Get("logical_block_size").Float() * 1024
+	smart.ch <- prometheus.MustNewConstMetric(
+		metricDeviceBytesWritten,
+		prometheus.CounterValue,
+		smart.json.Get("nvme_smart_health_information_log.data_units_written").Float()*blockSize,
+		smart.device.device,
+		smart.device.family,
+		smart.device.model,
+		smart.device.serial,
+	)
+}
+
+func (smart *SMARTctl) mineSmartStatus() {
+	smart.ch <- prometheus.MustNewConstMetric(
+		metricDeviceSmartStatus,
+		prometheus.GaugeValue,
+		smart.json.Get("smart_status.passed").Float(),
+		smart.device.device,
+		smart.device.family,
+		smart.device.model,
+		smart.device.serial,
+	)
+}
+
 func (smart *SMARTctl) mineDeviceStatistics() {
 	for _, page := range smart.json.Get("ata_device_statistics.pages").Array() {
 		table := strings.TrimSpace(page.Get("name").String())
@@ -255,6 +395,22 @@ func (smart *SMARTctl) mineDeviceStatistics() {
 				}),
 			)
 		}
+	}
+
+	for _, statistic := range smart.json.Get("sata_phy_event_counters.table").Array() {
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricDeviceStatistics,
+			prometheus.GaugeValue,
+			statistic.Get("value").Float(),
+			smart.device.device,
+			smart.device.family,
+			smart.device.model,
+			smart.device.serial,
+			"SATA PHY Event Counters",
+			strings.TrimSpace(statistic.Get("name").String()),
+			"V---",
+			"valid",
+		)
 	}
 }
 
@@ -300,6 +456,19 @@ func (smart *SMARTctl) mineNvmeSmartHealthInformationLog() {
 	)
 }
 
+func (smart *SMARTctl) mineDeviceStatus() {
+	status := smart.json.Get("smart_status")
+	smart.ch <- prometheus.MustNewConstMetric(
+		metricDeviceStatus,
+		prometheus.GaugeValue,
+		status.Get("passed").Float(),
+		smart.device.device,
+		smart.device.family,
+		smart.device.model,
+		smart.device.serial,
+	)
+}
+
 func (smart *SMARTctl) mineNvmeSmartStatus() {
 	iStatus := smart.json.Get("smart_status")
 	smart.ch <- prometheus.MustNewConstMetric(
@@ -311,4 +480,59 @@ func (smart *SMARTctl) mineNvmeSmartStatus() {
 		smart.device.model,
 		smart.device.serial,
 	)
+}
+
+func (smart *SMARTctl) mineDeviceErrorLog() {
+	for logType, status := range smart.json.Get("ata_smart_error_log").Map() {
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricDeviceErrorLogCount,
+			prometheus.GaugeValue,
+			status.Get("count").Float(),
+			smart.device.device,
+			smart.device.family,
+			smart.device.model,
+			smart.device.serial,
+			logType,
+		)
+	}
+}
+
+func (smart *SMARTctl) mineDeviceSelfTestLog() {
+	for logType, status := range smart.json.Get("ata_smart_self_test_log").Map() {
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricDeviceSelfTestLogCount,
+			prometheus.GaugeValue,
+			status.Get("count").Float(),
+			smart.device.device,
+			smart.device.family,
+			smart.device.model,
+			smart.device.serial,
+			logType,
+		)
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricDeviceSelfTestLogErrorCount,
+			prometheus.GaugeValue,
+			status.Get("error_count_total").Float(),
+			smart.device.device,
+			smart.device.family,
+			smart.device.model,
+			smart.device.serial,
+			logType,
+		)
+	}
+}
+
+func (smart *SMARTctl) mineDeviceERC() {
+	for ercType, status := range smart.json.Get("ata_sct_erc").Map() {
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricDeviceERCSeconds,
+			prometheus.GaugeValue,
+			status.Get("deciseconds").Float()/10.0,
+			smart.device.device,
+			smart.device.family,
+			smart.device.model,
+			smart.device.serial,
+			ercType,
+		)
+	}
 }
