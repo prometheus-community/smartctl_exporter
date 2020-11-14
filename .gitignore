@@ -3,3 +3,5 @@ bin
 *.json
 
 Manifest
+.idea
+smartctl_exporter
