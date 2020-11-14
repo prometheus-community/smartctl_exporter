@@ -151,6 +151,17 @@ var (
 		},
 		nil,
 	)
+	metricDeviceState = prometheus.NewDesc(
+		"smartctl_device_state",
+		"Device state (0=active, 1=standby, 2=sleep, 3=dst, 4=offline, 5=sct)",
+		[]string{
+			"device",
+			"model_family",
+			"model_name",
+			"serial_number",
+		},
+		nil,
+	)
 	metricDeviceStatistics = prometheus.NewDesc(
 		"smartctl_device_statistics",
 		"Device statistics",
@@ -177,6 +188,17 @@ var (
 		},
 		nil,
 	)
+	metricDeviceStatus = prometheus.NewDesc(
+		"smartctl_device_status",
+		"Device status",
+		[]string{
+			"device",
+			"model_family",
+			"model_name",
+			"serial_number",
+		},
+		nil,
+	)
 	metricAvailableSpare = prometheus.NewDesc(
 		"available_spare",
 		"Available spare",
@@ -185,6 +207,18 @@ var (
 			"model_family",
 			"model_name",
 			"serial_number",
+		},
+		nil,
+	)
+	metricDeviceErrorLogCount = prometheus.NewDesc(
+		"smartctl_device_error_log_count",
+		"Device SMART error log count",
+		[]string{
+			"device",
+			"model_family",
+			"model_name",
+			"serial_number",
+			"error_log_type",
 		},
 		nil,
 	)
@@ -199,6 +233,18 @@ var (
 		},
 		nil,
 	)
+	metricDeviceSelfTestLogCount = prometheus.NewDesc(
+		"smartctl_device_self_test_log_count",
+		"Device SMART self test log count",
+		[]string{
+			"device",
+			"model_family",
+			"model_name",
+			"serial_number",
+			"self_test_log_type",
+		},
+		nil,
+	)
 	metricSmartStatus = prometheus.NewDesc(
 		"smart_status",
 		"Smart status",
@@ -207,6 +253,30 @@ var (
 			"model_family",
 			"model_name",
 			"serial_number",
+		},
+		nil,
+	)
+	metricDeviceSelfTestLogErrorCount = prometheus.NewDesc(
+		"smartctl_device_self_test_log_error_count",
+		"Device SMART self test log error count",
+		[]string{
+			"device",
+			"model_family",
+			"model_name",
+			"serial_number",
+			"self_test_log_type",
+		},
+		nil,
+	)
+	metricDeviceERCSeconds = prometheus.NewDesc(
+		"smartctl_device_erc_seconds",
+		"Device SMART Error Recovery Control Seconds",
+		[]string{
+			"device",
+			"model_family",
+			"model_name",
+			"serial_number",
+			"op_type",
 		},
 		nil,
 	)
