@@ -79,11 +79,9 @@ func readData(device string) (gjson.Result, error) {
 		timeToScan := false
 		if cacheOk {
 			timeToScan = time.Now().After(cacheValue.LastCollect.Add(options.SMARTctl.CollectPeriodDuration))
-		} else {
-			timeToScan = true
 		}
 
-		if timeToScan {
+		if timeToScan || !cacheOk {
 			json, ok := readSMARTctl(device)
 			if ok {
 				jsonCache[device] = JSONCache{JSON: json, LastCollect: time.Now()}
@@ -91,7 +89,7 @@ func readData(device string) (gjson.Result, error) {
 			}
 			return gjson.Parse("{}"), fmt.Errorf("smartctl returned bad data for device %s", device)
 		}
-		return gjson.Parse("{}"), fmt.Errorf("Too early collect called for device %s", device)
+		return cacheValue.JSON, nil
 	}
 	return gjson.Parse("{}"), fmt.Errorf("Device %s unavialable", device)
 }
