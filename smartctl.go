@@ -66,7 +66,8 @@ func (smart *SMARTctl) Collect() {
 	smart.mineBytesRead()
 	smart.mineBytesWritten()
 	smart.mineSmartStatus()
-
+	smart.mineSCSIGrownDefectList()
+	smart.mineSCSIErrorCounterLog()
 }
 
 func (smart *SMARTctl) mineExitStatus() {
@@ -533,6 +534,63 @@ func (smart *SMARTctl) mineDeviceERC() {
 			smart.device.model,
 			smart.device.serial,
 			ercType,
+		)
+	}
+}
+
+func (smart *SMARTctl) mineSCSIGrownDefectList() {
+	scsi_grown_defect_list := smart.json.Get("scsi_grown_defect_list")
+	if scsi_grown_defect_list.Exists() {
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricSCSIGrownDefectList,
+			prometheus.CounterValue,
+			scsi_grown_defect_list.Float(),
+			smart.device.device,
+			smart.device.family,
+			smart.device.model,
+			smart.device.serial,
+		)
+	}
+}
+
+func (smart *SMARTctl) mineSCSIErrorCounterLog() {
+	SCSIHealth := smart.json.Get("scsi_error_counter_log")
+	if SCSIHealth.Exists() {
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricReadErrorsCorrectedByRereadsRewrites,
+			prometheus.CounterValue,
+			SCSIHealth.Get("read.errors_corrected_by_rereads_rewrites").Float(),
+			smart.device.device,
+			smart.device.family,
+			smart.device.model,
+			smart.device.serial,
+		)
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricReadTotalUncorrectedErrors,
+			prometheus.CounterValue,
+			SCSIHealth.Get("read.total_uncorrected_errors").Float(),
+			smart.device.device,
+			smart.device.family,
+			smart.device.model,
+			smart.device.serial,
+		)
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricWriteErrorsCorrectedByRereadsRewrites,
+			prometheus.CounterValue,
+			SCSIHealth.Get("write.errors_corrected_by_rereads_rewrites").Float(),
+			smart.device.device,
+			smart.device.family,
+			smart.device.model,
+			smart.device.serial,
+		)
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricWriteTotalUncorrectedErrors,
+			prometheus.CounterValue,
+			SCSIHealth.Get("write.total_uncorrected_errors").Float(),
+			smart.device.device,
+			smart.device.family,
+			smart.device.model,
+			smart.device.serial,
 		)
 	}
 }

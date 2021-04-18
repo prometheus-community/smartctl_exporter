@@ -379,4 +379,59 @@ var (
 		},
 		nil,
 	)
+	metricSCSIGrownDefectList = prometheus.NewDesc(
+		"smartctl_scsi_grown_defect_list",
+		"Device SCSI grown defect list counter",
+		[]string{
+			"device",
+			"model_family",
+			"model_name",
+			"serial_number",
+		},
+		nil,
+	)
+	metricReadErrorsCorrectedByRereadsRewrites = prometheus.NewDesc(
+		"smartctl_read_errors_corrected_by_rereads_rewrites",
+		"Read Errors Corrected by ReReads/ReWrites",
+		[]string{
+			"device",
+			"model_family",
+			"model_name",
+			"serial_number",
+		},
+		nil,
+	)
+	metricReadTotalUncorrectedErrors = prometheus.NewDesc(
+		"smartctl_read_total_uncorrected_errors",
+		"Read Total Uncorrected Errors",
+		[]string{
+			"device",
+			"model_family",
+			"model_name",
+			"serial_number",
+		},
+		nil,
+	)
+	metricWriteErrorsCorrectedByRereadsRewrites = prometheus.NewDesc(
+		"smartctl_write_errors_corrected_by_rereads_rewrites",
+		"Write Errors Corrected by ReReads/ReWrites",
+		[]string{
+			"device",
+			"model_family",
+			"model_name",
+			"serial_number",
+		},
+		nil,
+	)
+	metricWriteTotalUncorrectedErrors = prometheus.NewDesc(
+		"smartctl_write_total_uncorrected_errors",
+		"Write Total Uncorrected Errors",
+		[]string{
+			"device",
+			"model_family",
+			"model_name",
+			"serial_number",
+		},
+		nil,
+	)
 )
