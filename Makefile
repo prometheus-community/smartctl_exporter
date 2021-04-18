@@ -7,6 +7,10 @@ build: get
 	@echo "Building $(GOFILES) to ./bin"
 	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go build -v -o bin/$(GONAME) $(GOFILES)
 
+build-static:
+	@echo "Building $(GOFILES) to ./bin"
+	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -mod=mod -a -tags netgo -ldflags '-w -extldflags "-static"' -o bin/smartctl_exporter_static *.go
+
 get:
 	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go get -v .
 
