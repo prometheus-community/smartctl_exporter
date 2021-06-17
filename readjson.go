@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/tidwall/gjson"
@@ -18,11 +19,11 @@ type JSONCache struct {
 }
 
 var (
-	jsonCache map[string]JSONCache
+	jsonCache sync.Map
 )
 
 func init() {
-	jsonCache = make(map[string]JSONCache)
+	jsonCache.Store("", JSONCache{})
 }
 
 // Parse json to gjson object
@@ -75,10 +76,10 @@ func readData(device string) (gjson.Result, error) {
 	}
 
 	if _, err := os.Stat(device); err == nil {
-		cacheValue, cacheOk := jsonCache[device]
+		cacheValue, cacheOk := jsonCache.Load(device)
 		timeToScan := false
 		if cacheOk {
-			timeToScan = time.Now().After(cacheValue.LastCollect.Add(options.SMARTctl.CollectPeriodDuration))
+			timeToScan = time.Now().After(cacheValue.(JSONCache).LastCollect.Add(options.SMARTctl.CollectPeriodDuration))
 		} else {
 			timeToScan = true
 		}
@@ -86,8 +87,12 @@ func readData(device string) (gjson.Result, error) {
 		if timeToScan {
 			json, ok := readSMARTctl(device)
 			if ok {
-				jsonCache[device] = JSONCache{JSON: json, LastCollect: time.Now()}
-				return jsonCache[device].JSON, nil
+				jsonCache.Store(device, JSONCache{JSON: json, LastCollect: time.Now()})
+				j, found := jsonCache.Load(device)
+				if !found {
+					logger.Warning("device not found: %s", device)
+				}
+				return j.(JSONCache).JSON, nil
 			}
 			return gjson.Parse("{}"), fmt.Errorf("smartctl returned bad data for device %s", device)
 		}
