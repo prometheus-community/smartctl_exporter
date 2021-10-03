@@ -332,6 +332,11 @@ func (smart *SMARTctl) mineSmartStatus() {
 func (smart *SMARTctl) mineDeviceStatistics() {
 	for _, page := range smart.json.Get("ata_device_statistics.pages").Array() {
 		table := strings.TrimSpace(page.Get("name").String())
+		// skip vendor-specific statistics (they lead to duplicate metric labels on Seagate Exos drives,
+		// see https://github.com/Sheridan/smartctl_exporter/issues/3 for details)
+		if table == "Vendor Specific Statistics" {
+			continue;
+		}
 		for _, statistic := range page.Get("table").Array() {
 			smart.ch <- prometheus.MustNewConstMetric(
 				metricDeviceStatistics,
