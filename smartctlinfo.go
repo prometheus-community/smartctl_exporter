@@ -39,13 +39,15 @@ func (smart *SMARTctlInfo) mineVersion() {
 	smartctlJSON := smart.json.Get("smartctl")
 	smartctlVersion := smartctlJSON.Get("version").Array()
 	jsonVersion := smart.json.Get("json_format_version").Array()
-	smart.ch <- prometheus.MustNewConstMetric(
-		metricSmartctlVersion,
-		prometheus.GaugeValue,
-		1,
-		fmt.Sprintf("%d.%d", jsonVersion[0].Int(), jsonVersion[1].Int()),
-		fmt.Sprintf("%d.%d", smartctlVersion[0].Int(), smartctlVersion[1].Int()),
-		smartctlJSON.Get("svn_revision").String(),
-		smartctlJSON.Get("build_info").String(),
-	)
+	if len(smartctlVersion) > 0 && len(jsonVersion) > 0 {
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricSmartctlVersion,
+			prometheus.GaugeValue,
+			1,
+			fmt.Sprintf("%d.%d", jsonVersion[0].Int(), jsonVersion[1].Int()),
+			fmt.Sprintf("%d.%d", smartctlVersion[0].Int(), smartctlVersion[1].Int()),
+			smartctlJSON.Get("svn_revision").String(),
+			smartctlJSON.Get("build_info").String(),
+		)
+	}
 }
