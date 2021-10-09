@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -375,7 +376,7 @@ func (smart *SMARTctl) mineSmartStatus() {
 func (smart *SMARTctl) mineDeviceStatistics() {
 	for _, page := range smart.json.Get("ata_device_statistics.pages").Array() {
 		table := strings.TrimSpace(page.Get("name").String())
-		for _, statistic := range page.Get("table").Array() {
+		for row, statistic := range page.Get("table").Array() {
 			smart.ch <- prometheus.MustNewConstMetric(
 				metricDeviceStatistics,
 				prometheus.GaugeValue,
@@ -385,6 +386,7 @@ func (smart *SMARTctl) mineDeviceStatistics() {
 				smart.device.model,
 				smart.device.serial,
 				table,
+				strconv.Itoa(row),
 				strings.TrimSpace(statistic.Get("name").String()),
 				strings.TrimSpace(statistic.Get("flags.string").String()),
 				smart.mineLongFlags(statistic.Get("flags"), []string{
@@ -397,7 +399,7 @@ func (smart *SMARTctl) mineDeviceStatistics() {
 		}
 	}
 
-	for _, statistic := range smart.json.Get("sata_phy_event_counters.table").Array() {
+	for row, statistic := range smart.json.Get("sata_phy_event_counters.table").Array() {
 		smart.ch <- prometheus.MustNewConstMetric(
 			metricDeviceStatistics,
 			prometheus.GaugeValue,
@@ -407,6 +409,7 @@ func (smart *SMARTctl) mineDeviceStatistics() {
 			smart.device.model,
 			smart.device.serial,
 			"SATA PHY Event Counters",
+			strconv.Itoa(row),
 			strings.TrimSpace(statistic.Get("name").String()),
 			"V---",
 			"valid",

@@ -270,6 +270,7 @@ var (
 			"model_name",
 			"serial_number",
 			"statistic_table",
+			"statistic_table_row",
 			"statistic_name",
 			"statistic_flags_short",
 			"statistic_flags_long",
