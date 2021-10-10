@@ -70,15 +70,62 @@ func (smart *SMARTctl) Collect() {
 }
 
 func (smart *SMARTctl) mineExitStatus() {
-	smart.ch <- prometheus.MustNewConstMetric(
-		metricDeviceExitStatus,
-		prometheus.GaugeValue,
-		smart.json.Get("smartctl.exit_status").Float(),
-		smart.device.device,
-		smart.device.family,
-		smart.device.model,
-		smart.device.serial,
-	)
+	exitStatusValue := smart.json.Get("smartctl.exit_status").Float()
+	var exitStatusMessage, err = getExitStatusMessage(exitStatusValue)
+	if !err {
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricDeviceExitStatus,
+			prometheus.GaugeValue,
+			exitStatusValue,
+			smart.device.device,
+			smart.device.family,
+			smart.device.model,
+			smart.device.serial,
+		)
+	} else {
+		logger.Warning("SKIP: %s due %s", smart.json.Get("device.name"), exitStatusMessage)
+	}
+}
+
+func getExitStatusMessage(exitStatusValue float64) (string, bool) {
+	var messages []string
+	var fatalError = false
+	if exitStatusValue > 0 {
+		bits := fmt.Sprintf("%08b", int64(exitStatusValue))
+		logger.Verbose("SMART Return code: %f: %s", exitStatusValue, bits)
+		if bits[7] == '1' {
+			messages = append(messages, "Command line did not parse.")
+			fatalError = true
+		}
+		if bits[6] == '1' {
+			messages = append(messages, "Device open failed, device did not return an IDENTIFY DEVICE structure, or device is in a low-power mode")
+			fatalError = true
+		}
+		if bits[5] == '1' {
+			messages = append(messages, "Some SMART or other ATA command to the disk failed, or there was a checksum error in a SMART data structure")
+		}
+		if bits[4] == '1' {
+			messages = append(messages, "SMART status check returned 'DISK FAILING'.")
+		}
+		if bits[3] == '1' {
+			messages = append(messages, "We found prefail Attributes <= threshold.")
+		}
+		if bits[2] == '1' {
+			messages = append(messages, "SMART status check returned 'DISK OK' but we found that some (usage or prefail) Attributes have been <= threshold at some time in the past.")
+		}
+		if bits[1] == '1' {
+			messages = append(messages, "The device error log contains records of errors.")
+		}
+		if bits[0] == '1' {
+			messages = append(messages, "The device self-test log contains records of errors. [ATA only] Failed self-tests outdated by a newer successful extended self-test are ignored.")
+		}
+	}
+	if len(messages) > 0 {
+		result := fmt.Sprintf("[%s]", strings.Join(messages, "], ["))
+		logger.Warning("SMART Exit Status Message: %s", result)
+		return result, fatalError
+	}
+	return "", fatalError
 }
 
 func (smart *SMARTctl) mineDevice() {
