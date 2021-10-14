@@ -100,32 +100,31 @@ func readData(device string) (gjson.Result, error) {
 func resultCodeIsOk(SMARTCtlResult int64) bool {
 	result := true
 	if SMARTCtlResult > 0 {
-		bits := fmt.Sprintf("%08b", SMARTCtlResult)
-		// logger.Debug("Return code: %d: %s", SMARTCtlResult, bits)
-		if bits[0] == '1' {
+		logger.Debug("Return code: %d: %s", SMARTCtlResult, stringReverse(fmt.Sprintf("%08b", SMARTCtlResult)))
+		if isBitSet(SMARTCtlResult, 0) {
 			logger.Error("Command line did not parse.")
 			result = false
 		}
-		if bits[1] == '1' {
+		if isBitSet(SMARTCtlResult, 1) {
 			logger.Error("Device open failed, device did not return an IDENTIFY DEVICE structure, or device is in a low-power mode")
 			result = false
 		}
-		if bits[2] == '1' {
+		if isBitSet(SMARTCtlResult, 2) {
 			logger.Warning("Some SMART or other ATA command to the disk failed, or there was a checksum error in a SMART data structure")
 		}
-		if bits[3] == '1' {
+		if isBitSet(SMARTCtlResult, 3) {
 			logger.Warning("SMART status check returned 'DISK FAILING'.")
 		}
-		if bits[4] == '1' {
+		if isBitSet(SMARTCtlResult, 4) {
 			logger.Warning("We found prefail Attributes <= threshold.")
 		}
-		if bits[5] == '1' {
+		if isBitSet(SMARTCtlResult, 5) {
 			logger.Warning("SMART status check returned 'DISK OK' but we found that some (usage or prefail) Attributes have been <= threshold at some time in the past.")
 		}
-		if bits[6] == '1' {
+		if isBitSet(SMARTCtlResult, 6) {
 			logger.Warning("The device error log contains records of errors.")
 		}
-		if bits[7] == '1' {
+		if isBitSet(SMARTCtlResult, 7) {
 			logger.Warning("The device self-test log contains records of errors. [ATA only] Failed self-tests outdated by a newer successful extended self-test are ignored.")
 		}
 	}
@@ -135,7 +134,7 @@ func resultCodeIsOk(SMARTCtlResult int64) bool {
 // Check json
 func jsonIsOk(json gjson.Result) bool {
 	messages := json.Get("smartctl.messages")
-	// logger.Debug(messages.String())
+	logger.Debug(messages.String())
 	if messages.Exists() {
 		for _, message := range messages.Array() {
 			if message.Get("severity").String() == "error" {
@@ -145,4 +144,18 @@ func jsonIsOk(json gjson.Result) bool {
 		}
 	}
 	return true
+}
+
+// Reverse returns its argument string reversed rune-wise left to right.
+func stringReverse(s string) string {
+	r := []rune(s)
+	for i, j := 0, len(r)-1; i < len(r)/2; i, j = i+1, j-1 {
+		r[i], r[j] = r[j], r[i]
+	}
+	return string(r)
+}
+
+func isBitSet(n int64, pos uint) bool {
+	val := n & (1 << pos)
+	return bool(val > 0)
 }
