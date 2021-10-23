@@ -76,12 +76,7 @@ func readData(device string) (gjson.Result, error) {
 
 	if _, err := os.Stat(device); err == nil {
 		cacheValue, cacheOk := jsonCache[device]
-		timeToScan := false
-		if cacheOk {
-			timeToScan = time.Now().After(cacheValue.LastCollect.Add(options.SMARTctl.CollectPeriodDuration))
-		}
-
-		if timeToScan || !cacheOk {
+		if !cacheOk || time.Now().After(cacheValue.LastCollect.Add(options.SMARTctl.CollectPeriodDuration)) {
 			json, ok := readSMARTctl(device)
 			if ok {
 				jsonCache[device] = JSONCache{JSON: json, LastCollect: time.Now()}
