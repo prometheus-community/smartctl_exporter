@@ -100,32 +100,31 @@ func readData(device string) (gjson.Result, error) {
 func resultCodeIsOk(SMARTCtlResult int64) bool {
 	result := true
 	if SMARTCtlResult > 0 {
-		bits := fmt.Sprintf("%08b", SMARTCtlResult)
-		// logger.Debug("Return code: %d: %s", SMARTCtlResult, bits)
-		if bits[0] == '1' {
+		b := SMARTCtlResult
+		if (b & 1) != 0 {
 			logger.Error("Command line did not parse.")
 			result = false
 		}
-		if bits[1] == '1' {
+		if (b & (1 << 1)) != 0 {
 			logger.Error("Device open failed, device did not return an IDENTIFY DEVICE structure, or device is in a low-power mode")
 			result = false
 		}
-		if bits[2] == '1' {
+		if (b & (1 << 2)) != 0 {
 			logger.Warning("Some SMART or other ATA command to the disk failed, or there was a checksum error in a SMART data structure")
 		}
-		if bits[3] == '1' {
+		if (b & (1 << 3)) != 0 {
 			logger.Warning("SMART status check returned 'DISK FAILING'.")
 		}
-		if bits[4] == '1' {
+		if (b & (1 << 4)) != 0 {
 			logger.Warning("We found prefail Attributes <= threshold.")
 		}
-		if bits[5] == '1' {
+		if (b & (1 << 5)) != 0 {
 			logger.Warning("SMART status check returned 'DISK OK' but we found that some (usage or prefail) Attributes have been <= threshold at some time in the past.")
 		}
-		if bits[6] == '1' {
+		if (b & (1 << 6)) != 0 {
 			logger.Warning("The device error log contains records of errors.")
 		}
-		if bits[7] == '1' {
+		if (b & (1 << 7)) != 0 {
 			logger.Warning("The device self-test log contains records of errors. [ATA only] Failed self-tests outdated by a newer successful extended self-test are ignored.")
 		}
 	}
