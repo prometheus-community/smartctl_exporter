@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/Sheridan/smartctl_exporter.svg?style=svg)](https://circleci.com/gh/Sheridan/smartctl_exporter)
+[![CircleCI](https://circleci.com/gh/prometheus-community/smartctl_exporter.svg?style=svg)](https://circleci.com/gh/prometheus-community/smartctl_exporter)
 
 # smartctl_exporter
 Export smartctl statistics to prometheus
@@ -14,7 +14,7 @@ smartmontools >= 7.0, because export to json [released in 7.0](https://www.smart
 
 # Configuration
 ## Command line options
-* `--config=/path/to/file.yaml`: Path to configuration file, defaulr `/etc/smartctl_exporter.yaml`
+* `--config=/path/to/file.yaml`: Path to configuration file, default `/etc/smartctl_exporter.yaml`
 * `--verbose`: verbosed log, default no
 * `--debug`: Debug logging, default no
 * `--version`: Show version and exit
