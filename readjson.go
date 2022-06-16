@@ -35,8 +35,8 @@ func parseJSON(data string) gjson.Result {
 
 // Reading fake smartctl json
 func readFakeSMARTctl(device string) gjson.Result {
-	splitted := strings.Split(device, "/")
-	filename := fmt.Sprintf("debug/%s.json", splitted[len(splitted)-1])
+	s := strings.Split(device, "/")
+	filename := fmt.Sprintf("debug/%s.json", s[len(s)-1])
 	logger.Verbose("Read fake S.M.A.R.T. data from json: %s", filename)
 	jsonFile, err := ioutil.ReadFile(filename)
 	if err != nil {

@@ -1,42 +1,22 @@
-GOPATH=$(shell pwd)/vendor:$(shell pwd)
-GOBIN=$(shell pwd)/bin
-GOFILES=$(wildcard *.go)
-GONAME=$(shell basename "$(PWD)")
+# Copyright 2022 The Prometheus Authors
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-build: get
-	@echo "Building $(GOFILES) to ./bin"
-	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go build -v -o bin/$(GONAME) $(GOFILES)
+# Needs to be defined before including Makefile.common to auto-generate targets
+DOCKER_ARCHS ?= amd64 armv7 arm64
+DOCKER_REPO  ?= prometheuscommunity
 
-build-static:
-	@echo "Building $(GOFILES) to ./bin"
-	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -mod=mod -a -tags netgo -ldflags '-w -extldflags "-static"' -o bin/smartctl_exporter_static *.go
+include Makefile.common
 
-get:
-	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go get -v .
+STATICCHECK_IGNORE =
 
-install:
-	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go install $(GOFILES)
-
-run: build
-	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go run $(GOFILES) --config=$(shell pwd)/smartctl_exporter.yaml --debug --verbose
-
-run-sudo: build
-	sudo bin/$(GONAME) --config=$(shell pwd)/smartctl_exporter.yaml --debug --verbose
-
-clear:
-	@clear
-
-clean:
-	@echo "Cleaning"
-	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go clean
-
-example:
-	@echo "# Example output" > EXAMPLE.md
-	@echo '```' >> EXAMPLE.md
-	@curl -s localhost:9633/metrics | grep smartctl >> EXAMPLE.md
-	@echo '```' >> EXAMPLE.md
-
-collect_fake_json:
-	-mkdir debug
-	-rm -f debug/*json
-	sudo ./collect_fake_json.sh
+DOCKER_IMAGE_NAME ?= smartctl-exporter
