@@ -13,7 +13,7 @@ jobs:
     executor: golang
     steps:
       - prometheus/setup_environment
-      - run: make style lint yamllint unused build test
+      - run: make
       - prometheus/store_artifact:
           file: smartctl_exporter
   codespell:
