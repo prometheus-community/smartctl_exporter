@@ -1,8 +1,10 @@
-vendor
-bin
+/vendor
+/.build
+/.release
+/.tarballs
 debug
 *.json
 
 Manifest
-.idea
 smartctl_exporter
+*.exe
