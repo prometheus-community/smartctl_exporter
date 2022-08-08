@@ -3,7 +3,7 @@ ARG OS="linux"
 FROM ${ARCH}/alpine:3
 LABEL maintainer="The Prometheus Authors <prometheus-developers@googlegroups.com>"
 
-RUN apk install smartmontools
+RUN apk add smartmontools
 
 ARG ARCH="amd64"
 ARG OS="linux"
