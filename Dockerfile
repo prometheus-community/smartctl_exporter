@@ -1,7 +1,9 @@
 ARG ARCH="amd64"
 ARG OS="linux"
-FROM quay.io/prometheus/busybox-${OS}-${ARCH}:glibc
+FROM ${ARCH}/alpine:3
 LABEL maintainer="The Prometheus Authors <prometheus-developers@googlegroups.com>"
+
+RUN apk install smartmontools
 
 ARG ARCH="amd64"
 ARG OS="linux"
