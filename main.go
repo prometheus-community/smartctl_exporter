@@ -54,15 +54,27 @@ func (i SMARTctlManagerCollector) Collect(ch chan<- prometheus.Metric) {
 func init() {
 	options = loadOptions()
 
+	json := readSMARTctlDevices()
+	devices := json.Get("devices").Array()
+	deviceSet := make(map[string]bool)
+	for _, d := range devices {
+		device := d.Get("name").String()
+		logger.Debug("Found device: %s", device)
+		deviceSet[device] = true
+	}
+
+	var deviceList []string
+	for _, device := range options.SMARTctl.Devices {
+		if _, ok := deviceSet[device]; ok {
+			deviceList = append(deviceList, device)
+		} else {
+			logger.Debug("Device %s unavialable", device)
+		}
+	}
+
 	if len(options.SMARTctl.Devices) == 0 {
 		logger.Debug("No devices specified, trying to load them automatically")
-		json := readSMARTctlDevices()
-		devices := json.Get("devices").Array()
-		for _, d := range devices {
-			device := d.Get("name").String()
-			logger.Debug("Found device: %s", device)
-			options.SMARTctl.Devices = append(options.SMARTctl.Devices, device)
-		}
+		options.SMARTctl.Devices = deviceList
 	}
 }
 
