@@ -64,7 +64,7 @@ func readFakeSMARTctl(logger log.Logger, device string) gjson.Result {
 // Get json from smartctl and parse it
 func readSMARTctl(logger log.Logger, device string) (gjson.Result, bool) {
 	level.Debug(logger).Log("msg", "Collecting S.M.A.R.T. counters", "device", device)
-	out, err := exec.Command(*smartctlPath, "--json", "--xall", device).Output()
+	out, err := exec.Command(*smartctlPath, "--json", "--info", "--health", "--attributes", "--tolerance=verypermissive", "--nocheck=standby", "--format=brief", device).Output()
 	if err != nil {
 		level.Warn(logger).Log("msg", "S.M.A.R.T. output reading", "err", err)
 	}
@@ -75,10 +75,15 @@ func readSMARTctl(logger log.Logger, device string) (gjson.Result, bool) {
 }
 
 func readSMARTctlDevices(logger log.Logger) gjson.Result {
-	level.Debug(logger).Log("msg", "Collecting devices")
-	out, err := exec.Command(*smartctlPath, "--json", "--scan-open").Output()
-	if err != nil {
-		level.Warn(logger).Log("msg", "S.M.A.R.T. output reading error", "err", err)
+	level.Debug(logger).Log("msg", "Scanning for devices")
+	out, err := exec.Command(*smartctlPath, "--json", "--scan").Output()
+	if exiterr, ok := err.(*exec.ExitError); ok {
+		level.Debug(logger).Log("msg", "Exit Status", "exit_code", exiterr.ExitCode())
+		// The smartctl command returns 2 if devices are sleeping, ignore this error.
+		if exiterr.ExitCode() != 2 {
+			level.Warn(logger).Log("msg", "S.M.A.R.T. output reading error", "err", err)
+			return gjson.Result{}
+		}
 	}
 	return parseJSON(string(out))
 }
