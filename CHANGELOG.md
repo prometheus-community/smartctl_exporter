@@ -1,3 +1,12 @@
+## 0.8.0 / 2022-10-03
+
+Breaking Changes:
+All configuration has been moved from the config file to command line flags.
+
+* [CHANGE] Refactor exporter config #68
+* [BUGFIX] Fix smartctl command args to avoid wakeups #74
+* [ENHANCEMENT] Add smartmontools to container image #51
+
 ## 0.7.0 / 2022-08-05
 
 First prometheus-community release.
