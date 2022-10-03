@@ -17,6 +17,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/tidwall/gjson"
 )
@@ -33,26 +35,28 @@ type SMARTDevice struct {
 type SMARTctl struct {
 	ch     chan<- prometheus.Metric
 	json   gjson.Result
+	logger log.Logger
 	device SMARTDevice
 }
 
 // NewSMARTctl is smartctl constructor
-func NewSMARTctl(json gjson.Result, ch chan<- prometheus.Metric) SMARTctl {
-	smart := SMARTctl{}
-	smart.ch = ch
-	smart.json = json
-	smart.device = SMARTDevice{
-		device: strings.TrimSpace(smart.json.Get("device.name").String()),
-		serial: strings.TrimSpace(smart.json.Get("serial_number").String()),
-		family: strings.TrimSpace(smart.json.Get("model_family").String()),
-		model:  strings.TrimSpace(smart.json.Get("model_name").String()),
+func NewSMARTctl(logger log.Logger, json gjson.Result, ch chan<- prometheus.Metric) SMARTctl {
+	return SMARTctl{
+		ch:     ch,
+		json:   json,
+		logger: logger,
+		device: SMARTDevice{
+			device: strings.TrimSpace(json.Get("device.name").String()),
+			serial: strings.TrimSpace(json.Get("serial_number").String()),
+			family: strings.TrimSpace(json.Get("model_family").String()),
+			model:  strings.TrimSpace(json.Get("model_name").String()),
+		},
 	}
-	return smart
 }
 
 // Collect metrics
 func (smart *SMARTctl) Collect() {
-	logger.Verbose("Collecting metrics from %s: %s, %s", smart.device.device, smart.device.family, smart.device.model)
+	level.Debug(smart.logger).Log("msg", "Collecting metrics from", "device", smart.device.device, "family", smart.device.family, "model", smart.device.model)
 	smart.mineExitStatus()
 	smart.mineDevice()
 	smart.mineCapacity()
