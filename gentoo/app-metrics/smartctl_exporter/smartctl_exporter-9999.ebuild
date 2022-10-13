@@ -28,5 +28,4 @@ src_install() {
 	newbin bin/${PN}-${PV} ${PN}
 	dodoc "README.md"
         insinto /etc
-	newins "${FILESDIR}/smartctl_exporter.yaml" smartctl_exporter.yaml
 }

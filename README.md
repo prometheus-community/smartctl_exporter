@@ -1,4 +1,5 @@
 [![CircleCI](https://circleci.com/gh/prometheus-community/smartctl_exporter.svg?style=svg)](https://circleci.com/gh/prometheus-community/smartctl_exporter)
+[![Container Repository on Quay](https://quay.io/repository/prometheuscommunity/smartctl-exporter/status "Container Repository on Quay")](https://quay.io/repository/prometheuscommunity/smartctl-exporter)
 
 # smartctl_exporter
 Export smartctl statistics to prometheus
@@ -14,26 +15,34 @@ smartmontools >= 7.0, because export to json [released in 7.0](https://www.smart
 
 # Configuration
 ## Command line options
-* `--config=/path/to/file.yaml`: Path to configuration file, default `/etc/smartctl_exporter.yaml`
-* `--verbose`: verbosed log, default no
-* `--debug`: Debug logging, default no
-* `--version`: Show version and exit
 
-## Configuration file
-Example content:
+The exporter will scan the system for available devices if no `--smartctl.device` flags are used.
+
 ```
-smartctl_exporter:
-  bind_to: "[::1]:9633"
-  url_path: "/metrics"
-  fake_json: no
-  smartctl_location: /usr/sbin/smartctl
-  collect_not_more_than_period: 120s
-  devices:
-  - /dev/sda
-  - /dev/sdb
-  - /dev/sdc
-  - /dev/sdd
-  - /dev/sde
-  - /dev/sdf
+usage: smartctl_exporter [<flags>]
+
+Flags:
+  -h, --help                   Show context-sensitive help (also try --help-long and --help-man).
+      --smartctl.path="/usr/sbin/smartctl"  
+                               The path to the smartctl binary
+      --smartctl.interval=60s  The interval between smarctl polls
+      --smartctl.device=SMARTCTL.DEVICE ...  
+                               The device to monitor (repeatable)
+      --web.listen-address=":9633"  
+                               Address to listen on for web interface and telemetry
+      --web.telemetry-path="/metrics"  
+                               Path under which to expose metrics
+      --web.config.file=""     [EXPERIMENTAL] Path to configuration file that can enable TLS or authentication.
+      --log.level=info         Only log messages with the given severity or above. One of: [debug, info, warn,
+                               error]
+      --log.format=logfmt      Output format of log messages. One of: [logfmt, json]
+      --version                Show application version.
 ```
-`fake_json` used for debugging.
+
+## TLS and basic authentication
+
+This exporter supports TLS and basic authentication.
+
+To use TLS and/or basic authentication, you need to pass a configuration file
+using the `--web.config.file` parameter. The format of the file is described
+[in the exporter-toolkit repository](https://github.com/prometheus/exporter-toolkit/blob/master/docs/web-configuration.md).
