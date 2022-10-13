@@ -289,31 +289,9 @@ var (
 		},
 		nil,
 	)
-	metricCriticalWarning = prometheus.NewDesc(
-		"critical_warning",
-		"Critical warning counter",
-		[]string{
-			"device",
-			"model_family",
-			"model_name",
-			"serial_number",
-		},
-		nil,
-	)
 	metricDeviceStatus = prometheus.NewDesc(
 		"smartctl_device_status",
 		"Device status",
-		[]string{
-			"device",
-			"model_family",
-			"model_name",
-			"serial_number",
-		},
-		nil,
-	)
-	metricAvailableSpare = prometheus.NewDesc(
-		"available_spare",
-		"Available spare",
 		[]string{
 			"device",
 			"model_family",
@@ -334,17 +312,6 @@ var (
 		},
 		nil,
 	)
-	metricMediaErrors = prometheus.NewDesc(
-		"media_errors",
-		"Media errors counter",
-		[]string{
-			"device",
-			"model_family",
-			"model_name",
-			"serial_number",
-		},
-		nil,
-	)
 	metricDeviceSelfTestLogCount = prometheus.NewDesc(
 		"smartctl_device_self_test_log_count",
 		"Device SMART self test log count",
@@ -354,17 +321,6 @@ var (
 			"model_name",
 			"serial_number",
 			"self_test_log_type",
-		},
-		nil,
-	)
-	metricSmartStatus = prometheus.NewDesc(
-		"smart_status",
-		"Smart status",
-		[]string{
-			"device",
-			"model_family",
-			"model_name",
-			"serial_number",
 		},
 		nil,
 	)
