@@ -110,6 +110,7 @@ func (smart *SMARTctl) mineDevice() {
 		smart.json.Get("firmware_version").String(),
 		smart.json.Get("ata_version.string").String(),
 		smart.json.Get("sata_version.string").String(),
+		smart.json.Get("form_factor.name").String(),
 	)
 }
 

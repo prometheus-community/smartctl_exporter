@@ -43,6 +43,7 @@ var (
 			"firmware_version",
 			"ata_version",
 			"sata_version",
+			"form_factor",
 		},
 		nil,
 	)

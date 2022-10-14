@@ -91,7 +91,7 @@ func main() {
 	kingpin.Parse()
 	logger := promlog.New(promlogConfig)
 
-	level.Info(logger).Log("msg", "Starting systemd_exporter", "version", version.Info())
+	level.Info(logger).Log("msg", "Starting smartctl_exporter", "version", version.Info())
 	level.Info(logger).Log("msg", "Build context", "build_context", version.BuildContext())
 
 	devices := *smartctlDevices
