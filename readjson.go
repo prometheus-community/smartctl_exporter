@@ -16,7 +16,6 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
-	"os"
 	"os/exec"
 	"strings"
 	"time"
@@ -94,19 +93,16 @@ func readData(logger log.Logger, device string) (gjson.Result, error) {
 		return readFakeSMARTctl(logger, device), nil
 	}
 
-	if _, err := os.Stat(device); err == nil {
-		cacheValue, cacheOk := jsonCache[device]
-		if !cacheOk || time.Now().After(cacheValue.LastCollect.Add(*smartctlInterval)) {
-			json, ok := readSMARTctl(logger, device)
-			if ok {
-				jsonCache[device] = JSONCache{JSON: json, LastCollect: time.Now()}
-				return jsonCache[device].JSON, nil
-			}
-			return gjson.Parse("{}"), fmt.Errorf("smartctl returned bad data for device %s", device)
+	cacheValue, cacheOk := jsonCache[device]
+	if !cacheOk || time.Now().After(cacheValue.LastCollect.Add(*smartctlInterval)) {
+		json, ok := readSMARTctl(logger, device)
+		if ok {
+			jsonCache[device] = JSONCache{JSON: json, LastCollect: time.Now()}
+			return jsonCache[device].JSON, nil
 		}
-		return cacheValue.JSON, nil
+		return gjson.Parse("{}"), fmt.Errorf("smartctl returned bad data for device %s", device)
 	}
-	return gjson.Parse("{}"), fmt.Errorf("Device %s unavialable", device)
+	return cacheValue.JSON, nil
 }
 
 // Parse smartctl return code
