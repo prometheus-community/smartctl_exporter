@@ -94,17 +94,34 @@ func main() {
 	level.Info(logger).Log("msg", "Starting systemd_exporter", "version", version.Info())
 	level.Info(logger).Log("msg", "Build context", "build_context", version.BuildContext())
 
-	devices := *smartctlDevices
+	// Scan the host devices
+	json := readSMARTctlDevices(logger)
+	scanDevices := json.Get("devices").Array()
+	scanDevicesSet := make(map[string]bool)
+	var scanDeviceNames []string
+	for _, d := range scanDevices {
+		deviceName := d.Get("name").String()
+		level.Debug(logger).Log("msg", "Found device", "name", deviceName)
+		scanDevicesSet[deviceName] = true
+		scanDeviceNames = append(scanDeviceNames, deviceName)
+	}
 
-	if len(devices) == 0 {
-		level.Info(logger).Log("msg", "No devices specified, trying to load them automatically")
-		json := readSMARTctlDevices(logger)
-		scannedDevices := json.Get("devices").Array()
-		for _, d := range scannedDevices {
-			device := d.Get("name").String()
-			level.Info(logger).Log("msg", "Found device", "device", device)
-			devices = append(devices, device)
+	// Read the configuration and verify that it is available
+	devices := *smartctlDevices
+	var readDeviceNames []string
+	for _, device := range devices {
+		if _, ok := scanDevicesSet[device]; ok {
+			readDeviceNames = append(readDeviceNames, device)
+		} else {
+			level.Warn(logger).Log("msg", "Device unavailable", "name", device)
 		}
+	}
+
+	if len(readDeviceNames) > 0 {
+		devices = readDeviceNames
+	} else {
+		level.Info(logger).Log("msg", "No devices specified, trying to load them automatically")
+		devices = scanDeviceNames
 	}
 
 	if len(devices) == 0 {
