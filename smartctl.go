@@ -46,7 +46,7 @@ func NewSMARTctl(logger log.Logger, json gjson.Result, ch chan<- prometheus.Metr
 		json:   json,
 		logger: logger,
 		device: SMARTDevice{
-			device: strings.TrimSpace(json.Get("device.name").String()),
+			device: strings.TrimPrefix(strings.TrimSpace(json.Get("device.name").String()), "/dev/"),
 			serial: strings.TrimSpace(json.Get("serial_number").String()),
 			family: strings.TrimSpace(json.Get("model_family").String()),
 			model:  strings.TrimSpace(json.Get("model_name").String()),
