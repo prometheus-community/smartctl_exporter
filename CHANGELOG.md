@@ -1,3 +1,16 @@
+## 0.9.0 / 2022-10-20
+
+Breaking Changes:
+- Now labels with device model & serial number landed only to smartctl_device meta metric
+- /dev/ prefix pruned from device label for matching with node_exporter labels
+
+* [CHANGE] Removed doubled NVMe metrics #82
+* [CHANGE] Reduced number of meta labels #83
+* [FEATURE] Added disk form_factor meta label #84
+* [CHANGE] Pruned /dev/ prefix from device label #88
+* [ENHANCEMENT] remove `os.stat` in order to fit in Windows #86
+* [ENHANCEMENT] Skip vendor-specific statistics that lead to duplicate metric labels #28
+
 ## 0.8.0 / 2022-10-03
 
 Breaking Changes:
