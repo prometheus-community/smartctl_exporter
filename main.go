@@ -76,13 +76,10 @@ var (
 )
 
 func main() {
-	listenAddress := kingpin.Flag("web.listen-address",
-		"Address to listen on for web interface and telemetry",
-	).Default(":9633").String()
 	metricsPath := kingpin.Flag(
 		"web.telemetry-path", "Path under which to expose metrics",
 	).Default("/metrics").String()
-	webConfig := webflag.AddFlags(kingpin.CommandLine)
+	toolkitFlags := webflag.AddFlags(kingpin.CommandLine, ":9633")
 
 	promlogConfig := &promlog.Config{}
 	flag.AddFlags(kingpin.CommandLine, promlogConfig)
@@ -142,7 +139,6 @@ func main() {
 
 	prometheus.WrapRegistererWithPrefix("", reg).MustRegister(collector)
 
-	level.Info(logger).Log("msg", "Listening on", "address", *listenAddress)
 	http.Handle(*metricsPath, promhttp.HandlerFor(reg, promhttp.HandlerOpts{}))
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		_, err := w.Write([]byte(`<html>
@@ -157,8 +153,8 @@ func main() {
 		}
 	})
 
-	srv := &http.Server{Addr: *listenAddress}
-	if err := web.ListenAndServe(srv, *webConfig, logger); err != nil {
+	srv := &http.Server{}
+	if err := web.ListenAndServe(srv, toolkitFlags, logger); err != nil {
 		level.Error(logger).Log("err", err)
 		os.Exit(1)
 	}
