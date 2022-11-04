@@ -89,9 +89,9 @@ func readSMARTctlDevices(logger log.Logger) gjson.Result {
 }
 
 // Select json source and parse
-func readData(logger log.Logger, device string) (gjson.Result, error) {
+func readData(logger log.Logger, device string) gjson.Result {
 	if *smartctlFakeData {
-		return readFakeSMARTctl(logger, device), nil
+		return readFakeSMARTctl(logger, device)
 	}
 
 	cacheValue, cacheOk := jsonCache.Load(device)
@@ -103,11 +103,11 @@ func readData(logger log.Logger, device string) (gjson.Result, error) {
 			if !found {
 				level.Warn(logger).Log("msg", "device not found", "device", device)
 			}
-			return j.(JSONCache).JSON, nil
+			return j.(JSONCache).JSON
 		}
-		return gjson.Parse("{}"), fmt.Errorf("smartctl returned bad data for device %s", device)
+		return gjson.Result{}
 	}
-	return cacheValue.(JSONCache).JSON, nil
+	return cacheValue.(JSONCache).JSON
 }
 
 // Parse smartctl return code
