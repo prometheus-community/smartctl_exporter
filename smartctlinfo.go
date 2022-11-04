@@ -45,7 +45,9 @@ func (smart *SMARTctlInfo) SetJSON(json gjson.Result) {
 
 // Collect metrics
 func (smart *SMARTctlInfo) Collect() {
-	smart.mineVersion()
+	if smart.Ready {
+		smart.mineVersion()
+	}
 }
 
 func (smart *SMARTctlInfo) mineVersion() {
