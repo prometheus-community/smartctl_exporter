@@ -18,6 +18,7 @@ import (
 	"io/ioutil"
 	"os/exec"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/go-kit/log"
@@ -32,11 +33,11 @@ type JSONCache struct {
 }
 
 var (
-	jsonCache map[string]JSONCache
+	jsonCache sync.Map
 )
 
 func init() {
-	jsonCache = make(map[string]JSONCache)
+	jsonCache.Store("", JSONCache{})
 }
 
 // Parse json to gjson object
@@ -93,16 +94,20 @@ func readData(logger log.Logger, device string) (gjson.Result, error) {
 		return readFakeSMARTctl(logger, device), nil
 	}
 
-	cacheValue, cacheOk := jsonCache[device]
-	if !cacheOk || time.Now().After(cacheValue.LastCollect.Add(*smartctlInterval)) {
+	cacheValue, cacheOk := jsonCache.Load(device)
+	if !cacheOk || time.Now().After(cacheValue.(JSONCache).LastCollect.Add(*smartctlInterval)) {
 		json, ok := readSMARTctl(logger, device)
 		if ok {
-			jsonCache[device] = JSONCache{JSON: json, LastCollect: time.Now()}
-			return jsonCache[device].JSON, nil
+			jsonCache.Store(device, JSONCache{JSON: json, LastCollect: time.Now()})
+			j, found := jsonCache.Load(device)
+			if !found {
+				level.Warn(logger).Log("msg", "device not found", "device", device)
+			}
+			return j.(JSONCache).JSON, nil
 		}
 		return gjson.Parse("{}"), fmt.Errorf("smartctl returned bad data for device %s", device)
 	}
-	return cacheValue.JSON, nil
+	return cacheValue.(JSONCache).JSON, nil
 }
 
 // Parse smartctl return code
