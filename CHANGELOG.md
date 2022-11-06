@@ -1,3 +1,8 @@
+## 0.9.1 / 2022-11-06
+
+* [BUGFIX] Fix runtime error: index out of range in mineVersion #93
+* [BUGFIX] Fix race condition with maps and goroutines #94
+
 ## 0.9.0 / 2022-10-20
 
 Breaking Changes:
