@@ -16,25 +16,27 @@ smartmontools >= 7.0, because export to json [released in 7.0](https://www.smart
 # Configuration
 ## Command line options
 
-The exporter will scan the system for available devices if no `--smartctl.device` flags are used.
+The exporter will scan the system for available devices if no `--smartctl.device` flags are used and may exclude devices by pattern with flag`--smartctl.device-exclude`.
 
 ```
 usage: smartctl_exporter [<flags>]
 
 Flags:
   -h, --help                   Show context-sensitive help (also try --help-long and --help-man).
-      --smartctl.path="/usr/sbin/smartctl"  
+      --smartctl.path="/usr/sbin/smartctl"
                                The path to the smartctl binary
       --smartctl.interval=60s  The interval between smarctl polls
-      --smartctl.device=SMARTCTL.DEVICE ...  
+      --smartctl.device=SMARTCTL.DEVICE ...
                                The device to monitor (repeatable)
-      --web.listen-address=":9633"  
-                               Address to listen on for web interface and telemetry
-      --web.telemetry-path="/metrics"  
+      --smartctl.device-exclude=REGEXP
+                               Regexp of devices to exclude.
+      --web.telemetry-path="/metrics"
                                Path under which to expose metrics
+      --web.systemd-socket     Use systemd socket activation listeners instead of port listeners (Linux only).
+      --web.listen-address=:9633 ...
+                               Addresses on which to expose metrics and web interface. Repeatable for multiple addresses.
       --web.config.file=""     [EXPERIMENTAL] Path to configuration file that can enable TLS or authentication.
-      --log.level=info         Only log messages with the given severity or above. One of: [debug, info, warn,
-                               error]
+      --log.level=info         Only log messages with the given severity or above. One of: [debug, info, warn, error]
       --log.format=logfmt      Output format of log messages. One of: [logfmt, json]
       --version                Show application version.
 ```
