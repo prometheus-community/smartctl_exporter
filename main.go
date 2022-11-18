@@ -16,6 +16,7 @@ package main
 import (
 	"net/http"
 	"os"
+	"regexp"
 	"time"
 
 	"github.com/go-kit/log"
@@ -69,10 +70,29 @@ var (
 	smartctlDevices = kingpin.Flag("smartctl.device",
 		"The device to monitor (repeatable)",
 	).Strings()
+	smartctlDeviceExclude = kingpin.Flag(
+		"smartctl.device-exclude",
+		"Regexp of devices to exclude.",
+	).Default("").String()
 	smartctlFakeData = kingpin.Flag("smartctl.fake-data",
 		"The device to monitor (repeatable)",
 	).Default("false").Hidden().Bool()
 )
+
+type deviceFilter struct {
+	ignorePattern *regexp.Regexp
+}
+
+func newDeviceFilter(ignoredPattern string) (f deviceFilter) {
+	if ignoredPattern != "" {
+		f.ignorePattern = regexp.MustCompile(ignoredPattern)
+	}
+	return
+}
+
+func (f *deviceFilter) ignored(name string) bool {
+	return (f.ignorePattern != nil && f.ignorePattern.MatchString(name))
+}
 
 func main() {
 	metricsPath := kingpin.Flag(
@@ -118,6 +138,12 @@ func main() {
 	} else {
 		level.Info(logger).Log("msg", "No devices specified, trying to load them automatically")
 		devices = scanDeviceNames
+	}
+	filter := newDeviceFilter(*smartctlDeviceExclude)
+	for i, device := range devices {
+		if filter.ignored(device) {
+			devices = append(devices[:i], devices[i+1:]...)
+		}
 	}
 
 	if len(devices) == 0 {
