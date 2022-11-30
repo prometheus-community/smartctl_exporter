@@ -28,10 +28,18 @@ Flags:
       --smartctl.interval=60s  The interval between smarctl polls
       --smartctl.device=SMARTCTL.DEVICE ...  
                                The device to monitor (repeatable)
-      --web.listen-address=":9633"  
-                               Address to listen on for web interface and telemetry
+      --smartctl.device-exclude=""
+                               Regexp of devices to exclude from automatic scanning. (mutually exclusive to
+                               device-include)
+      --smartctl.device-include=""
+                               Regexp of devices to exclude from automatic scanning. (mutually exclusive to
+                               device-exclude)
       --web.telemetry-path="/metrics"  
                                Path under which to expose metrics
+      --web.systemd-socket     Use systemd socket activation listeners instead of port listeners (Linux only).
+      --web.listen-address=:9633 ...
+                               Addresses on which to expose metrics and web interface. Repeatable for multiple
+                               addresses.
       --web.config.file=""     [EXPERIMENTAL] Path to configuration file that can enable TLS or authentication.
       --log.level=info         Only log messages with the given severity or above. One of: [debug, info, warn,
                                error]
