@@ -69,10 +69,37 @@ var (
 	smartctlDevices = kingpin.Flag("smartctl.device",
 		"The device to monitor (repeatable)",
 	).Strings()
+	smartctlDeviceExclude = kingpin.Flag(
+		"smartctl.device-exclude",
+		"Regexp of devices to exclude from automatic scanning. (mutually exclusive to device-include)",
+	).Default("").String()
+	smartctlDeviceInclude = kingpin.Flag(
+		"smartctl.device-include",
+		"Regexp of devices to exclude from automatic scanning. (mutually exclusive to device-exclude)",
+	).Default("").String()
 	smartctlFakeData = kingpin.Flag("smartctl.fake-data",
 		"The device to monitor (repeatable)",
 	).Default("false").Hidden().Bool()
 )
+
+// scanDevices uses smartctl to gather the list of available devices.
+func scanDevices(logger log.Logger) []string {
+	filter := newDeviceFilter(*smartctlDeviceExclude, *smartctlDeviceInclude)
+
+	json := readSMARTctlDevices(logger)
+	scanDevices := json.Get("devices").Array()
+	var scanDeviceResult []string
+	for _, d := range scanDevices {
+		deviceName := d.Get("name").String()
+		if filter.ignored(deviceName) {
+			level.Info(logger).Log("msg", "Ignoring device", "name", deviceName)
+		} else {
+			level.Info(logger).Log("msg", "Found device", "name", deviceName)
+			scanDeviceResult = append(scanDeviceResult, deviceName)
+		}
+	}
+	return scanDeviceResult
+}
 
 func main() {
 	metricsPath := kingpin.Flag(
@@ -90,34 +117,12 @@ func main() {
 	level.Info(logger).Log("msg", "Starting smartctl_exporter", "version", version.Info())
 	level.Info(logger).Log("msg", "Build context", "build_context", version.BuildContext())
 
-	// Scan the host devices
-	json := readSMARTctlDevices(logger)
-	scanDevices := json.Get("devices").Array()
-	scanDevicesSet := make(map[string]bool)
-	var scanDeviceNames []string
-	for _, d := range scanDevices {
-		deviceName := d.Get("name").String()
-		level.Debug(logger).Log("msg", "Found device", "name", deviceName)
-		scanDevicesSet[deviceName] = true
-		scanDeviceNames = append(scanDeviceNames, deviceName)
-	}
-
-	// Read the configuration and verify that it is available
-	devices := *smartctlDevices
-	var readDeviceNames []string
-	for _, device := range devices {
-		if _, ok := scanDevicesSet[device]; ok {
-			readDeviceNames = append(readDeviceNames, device)
-		} else {
-			level.Warn(logger).Log("msg", "Device unavailable", "name", device)
-		}
-	}
-
-	if len(readDeviceNames) > 0 {
-		devices = readDeviceNames
+	var devices []string
+	if len(*smartctlDevices) > 0 {
+		devices = *smartctlDevices
 	} else {
 		level.Info(logger).Log("msg", "No devices specified, trying to load them automatically")
-		devices = scanDeviceNames
+		devices = scanDevices(logger)
 	}
 
 	if len(devices) == 0 {
