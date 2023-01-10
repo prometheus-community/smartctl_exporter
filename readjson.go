@@ -62,9 +62,10 @@ func readFakeSMARTctl(logger log.Logger, device string) gjson.Result {
 }
 
 // Get json from smartctl and parse it
-func readSMARTctl(logger log.Logger, device string) (gjson.Result, bool) {
-	level.Debug(logger).Log("msg", "Collecting S.M.A.R.T. counters", "device", device)
-	out, err := exec.Command(*smartctlPath, "--json", "--info", "--health", "--attributes", "--tolerance=verypermissive", "--nocheck=standby", "--format=brief", device).Output()
+func readSMARTctl(logger log.Logger, deviceType string, device string) (gjson.Result, bool) {
+	level.Debug(logger).Log("msg", "Collecting S.M.A.R.T. counters", "device_type", deviceType, "device", device)
+	deviceTypeFlag := fmt.Sprintf("--device=%s", deviceType)
+	out, err := exec.Command(*smartctlPath, "--json", "--info", "--health", "--attributes", "--tolerance=verypermissive", "--nocheck=standby", "--format=brief", deviceTypeFlag, device).Output()
 	if err != nil {
 		level.Warn(logger).Log("msg", "S.M.A.R.T. output reading", "err", err)
 	}
@@ -96,7 +97,7 @@ func readData(logger log.Logger, device string) gjson.Result {
 
 	cacheValue, cacheOk := jsonCache.Load(device)
 	if !cacheOk || time.Now().After(cacheValue.(JSONCache).LastCollect.Add(*smartctlInterval)) {
-		json, ok := readSMARTctl(logger, device)
+		json, ok := readSMARTctl(logger, *smartctlDeviceType, device)
 		if ok {
 			jsonCache.Store(device, JSONCache{JSON: json, LastCollect: time.Now()})
 			j, found := jsonCache.Load(device)

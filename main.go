@@ -66,6 +66,9 @@ var (
 	smartctlInterval = kingpin.Flag("smartctl.interval",
 		"The interval between smarctl polls",
 	).Default("60s").Duration()
+	smartctlDeviceType = kingpin.Flag("smartctl.device-type",
+		"The device type (-d / --device)",
+	).Default("auto").String()
 	smartctlDevices = kingpin.Flag("smartctl.device",
 		"The device to monitor (repeatable)",
 	).Strings()
