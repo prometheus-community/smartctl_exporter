@@ -25,7 +25,7 @@ Flags:
   -h, --help                   Show context-sensitive help (also try --help-long and --help-man).
       --smartctl.path="/usr/sbin/smartctl"  
                                The path to the smartctl binary
-      --smartctl.interval=60s  The interval between smarctl polls
+      --smartctl.interval=60s  The interval between smartctl polls
       --smartctl.device=SMARTCTL.DEVICE ...  
                                The device to monitor (repeatable)
       --smartctl.device-exclude=""
