@@ -15,7 +15,7 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"os/exec"
 	"strings"
 	"sync"
@@ -53,7 +53,7 @@ func readFakeSMARTctl(logger log.Logger, device string) gjson.Result {
 	s := strings.Split(device, "/")
 	filename := fmt.Sprintf("debug/%s.json", s[len(s)-1])
 	level.Debug(logger).Log("msg", "Read fake S.M.A.R.T. data from json", "filename", filename)
-	jsonFile, err := ioutil.ReadFile(filename)
+	jsonFile, err := os.ReadFile(filename)
 	if err != nil {
 		level.Error(logger).Log("msg", "Fake S.M.A.R.T. data reading error", "err", err)
 		return parseJSON("{}")
