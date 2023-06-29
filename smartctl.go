@@ -442,7 +442,7 @@ func (smart *SMARTctl) mineSCSIGrownDefectList() {
 	if scsi_grown_defect_list.Exists() {
 		smart.ch <- prometheus.MustNewConstMetric(
 			metricSCSIGrownDefectList,
-			prometheus.CounterValue,
+			prometheus.GaugeValue,
 			scsi_grown_defect_list.Float(),
 			smart.device.device,
 			smart.device.family,
@@ -457,7 +457,7 @@ func (smart *SMARTctl) mineSCSIErrorCounterLog() {
 	if SCSIHealth.Exists() {
 		smart.ch <- prometheus.MustNewConstMetric(
 			metricReadErrorsCorrectedByRereadsRewrites,
-			prometheus.CounterValue,
+			prometheus.GaugeValue,
 			SCSIHealth.Get("read.errors_corrected_by_rereads_rewrites").Float(),
 			smart.device.device,
 			smart.device.family,
@@ -466,7 +466,7 @@ func (smart *SMARTctl) mineSCSIErrorCounterLog() {
 		)
 		smart.ch <- prometheus.MustNewConstMetric(
 			metricReadTotalUncorrectedErrors,
-			prometheus.CounterValue,
+			prometheus.GaugeValue,
 			SCSIHealth.Get("read.total_uncorrected_errors").Float(),
 			smart.device.device,
 			smart.device.family,
@@ -475,7 +475,7 @@ func (smart *SMARTctl) mineSCSIErrorCounterLog() {
 		)
 		smart.ch <- prometheus.MustNewConstMetric(
 			metricWriteErrorsCorrectedByRereadsRewrites,
-			prometheus.CounterValue,
+			prometheus.GaugeValue,
 			SCSIHealth.Get("write.errors_corrected_by_rereads_rewrites").Float(),
 			smart.device.device,
 			smart.device.family,
@@ -484,7 +484,7 @@ func (smart *SMARTctl) mineSCSIErrorCounterLog() {
 		)
 		smart.ch <- prometheus.MustNewConstMetric(
 			metricWriteTotalUncorrectedErrors,
-			prometheus.CounterValue,
+			prometheus.GaugeValue,
 			SCSIHealth.Get("write.total_uncorrected_errors").Float(),
 			smart.device.device,
 			smart.device.family,
