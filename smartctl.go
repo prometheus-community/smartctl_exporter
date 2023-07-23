@@ -68,7 +68,6 @@ func (smart *SMARTctl) Collect() {
 	smart.minePowerCycleCount()
 	smart.mineDeviceSCTStatus()
 	smart.mineDeviceStatistics()
-	smart.mineDeviceStatus()
 	smart.mineDeviceErrorLog()
 	smart.mineDeviceSelfTestLog()
 	smart.mineDeviceERC()
@@ -381,16 +380,6 @@ func (smart *SMARTctl) mineLongFlags(json gjson.Result, flags []string) string {
 		}
 	}
 	return strings.Join(result, ",")
-}
-
-func (smart *SMARTctl) mineDeviceStatus() {
-	status := smart.json.Get("smart_status")
-	smart.ch <- prometheus.MustNewConstMetric(
-		metricDeviceStatus,
-		prometheus.GaugeValue,
-		status.Get("passed").Float(),
-		smart.device.device,
-	)
 }
 
 func (smart *SMARTctl) mineDeviceErrorLog() {
