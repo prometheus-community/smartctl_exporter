@@ -93,7 +93,9 @@ func scanDevices(logger log.Logger) []string {
 		deviceName := d.Get("name").String()
 		deviceType := d.Get("type").String()
 		deviceProtocol := d.Get("protocol").String()
-		if filter.ignored(deviceName) || filter.ignored(deviceType) || filter.ignored(deviceProtocol) {
+		// filter schema "name=<deviceName>;type=<deviceType>;protocol=<deviceProtocol>"
+		device := "name=" + deviceName + ";type=" + deviceType + ";protocol=" + deviceProtocol
+		if filter.ignored(device) {
 			level.Info(logger).Log("msg", "Ignoring device", "name", deviceName, "type", deviceType, "protocol", deviceProtocol)
 		} else {
 			level.Info(logger).Log("msg", "Found device", "name", deviceName, "type", deviceType, "protocol", deviceProtocol)
