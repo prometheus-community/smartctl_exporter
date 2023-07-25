@@ -300,21 +300,25 @@ func (smart *SMARTctl) mineNumErrLogEntries() {
 }
 
 func (smart *SMARTctl) mineBytesRead() {
-	blockSize := smart.json.Get("logical_block_size").Float() * 1024
+	blockSize := smart.json.Get("logical_block_size").Float()
 	smart.ch <- prometheus.MustNewConstMetric(
 		metricDeviceBytesRead,
 		prometheus.CounterValue,
-		smart.json.Get("nvme_smart_health_information_log.data_units_read").Float()*blockSize,
+		// This value is reported in thousands (i.e., a value of 1 corresponds to 1000 units of 512 bytes written) and is rounded up.
+		// When the LBA size is a value other than 512 bytes, the controller shall convert the amount of data written to 512 byte units.
+		smart.json.Get("nvme_smart_health_information_log.data_units_read").Float()*1000.0*blockSize,
 		smart.device.device,
 	)
 }
 
 func (smart *SMARTctl) mineBytesWritten() {
-	blockSize := smart.json.Get("logical_block_size").Float() * 1024
+	blockSize := smart.json.Get("logical_block_size").Float()
 	smart.ch <- prometheus.MustNewConstMetric(
 		metricDeviceBytesWritten,
 		prometheus.CounterValue,
-		smart.json.Get("nvme_smart_health_information_log.data_units_written").Float()*blockSize,
+		// This value is reported in thousands (i.e., a value of 1 corresponds to 1000 units of 512 bytes written) and is rounded up.
+		// When the LBA size is a value other than 512 bytes, the controller shall convert the amount of data written to 512 byte units.
+		smart.json.Get("nvme_smart_health_information_log.data_units_written").Float()*1000.0*blockSize,
 		smart.device.device,
 	)
 }
