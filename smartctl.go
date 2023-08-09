@@ -81,7 +81,8 @@ func (smart *SMARTctl) Collect() {
 	smart.mineBytesRead()
 	smart.mineBytesWritten()
 	smart.mineSmartStatus()
-
+	smart.mineSCSIGrownDefectList()
+	smart.mineSCSIErrorCounterLog()
 }
 
 func (smart *SMARTctl) mineExitStatus() {
@@ -432,6 +433,63 @@ func (smart *SMARTctl) mineDeviceERC() {
 			status.Get("deciseconds").Float()/10.0,
 			smart.device.device,
 			ercType,
+		)
+	}
+}
+
+func (smart *SMARTctl) mineSCSIGrownDefectList() {
+	scsi_grown_defect_list := smart.json.Get("scsi_grown_defect_list")
+	if scsi_grown_defect_list.Exists() {
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricSCSIGrownDefectList,
+			prometheus.GaugeValue,
+			scsi_grown_defect_list.Float(),
+			smart.device.device,
+			smart.device.family,
+			smart.device.model,
+			smart.device.serial,
+		)
+	}
+}
+
+func (smart *SMARTctl) mineSCSIErrorCounterLog() {
+	SCSIHealth := smart.json.Get("scsi_error_counter_log")
+	if SCSIHealth.Exists() {
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricReadErrorsCorrectedByRereadsRewrites,
+			prometheus.GaugeValue,
+			SCSIHealth.Get("read.errors_corrected_by_rereads_rewrites").Float(),
+			smart.device.device,
+			smart.device.family,
+			smart.device.model,
+			smart.device.serial,
+		)
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricReadTotalUncorrectedErrors,
+			prometheus.GaugeValue,
+			SCSIHealth.Get("read.total_uncorrected_errors").Float(),
+			smart.device.device,
+			smart.device.family,
+			smart.device.model,
+			smart.device.serial,
+		)
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricWriteErrorsCorrectedByRereadsRewrites,
+			prometheus.GaugeValue,
+			SCSIHealth.Get("write.errors_corrected_by_rereads_rewrites").Float(),
+			smart.device.device,
+			smart.device.family,
+			smart.device.model,
+			smart.device.serial,
+		)
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricWriteTotalUncorrectedErrors,
+			prometheus.GaugeValue,
+			SCSIHealth.Get("write.total_uncorrected_errors").Float(),
+			smart.device.device,
+			smart.device.family,
+			smart.device.model,
+			smart.device.serial,
 		)
 	}
 }
