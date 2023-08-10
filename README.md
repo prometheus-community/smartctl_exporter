@@ -26,6 +26,9 @@ Flags:
       --smartctl.path="/usr/sbin/smartctl"  
                                The path to the smartctl binary
       --smartctl.interval=60s  The interval between smartctl polls
+      --smartctl.rescan=10m    The interval between rescanning for new/disappeared devices. If the interval is smaller than 1s no
+                               rescanning takes place. If any devices are configured with smartctl.device also no rescanning takes
+                               place.
       --smartctl.device=SMARTCTL.DEVICE ...  
                                The device to monitor (repeatable)
       --smartctl.device-exclude=""

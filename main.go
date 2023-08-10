@@ -16,6 +16,7 @@ package main
 import (
 	"net/http"
 	"os"
+	"sync"
 	"time"
 
 	kingpin "github.com/alecthomas/kingpin/v2"
@@ -38,16 +39,18 @@ type SMARTctlManagerCollector struct {
 	Devices               []string
 
 	logger log.Logger
+	mutex  sync.Mutex
 }
 
 // Describe sends the super-set of all possible descriptors of metrics
-func (i SMARTctlManagerCollector) Describe(ch chan<- *prometheus.Desc) {
+func (i *SMARTctlManagerCollector) Describe(ch chan<- *prometheus.Desc) {
 	prometheus.DescribeByCollect(i, ch)
 }
 
 // Collect is called by the Prometheus registry when collecting metrics.
-func (i SMARTctlManagerCollector) Collect(ch chan<- prometheus.Metric) {
+func (i *SMARTctlManagerCollector) Collect(ch chan<- prometheus.Metric) {
 	info := NewSMARTctlInfo(ch)
+	i.mutex.Lock()
 	for _, device := range i.Devices {
 		json := readData(i.logger, device)
 		if json.Exists() {
@@ -57,6 +60,18 @@ func (i SMARTctlManagerCollector) Collect(ch chan<- prometheus.Metric) {
 		}
 	}
 	info.Collect()
+	i.mutex.Unlock()
+}
+
+func (i *SMARTctlManagerCollector) RescanForDevices() {
+	for {
+		time.Sleep(*smartctlRescanInterval)
+		level.Info(i.logger).Log("msg", "Rescanning for devices")
+		devices := scanDevices(i.logger)
+		i.mutex.Lock()
+		i.Devices = devices
+		i.mutex.Unlock()
+	}
 }
 
 var (
@@ -66,6 +81,9 @@ var (
 	smartctlInterval = kingpin.Flag("smartctl.interval",
 		"The interval between smartctl polls",
 	).Default("60s").Duration()
+	smartctlRescanInterval = kingpin.Flag("smartctl.rescan",
+		"The interval between rescanning for new/disappeared devices. If the interval is smaller than 1s no rescanning takes place. If any devices are configured with smartctl.device also no rescanning takes place.",
+	).Default("10m").Duration()
 	smartctlDevices = kingpin.Flag("smartctl.device",
 		"The device to monitor (repeatable)",
 	).Strings()
@@ -135,13 +153,19 @@ func main() {
 		logger:  logger,
 	}
 
+	if *smartctlRescanInterval >= 1*time.Second && len(*smartctlDevices) == 0 {
+		level.Info(logger).Log("msg", "Start background scan process")
+		level.Info(logger).Log("msg", "Rescanning for devices every", "rescanInterval", *smartctlRescanInterval)
+		go collector.RescanForDevices()
+	}
+
 	reg := prometheus.NewPedanticRegistry()
 	reg.MustRegister(
 		collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}),
 		collectors.NewGoCollector(),
 	)
 
-	prometheus.WrapRegistererWithPrefix("", reg).MustRegister(collector)
+	prometheus.WrapRegistererWithPrefix("", reg).MustRegister(&collector)
 
 	http.Handle(*metricsPath, promhttp.HandlerFor(reg, promhttp.HandlerOpts{}))
 
