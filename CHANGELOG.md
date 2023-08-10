@@ -1,8 +1,10 @@
 ## 0.10.0 / 2023-06-10
 
 * [FEATURE] Add device include/exclude filters for the automatic scanning #99
-* [FEATURE] Add background scanning for devices #140
 * [ENHANCEMENT] Critical metrics for SCSI disks added #131
+* [CHANGE] Remove duplicate smartctl_device_status metric #137
+* [CHANGE] Fix reported Data bytes Read/Written on SSDs #138
+* [FEATURE] Add background scanning for devices #140
 * [ENHANCEMENT] Added device name to logger rc code parser #141
 
 ## 0.9.1 / 2022-11-06
