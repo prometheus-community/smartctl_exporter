@@ -1,4 +1,4 @@
-## 0.9.2 / 2023-06-10
+## 0.10.0 / 2023-06-10
 
 * [FEATURE] Add device include/exclude filters for the automatic scanning #99
 * [FEATURE] Add background scanning for devices #140
