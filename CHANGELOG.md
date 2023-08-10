@@ -1,3 +1,10 @@
+## 0.9.2 / 2023-06-10
+
+* [FEATURE] Add device include/exclude filters for the automatic scanning #99
+* [FEATURE] Add background scanning for devices #140
+* [ENHANCEMENT] Critical metrics for SCSI disks added #131
+* [ENHANCEMENT] Added device name to logger rc code parser #141
+
 ## 0.9.1 / 2022-11-06
 
 * [BUGFIX] Fix runtime error: index out of range in mineVersion #93
