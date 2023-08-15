@@ -47,6 +47,12 @@ var (
 		},
 		nil,
 	)
+	metricDeviceCount = prometheus.NewDesc(
+		"smartctl_device_count",
+		"Number of devices configured or dynamically discovered",
+		[]string{},
+		nil,
+	)
 	metricDeviceCapacityBlocks = prometheus.NewDesc(
 		"smartctl_device_capacity_blocks",
 		"Device capacity in blocks",

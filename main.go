@@ -59,6 +59,11 @@ func (i *SMARTctlManagerCollector) Collect(ch chan<- prometheus.Metric) {
 			smart.Collect()
 		}
 	}
+	ch <- prometheus.MustNewConstMetric(
+		metricDeviceCount,
+		prometheus.GaugeValue,
+		float64(len(i.Devices)),
+	)
 	info.Collect()
 	i.mutex.Unlock()
 }
@@ -141,11 +146,7 @@ func main() {
 	} else {
 		level.Info(logger).Log("msg", "No devices specified, trying to load them automatically")
 		devices = scanDevices(logger)
-	}
-
-	if len(devices) == 0 {
-		level.Error(logger).Log("msg", "No devices found")
-		os.Exit(1)
+		level.Info(logger).Log("msg", "Number of devices found", "count", len(devices))
 	}
 
 	collector := SMARTctlManagerCollector{
