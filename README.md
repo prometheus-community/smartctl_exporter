@@ -57,3 +57,18 @@ This exporter supports TLS and basic authentication.
 To use TLS and/or basic authentication, you need to pass a configuration file
 using the `--web.config.file` parameter. The format of the file is described
 [in the exporter-toolkit repository](https://github.com/prometheus/exporter-toolkit/blob/master/docs/web-configuration.md).
+
+## Example of running in Docker
+
+Minimal functional `docker-compose.yml`:
+```yaml
+version: "3"
+
+services:
+  smartctl-exporter:
+    image: prometheuscommunity/smartctl-exporter
+    privileged: true
+    user: root
+    ports:
+      - "9633:9633"
+```
