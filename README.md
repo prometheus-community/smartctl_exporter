@@ -35,7 +35,7 @@ Flags:
                                Regexp of devices to exclude from automatic scanning. (mutually exclusive to
                                device-include)
       --smartctl.device-include=""
-                               Regexp of devices to include from automatic scanning. (mutually exclusive to
+                               Regexp of devices to include in automatic scanning. (mutually exclusive to
                                device-exclude)
       --web.telemetry-path="/metrics"  
                                Path under which to expose metrics
