@@ -48,7 +48,7 @@ var (
 		nil,
 	)
 	metricDeviceCount = prometheus.NewDesc(
-		"smartctl_device_count",
+		"smartctl_devices",
 		"Number of devices configured or dynamically discovered",
 		[]string{},
 		nil,
