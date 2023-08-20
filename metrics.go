@@ -242,6 +242,17 @@ var (
 		},
 		nil,
 	)
+	metricDeviceSelfTest = prometheus.NewDesc(
+		"smartctl_device_self_test_log_seconds",
+		"Device SMART self test log execution lifetime seconds",
+		[]string{
+			"device",
+			"self_test_log_type",
+			"self_test_passed",
+		},
+		nil,
+	)
+
 	metricDeviceSelfTestLogCount = prometheus.NewDesc(
 		"smartctl_device_self_test_log_count",
 		"Device SMART self test log count",

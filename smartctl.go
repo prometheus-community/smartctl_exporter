@@ -15,6 +15,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/go-kit/log"
@@ -69,6 +70,7 @@ func (smart *SMARTctl) Collect() {
 	smart.mineDeviceSCTStatus()
 	smart.mineDeviceStatistics()
 	smart.mineDeviceErrorLog()
+	smart.mineDeviceSelfTest()
 	smart.mineDeviceSelfTestLog()
 	smart.mineDeviceERC()
 	smart.minePercentageUsed()
@@ -396,6 +398,50 @@ func (smart *SMARTctl) mineDeviceErrorLog() {
 			smart.device.device,
 			logType,
 		)
+	}
+}
+
+func (smart *SMARTctl) mineDeviceSelfTest() {
+	validTypes := map[int]string{
+		255: "vendor",
+		129: "short_captive",
+		2:   "long",
+		1:   "short",
+	}
+
+	// assume the table will always be in descending order
+	processedTypes := make(map[string]bool)
+
+	for _, logEntry := range smart.json.Get("ata_smart_self_test_log.standard.table").Array() {
+		testType := int(logEntry.Get("type.value").Int())
+		testTime := float64(logEntry.Get("lifetime_hours").Int())
+		testRunningIndicator := int(logEntry.Get("status.value").Int())
+		testStatus := strconv.FormatBool(logEntry.Get("status.passed").Bool())
+
+		// stick with seconds
+		testTime = testTime * 60 * 60
+
+		// skip running tests
+		if testRunningIndicator != 0 {
+			continue
+		}
+
+		logTestType, exists := validTypes[testType]
+		if !exists {
+			logTestType = "unknown"
+		}
+
+		if !processedTypes[logTestType] {
+			smart.ch <- prometheus.MustNewConstMetric(
+				metricDeviceSelfTest,
+				prometheus.GaugeValue,
+				testTime,
+				smart.device.device,
+				logTestType,
+				testStatus,
+			)
+			processedTypes[logTestType] = true
+		}
 	}
 }
 
