@@ -69,6 +69,14 @@ var (
 		},
 		nil,
 	)
+	metricDeviceTotalCapacityBytes = prometheus.NewDesc(
+		"smartctl_device_nvme_capacity_bytes",
+		"NVMe device total capacity bytes",
+		[]string{
+			"device",
+		},
+		nil,
+	)
 	metricDeviceBlockSize = prometheus.NewDesc(
 		"smartctl_device_block_size",
 		"Device block size",
@@ -274,9 +282,6 @@ var (
 		"Device SCSI grown defect list counter",
 		[]string{
 			"device",
-			"model_family",
-			"model_name",
-			"serial_number",
 		},
 		nil,
 	)
@@ -285,9 +290,6 @@ var (
 		"Read Errors Corrected by ReReads/ReWrites",
 		[]string{
 			"device",
-			"model_family",
-			"model_name",
-			"serial_number",
 		},
 		nil,
 	)
@@ -296,9 +298,6 @@ var (
 		"Read Total Uncorrected Errors",
 		[]string{
 			"device",
-			"model_family",
-			"model_name",
-			"serial_number",
 		},
 		nil,
 	)
@@ -307,9 +306,6 @@ var (
 		"Write Errors Corrected by ReReads/ReWrites",
 		[]string{
 			"device",
-			"model_family",
-			"model_name",
-			"serial_number",
 		},
 		nil,
 	)
@@ -318,9 +314,6 @@ var (
 		"Write Total Uncorrected Errors",
 		[]string{
 			"device",
-			"model_family",
-			"model_name",
-			"serial_number",
 		},
 		nil,
 	)

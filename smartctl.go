@@ -48,7 +48,7 @@ func NewSMARTctl(logger log.Logger, json gjson.Result, ch chan<- prometheus.Metr
 		device: SMARTDevice{
 			device: strings.TrimPrefix(strings.TrimSpace(json.Get("device.name").String()), "/dev/"),
 			serial: strings.TrimSpace(json.Get("serial_number").String()),
-			family: strings.TrimSpace(json.Get("model_family").String()),
+			family: strings.TrimSpace(GetStringIfExists(json, "model_family", "unknown")),
 			model:  strings.TrimSpace(json.Get("model_name").String()),
 		},
 	}
@@ -60,6 +60,7 @@ func (smart *SMARTctl) Collect() {
 	smart.mineExitStatus()
 	smart.mineDevice()
 	smart.mineCapacity()
+	smart.mineBlockSize()
 	smart.mineInterfaceSpeed()
 	smart.mineDeviceAttribute()
 	smart.minePowerOnSeconds()
@@ -71,14 +72,14 @@ func (smart *SMARTctl) Collect() {
 	smart.mineDeviceErrorLog()
 	smart.mineDeviceSelfTestLog()
 	smart.mineDeviceERC()
-	smart.minePercentageUsed()
-	smart.mineAvailableSpare()
-	smart.mineAvailableSpareThreshold()
-	smart.mineCriticalWarning()
-	smart.mineMediaErrors()
-	smart.mineNumErrLogEntries()
-	smart.mineBytesRead()
-	smart.mineBytesWritten()
+	smart.mineNvmePercentageUsed()
+	smart.mineNvmeAvailableSpare()
+	smart.mineNvmeAvailableSpareThreshold()
+	smart.mineNvmeCriticalWarning()
+	smart.mineNvmeMediaErrors()
+	smart.mineNvmeNumErrLogEntries()
+	smart.mineNvmeBytesRead()
+	smart.mineNvmeBytesWritten()
 	smart.mineSmartStatus()
 	smart.mineSCSIGrownDefectList()
 	smart.mineSCSIErrorCounterLog()
@@ -114,19 +115,30 @@ func (smart *SMARTctl) mineDevice() {
 }
 
 func (smart *SMARTctl) mineCapacity() {
-	capacity := smart.json.Get("user_capacity")
+	// The user_capacity exists only when NVMe have single namespace. Otherwise,
+	// for NVMe devices with multiple namespaces, when device name used without
+	// namespace number (exporter case) user_capacity will be absent
 	smart.ch <- prometheus.MustNewConstMetric(
 		metricDeviceCapacityBlocks,
 		prometheus.GaugeValue,
-		capacity.Get("blocks").Float(),
+		smart.json.Get("user_capacity.blocks").Float(),
 		smart.device.device,
 	)
 	smart.ch <- prometheus.MustNewConstMetric(
 		metricDeviceCapacityBytes,
 		prometheus.GaugeValue,
-		capacity.Get("bytes").Float(),
+		smart.json.Get("user_capacity.bytes").Float(),
 		smart.device.device,
 	)
+	smart.ch <- prometheus.MustNewConstMetric(
+		metricDeviceTotalCapacityBytes,
+		prometheus.GaugeValue,
+		smart.json.Get("nvme_total_capacity").Float(),
+		smart.device.device,
+	)
+}
+
+func (smart *SMARTctl) mineBlockSize() {
 	for _, blockType := range []string{"logical", "physical"} {
 		smart.ch <- prometheus.MustNewConstMetric(
 			metricDeviceBlockSize,
@@ -245,7 +257,7 @@ func (smart *SMARTctl) mineDeviceSCTStatus() {
 	}
 }
 
-func (smart *SMARTctl) minePercentageUsed() {
+func (smart *SMARTctl) mineNvmePercentageUsed() {
 	smart.ch <- prometheus.MustNewConstMetric(
 		metricDevicePercentageUsed,
 		prometheus.CounterValue,
@@ -254,7 +266,7 @@ func (smart *SMARTctl) minePercentageUsed() {
 	)
 }
 
-func (smart *SMARTctl) mineAvailableSpare() {
+func (smart *SMARTctl) mineNvmeAvailableSpare() {
 	smart.ch <- prometheus.MustNewConstMetric(
 		metricDeviceAvailableSpare,
 		prometheus.CounterValue,
@@ -263,7 +275,7 @@ func (smart *SMARTctl) mineAvailableSpare() {
 	)
 }
 
-func (smart *SMARTctl) mineAvailableSpareThreshold() {
+func (smart *SMARTctl) mineNvmeAvailableSpareThreshold() {
 	smart.ch <- prometheus.MustNewConstMetric(
 		metricDeviceAvailableSpareThreshold,
 		prometheus.CounterValue,
@@ -272,7 +284,7 @@ func (smart *SMARTctl) mineAvailableSpareThreshold() {
 	)
 }
 
-func (smart *SMARTctl) mineCriticalWarning() {
+func (smart *SMARTctl) mineNvmeCriticalWarning() {
 	smart.ch <- prometheus.MustNewConstMetric(
 		metricDeviceCriticalWarning,
 		prometheus.CounterValue,
@@ -281,7 +293,7 @@ func (smart *SMARTctl) mineCriticalWarning() {
 	)
 }
 
-func (smart *SMARTctl) mineMediaErrors() {
+func (smart *SMARTctl) mineNvmeMediaErrors() {
 	smart.ch <- prometheus.MustNewConstMetric(
 		metricDeviceMediaErrors,
 		prometheus.CounterValue,
@@ -290,7 +302,7 @@ func (smart *SMARTctl) mineMediaErrors() {
 	)
 }
 
-func (smart *SMARTctl) mineNumErrLogEntries() {
+func (smart *SMARTctl) mineNvmeNumErrLogEntries() {
 	smart.ch <- prometheus.MustNewConstMetric(
 		metricDeviceNumErrLogEntries,
 		prometheus.CounterValue,
@@ -299,7 +311,7 @@ func (smart *SMARTctl) mineNumErrLogEntries() {
 	)
 }
 
-func (smart *SMARTctl) mineBytesRead() {
+func (smart *SMARTctl) mineNvmeBytesRead() {
 	blockSize := smart.json.Get("logical_block_size").Float()
 	smart.ch <- prometheus.MustNewConstMetric(
 		metricDeviceBytesRead,
@@ -311,7 +323,7 @@ func (smart *SMARTctl) mineBytesRead() {
 	)
 }
 
-func (smart *SMARTctl) mineBytesWritten() {
+func (smart *SMARTctl) mineNvmeBytesWritten() {
 	blockSize := smart.json.Get("logical_block_size").Float()
 	smart.ch <- prometheus.MustNewConstMetric(
 		metricDeviceBytesWritten,
@@ -346,9 +358,6 @@ func (smart *SMARTctl) mineDeviceStatistics() {
 				prometheus.GaugeValue,
 				statistic.Get("value").Float(),
 				smart.device.device,
-				smart.device.family,
-				smart.device.model,
-				smart.device.serial,
 				table,
 				strings.TrimSpace(statistic.Get("name").String()),
 				strings.TrimSpace(statistic.Get("flags.string").String()),
@@ -438,9 +447,6 @@ func (smart *SMARTctl) mineSCSIGrownDefectList() {
 			prometheus.GaugeValue,
 			scsi_grown_defect_list.Float(),
 			smart.device.device,
-			smart.device.family,
-			smart.device.model,
-			smart.device.serial,
 		)
 	}
 }
@@ -453,36 +459,24 @@ func (smart *SMARTctl) mineSCSIErrorCounterLog() {
 			prometheus.GaugeValue,
 			SCSIHealth.Get("read.errors_corrected_by_rereads_rewrites").Float(),
 			smart.device.device,
-			smart.device.family,
-			smart.device.model,
-			smart.device.serial,
 		)
 		smart.ch <- prometheus.MustNewConstMetric(
 			metricReadTotalUncorrectedErrors,
 			prometheus.GaugeValue,
 			SCSIHealth.Get("read.total_uncorrected_errors").Float(),
 			smart.device.device,
-			smart.device.family,
-			smart.device.model,
-			smart.device.serial,
 		)
 		smart.ch <- prometheus.MustNewConstMetric(
 			metricWriteErrorsCorrectedByRereadsRewrites,
 			prometheus.GaugeValue,
 			SCSIHealth.Get("write.errors_corrected_by_rereads_rewrites").Float(),
 			smart.device.device,
-			smart.device.family,
-			smart.device.model,
-			smart.device.serial,
 		)
 		smart.ch <- prometheus.MustNewConstMetric(
 			metricWriteTotalUncorrectedErrors,
 			prometheus.GaugeValue,
 			SCSIHealth.Get("write.total_uncorrected_errors").Float(),
 			smart.device.device,
-			smart.device.family,
-			smart.device.model,
-			smart.device.serial,
 		)
 	}
 }
