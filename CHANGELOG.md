@@ -1,4 +1,11 @@
-## 0.10.0 / 2023-06-10
+## 0.11.0 / 2023-08-27
+
+* [CHANGE] Remove redundant meta labels from SCSI metrics #154
+* [CHANGE] Device `family` label now have "unknown" value if not present #154
+* [ENHANCEMENT] New metric for total NVMe device capacity in bytes #154
+* [ENHANCEMENT] New metric for dynamically discovered devices count #129 #147
+
+## 0.10.0 / 2023-08-10
 
 * [FEATURE] Add device include/exclude filters for the automatic scanning #99
 * [ENHANCEMENT] Critical metrics for SCSI disks added #131
