@@ -1,0 +1,120 @@
+{
+	"device": {
+		"info_name": "/dev/nvme2",
+		"name": "/dev/nvme2",
+		"protocol": "NVMe",
+		"type": "nvme"
+	},
+	"firmware_version": "REDACTED",
+	"json_format_version": [
+		1,
+		0
+	],
+	"local_time": {
+		"asctime": "Fri Feb 13 23:31:30 2009 UTC",
+		"time_t": 1234567890
+	},
+	"logical_block_size": 512,
+	"model_name": "KXG60ZNV512G TOSHIBA",
+	"nvme_controller_id": 0,
+	"nvme_ieee_oui_identifier": 9233294,
+	"nvme_namespaces": [
+		{
+			"capacity": {
+				"blocks": 1000215216,
+				"bytes": 512110190592
+			},
+			"eui64": {
+				"ext_id": 4295713919,
+				"oui": 9233294
+			},
+			"formatted_lba_size": 512,
+			"id": 1,
+			"size": {
+				"blocks": 1000215216,
+				"bytes": 512110190592
+			},
+			"utilization": {
+				"blocks": 1000215216,
+				"bytes": 512110190592
+			}
+		}
+	],
+	"nvme_number_of_namespaces": 1,
+	"nvme_pci_vendor": {
+		"id": 4473,
+		"subsystem_id": 4473
+	},
+	"nvme_smart_health_information_log": {
+		"available_spare": 100,
+		"available_spare_threshold": 10,
+		"controller_busy_time": 594,
+		"critical_comp_time": 0,
+		"critical_warning": 0,
+		"data_units_read": 10480864,
+		"data_units_written": 5578530,
+		"host_reads": 141510981,
+		"host_writes": 206619338,
+		"media_errors": 0,
+		"num_err_log_entries": 0,
+		"percentage_used": 4,
+		"power_cycles": 52,
+		"power_on_hours": 12728,
+		"temperature": 35,
+		"temperature_sensors": [
+			35
+		],
+		"unsafe_shutdowns": 28,
+		"warning_temp_time": 0
+	},
+	"nvme_total_capacity": 512110190592,
+	"nvme_unallocated_capacity": 0,
+	"nvme_version": {
+		"string": "1.3",
+		"value": 66304
+	},
+	"power_cycle_count": 52,
+	"power_on_time": {
+		"hours": 12728
+	},
+	"serial_number": "REDACTED",
+	"smart_status": {
+		"nvme": {
+			"value": 0
+		},
+		"passed": true
+	},
+	"smart_support": {
+		"available": true,
+		"enabled": true
+	},
+	"smartctl": {
+		"argv": [
+			"smartctl",
+			"--json",
+			"--info",
+			"--health",
+			"--attributes",
+			"--tolerance=verypermissive",
+			"--nocheck=standby",
+			"--format=brief",
+			"--log=error",
+			"/dev/nvme2"
+		],
+		"build_info": "REDACTED",
+		"exit_status": 0,
+		"platform_info": "REDACTED",
+		"svn_revision": "5338",
+		"version": [
+			7,
+			3
+		]
+	},
+	"temperature": {
+		"current": 35
+	},
+	"user_capacity": {
+		"blocks": 1000215216,
+		"bytes": 512110190592
+	}
+}

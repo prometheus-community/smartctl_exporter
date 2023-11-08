@@ -1,0 +1,107 @@
+{
+	"device": {
+		"info_name": "/dev/sda",
+		"name": "/dev/sda",
+		"protocol": "SCSI",
+		"type": "scsi"
+	},
+	"device_type": {
+		"name": "disk",
+		"scsi_terminology": "Peripheral Device Type [PDT]",
+		"scsi_value": 0
+	},
+	"json_format_version": [
+		1,
+		0
+	],
+	"local_time": {
+		"asctime": "Fri Feb 13 23:31:30 2009 UTC",
+		"time_t": 1234567890
+	},
+	"logical_block_size": 512,
+	"power_on_time": {
+		"hours": 91691,
+		"minutes": 24
+	},
+	"rotation_rate": 15015,
+	"scsi_error_counter_log": {
+		"read": {
+			"correction_algorithm_invocations": 128691559,
+			"errors_corrected_by_eccdelayed": 0,
+			"errors_corrected_by_eccfast": 128691425,
+			"errors_corrected_by_rereads_rewrites": 0,
+			"gigabytes_processed": "157558.954",
+			"total_errors_corrected": 128691425,
+			"total_uncorrected_errors": 0
+		},
+		"verify": {
+			"correction_algorithm_invocations": 342052,
+			"errors_corrected_by_eccdelayed": 0,
+			"errors_corrected_by_eccfast": 342052,
+			"errors_corrected_by_rereads_rewrites": 0,
+			"gigabytes_processed": "577.560",
+			"total_errors_corrected": 342052,
+			"total_uncorrected_errors": 0
+		},
+		"write": {
+			"correction_algorithm_invocations": 0,
+			"errors_corrected_by_eccdelayed": 0,
+			"errors_corrected_by_eccfast": 0,
+			"errors_corrected_by_rereads_rewrites": 0,
+			"gigabytes_processed": "13782.768",
+			"total_errors_corrected": 0,
+			"total_uncorrected_errors": 0
+		}
+	},
+	"scsi_grown_defect_list": 0,
+	"scsi_model_name": "SEAGATE ST373453LC",
+	"scsi_product": "ST373453LC",
+	"scsi_revision": "DX10",
+	"scsi_transport_protocol": {
+		"name": "Parallel SCSI (SPI-4)",
+		"value": 1
+	},
+	"scsi_vendor": "SEAGATE",
+	"serial_number": "REDACTED",
+	"smart_status": {
+		"passed": true
+	},
+	"smart_support": {
+		"available": true,
+		"enabled": false
+	},
+	"smartctl": {
+		"argv": [
+			"smartctl",
+			"--json",
+			"--info",
+			"--health",
+			"--attributes",
+			"--tolerance=verypermissive",
+			"--nocheck=standby",
+			"--format=brief",
+			"--log=error",
+			"/dev/sda"
+		],
+		"build_info": "REDACTED",
+		"exit_status": 0,
+		"platform_info": "REDACTED",
+		"pre_release": false,
+		"svn_revision": "5530",
+		"version": [
+			7,
+			4
+		]
+	},
+	"temperature": {
+		"current": 34,
+		"drive_trip": 68
+	},
+	"temperature_warning": {
+		"enabled": true
+	},
+	"user_capacity": {
+		"blocks": 143374650,
+		"bytes": 73407820800
+	}
+}

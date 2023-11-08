@@ -1,0 +1,849 @@
+{
+	"ata_smart_attributes": {
+		"revision": 10,
+		"table": [
+			{
+				"flags": {
+					"auto_keep": false,
+					"error_rate": true,
+					"event_count": false,
+					"performance": true,
+					"prefailure": true,
+					"string": "POSR-- ",
+					"updated_online": true,
+					"value": 15
+				},
+				"id": 1,
+				"name": "Raw_Read_Error_Rate",
+				"raw": {
+					"string": "143944925",
+					"value": 143944925
+				},
+				"thresh": 6,
+				"value": 117,
+				"when_failed": "",
+				"worst": 88
+			},
+			{
+				"flags": {
+					"auto_keep": false,
+					"error_rate": false,
+					"event_count": false,
+					"performance": false,
+					"prefailure": true,
+					"string": "PO---- ",
+					"updated_online": true,
+					"value": 3
+				},
+				"id": 3,
+				"name": "Spin_Up_Time",
+				"raw": {
+					"string": "0",
+					"value": 0
+				},
+				"thresh": 0,
+				"value": 96,
+				"when_failed": "",
+				"worst": 96
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 4,
+				"name": "Start_Stop_Count",
+				"raw": {
+					"string": "37",
+					"value": 37
+				},
+				"thresh": 20,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": true,
+					"string": "PO--CK ",
+					"updated_online": true,
+					"value": 51
+				},
+				"id": 5,
+				"name": "Reallocated_Sector_Ct",
+				"raw": {
+					"string": "0",
+					"value": 0
+				},
+				"thresh": 36,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": false,
+					"error_rate": true,
+					"event_count": false,
+					"performance": true,
+					"prefailure": true,
+					"string": "POSR-- ",
+					"updated_online": true,
+					"value": 15
+				},
+				"id": 7,
+				"name": "Seek_Error_Rate",
+				"raw": {
+					"string": "184476319",
+					"value": 184476319
+				},
+				"thresh": 30,
+				"value": 82,
+				"when_failed": "",
+				"worst": 55
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 9,
+				"name": "Power_On_Hours",
+				"raw": {
+					"string": "100161",
+					"value": 100161
+				},
+				"thresh": 0,
+				"value": 1,
+				"when_failed": "",
+				"worst": 1
+			},
+			{
+				"flags": {
+					"auto_keep": false,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": true,
+					"string": "PO--C- ",
+					"updated_online": true,
+					"value": 19
+				},
+				"id": 10,
+				"name": "Spin_Retry_Count",
+				"raw": {
+					"string": "0",
+					"value": 0
+				},
+				"thresh": 97,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 12,
+				"name": "Power_Cycle_Count",
+				"raw": {
+					"string": "79",
+					"value": 79
+				},
+				"thresh": 20,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 187,
+				"name": "Reported_Uncorrect",
+				"raw": {
+					"string": "0",
+					"value": 0
+				},
+				"thresh": 0,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": true,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O-RCK ",
+					"updated_online": true,
+					"value": 58
+				},
+				"id": 189,
+				"name": "High_Fly_Writes",
+				"raw": {
+					"string": "0",
+					"value": 0
+				},
+				"thresh": 0,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": false,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O---K ",
+					"updated_online": true,
+					"value": 34
+				},
+				"id": 190,
+				"name": "Airflow_Temperature_Cel",
+				"raw": {
+					"string": "33 (Min/Max 26/37)",
+					"value": 622460961
+				},
+				"thresh": 45,
+				"value": 67,
+				"when_failed": "",
+				"worst": 56
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": false,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O---K ",
+					"updated_online": true,
+					"value": 34
+				},
+				"id": 194,
+				"name": "Temperature_Celsius",
+				"raw": {
+					"string": "33 (0 20 0 0 0)",
+					"value": 85899345953
+				},
+				"thresh": 0,
+				"value": 33,
+				"when_failed": "",
+				"worst": 44
+			},
+			{
+				"flags": {
+					"auto_keep": false,
+					"error_rate": true,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O-RC- ",
+					"updated_online": true,
+					"value": 26
+				},
+				"id": 195,
+				"name": "Hardware_ECC_Recovered",
+				"raw": {
+					"string": "10474133",
+					"value": 10474133
+				},
+				"thresh": 0,
+				"value": 69,
+				"when_failed": "",
+				"worst": 64
+			},
+			{
+				"flags": {
+					"auto_keep": false,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--C- ",
+					"updated_online": true,
+					"value": 18
+				},
+				"id": 197,
+				"name": "Current_Pending_Sector",
+				"raw": {
+					"string": "0",
+					"value": 0
+				},
+				"thresh": 0,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": false,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "----C- ",
+					"updated_online": false,
+					"value": 16
+				},
+				"id": 198,
+				"name": "Offline_Uncorrectable",
+				"raw": {
+					"string": "0",
+					"value": 0
+				},
+				"thresh": 0,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": true,
+					"event_count": true,
+					"performance": true,
+					"prefailure": false,
+					"string": "-OSRCK ",
+					"updated_online": true,
+					"value": 62
+				},
+				"id": 199,
+				"name": "UDMA_CRC_Error_Count",
+				"raw": {
+					"string": "0",
+					"value": 0
+				},
+				"thresh": 0,
+				"value": 200,
+				"when_failed": "",
+				"worst": 200
+			},
+			{
+				"flags": {
+					"auto_keep": false,
+					"error_rate": false,
+					"event_count": false,
+					"performance": false,
+					"prefailure": false,
+					"string": "------ ",
+					"updated_online": false,
+					"value": 0
+				},
+				"id": 200,
+				"name": "Multi_Zone_Error_Rate",
+				"raw": {
+					"string": "0",
+					"value": 0
+				},
+				"thresh": 0,
+				"value": 100,
+				"when_failed": "",
+				"worst": 253
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 202,
+				"name": "Data_Address_Mark_Errs",
+				"raw": {
+					"string": "0",
+					"value": 0
+				},
+				"thresh": 0,
+				"value": 100,
+				"when_failed": "",
+				"worst": 253
+			}
+		]
+	},
+	"ata_smart_error_log": {
+		"summary": {
+			"count": 98,
+			"logged_count": 5,
+			"revision": 1,
+			"table": [
+				{
+					"completion_registers": {
+						"count": 1,
+						"device": 231,
+						"error": 16,
+						"lba": 4843886,
+						"status": 81
+					},
+					"error_number": 98,
+					"lifetime_hours": 7042,
+					"previous_commands": [
+						{
+							"command_name": "SET NATIVE MAX ADDRESS EXT [OBS-ACS-3]",
+							"powerup_milliseconds": 21652853,
+							"registers": {
+								"command": 55,
+								"count": 1,
+								"device": 231,
+								"device_control": 0,
+								"features": 255,
+								"lba": 4843886
+							}
+						},
+						{
+							"command_name": "READ NATIVE MAX ADDRESS EXT [OBS-ACS-3]",
+							"powerup_milliseconds": 21652717,
+							"registers": {
+								"command": 39,
+								"count": 0,
+								"device": 224,
+								"device_control": 0,
+								"features": 255,
+								"lba": 4843886
+							}
+						},
+						{
+							"command_name": "SET NATIVE MAX ADDRESS EXT [OBS-ACS-3]",
+							"powerup_milliseconds": 21652601,
+							"registers": {
+								"command": 55,
+								"count": 0,
+								"device": 231,
+								"device_control": 0,
+								"features": 255,
+								"lba": 4843886
+							}
+						},
+						{
+							"command_name": "READ NATIVE MAX ADDRESS EXT [OBS-ACS-3]",
+							"powerup_milliseconds": 21652540,
+							"registers": {
+								"command": 39,
+								"count": 1,
+								"device": 224,
+								"device_control": 0,
+								"features": 255,
+								"lba": 4843886
+							}
+						},
+						{
+							"command_name": "SET NATIVE MAX ADDRESS EXT [OBS-ACS-3]",
+							"powerup_milliseconds": 21648486,
+							"registers": {
+								"command": 55,
+								"count": 1,
+								"device": 231,
+								"device_control": 0,
+								"features": 255,
+								"lba": 4843886
+							}
+						}
+					]
+				},
+				{
+					"completion_registers": {
+						"count": 1,
+						"device": 231,
+						"error": 16,
+						"lba": 4843886,
+						"status": 81
+					},
+					"error_number": 97,
+					"lifetime_hours": 7042,
+					"previous_commands": [
+						{
+							"command_name": "SET NATIVE MAX ADDRESS EXT [OBS-ACS-3]",
+							"powerup_milliseconds": 21652853,
+							"registers": {
+								"command": 55,
+								"count": 1,
+								"device": 231,
+								"device_control": 0,
+								"features": 255,
+								"lba": 4843886
+							}
+						},
+						{
+							"command_name": "READ NATIVE MAX ADDRESS EXT [OBS-ACS-3]",
+							"powerup_milliseconds": 21652717,
+							"registers": {
+								"command": 39,
+								"count": 0,
+								"device": 224,
+								"device_control": 0,
+								"features": 255,
+								"lba": 4843886
+							}
+						},
+						{
+							"command_name": "SET NATIVE MAX ADDRESS EXT [OBS-ACS-3]",
+							"powerup_milliseconds": 21652601,
+							"registers": {
+								"command": 55,
+								"count": 0,
+								"device": 231,
+								"device_control": 0,
+								"features": 255,
+								"lba": 4843886
+							}
+						},
+						{
+							"command_name": "READ NATIVE MAX ADDRESS EXT [OBS-ACS-3]",
+							"powerup_milliseconds": 21652540,
+							"registers": {
+								"command": 39,
+								"count": 1,
+								"device": 224,
+								"device_control": 0,
+								"features": 255,
+								"lba": 4845999
+							}
+						},
+						{
+							"command_name": "READ MULTIPLE EXT",
+							"powerup_milliseconds": 21648486,
+							"registers": {
+								"command": 41,
+								"count": 1,
+								"device": 224,
+								"device_control": 0,
+								"features": 0,
+								"lba": 4845999
+							}
+						}
+					]
+				},
+				{
+					"completion_registers": {
+						"count": 1,
+						"device": 231,
+						"error": 16,
+						"lba": 4843886,
+						"status": 81
+					},
+					"error_number": 96,
+					"lifetime_hours": 5297,
+					"previous_commands": [
+						{
+							"command_name": "SET NATIVE MAX ADDRESS EXT [OBS-ACS-3]",
+							"powerup_milliseconds": 17205739,
+							"registers": {
+								"command": 55,
+								"count": 1,
+								"device": 231,
+								"device_control": 0,
+								"features": 255,
+								"lba": 4843886
+							}
+						},
+						{
+							"command_name": "READ NATIVE MAX ADDRESS EXT [OBS-ACS-3]",
+							"powerup_milliseconds": 17205674,
+							"registers": {
+								"command": 39,
+								"count": 0,
+								"device": 224,
+								"device_control": 0,
+								"features": 255,
+								"lba": 4843886
+							}
+						},
+						{
+							"command_name": "SET NATIVE MAX ADDRESS EXT [OBS-ACS-3]",
+							"powerup_milliseconds": 17205539,
+							"registers": {
+								"command": 55,
+								"count": 0,
+								"device": 231,
+								"device_control": 0,
+								"features": 255,
+								"lba": 4843886
+							}
+						},
+						{
+							"command_name": "READ NATIVE MAX ADDRESS EXT [OBS-ACS-3]",
+							"powerup_milliseconds": 17205422,
+							"registers": {
+								"command": 39,
+								"count": 1,
+								"device": 224,
+								"device_control": 0,
+								"features": 255,
+								"lba": 4843886
+							}
+						},
+						{
+							"command_name": "SET NATIVE MAX ADDRESS EXT [OBS-ACS-3]",
+							"powerup_milliseconds": 17205351,
+							"registers": {
+								"command": 55,
+								"count": 1,
+								"device": 231,
+								"device_control": 0,
+								"features": 255,
+								"lba": 4843886
+							}
+						}
+					]
+				},
+				{
+					"completion_registers": {
+						"count": 1,
+						"device": 231,
+						"error": 16,
+						"lba": 4843886,
+						"status": 81
+					},
+					"error_number": 95,
+					"lifetime_hours": 5297,
+					"previous_commands": [
+						{
+							"command_name": "SET NATIVE MAX ADDRESS EXT [OBS-ACS-3]",
+							"powerup_milliseconds": 17205739,
+							"registers": {
+								"command": 55,
+								"count": 1,
+								"device": 231,
+								"device_control": 0,
+								"features": 255,
+								"lba": 4843886
+							}
+						},
+						{
+							"command_name": "READ NATIVE MAX ADDRESS EXT [OBS-ACS-3]",
+							"powerup_milliseconds": 17205674,
+							"registers": {
+								"command": 39,
+								"count": 0,
+								"device": 224,
+								"device_control": 0,
+								"features": 255,
+								"lba": 4843886
+							}
+						},
+						{
+							"command_name": "SET NATIVE MAX ADDRESS EXT [OBS-ACS-3]",
+							"powerup_milliseconds": 17205539,
+							"registers": {
+								"command": 55,
+								"count": 0,
+								"device": 231,
+								"device_control": 0,
+								"features": 255,
+								"lba": 4843886
+							}
+						},
+						{
+							"command_name": "READ NATIVE MAX ADDRESS EXT [OBS-ACS-3]",
+							"powerup_milliseconds": 17205422,
+							"registers": {
+								"command": 39,
+								"count": 1,
+								"device": 224,
+								"device_control": 0,
+								"features": 255,
+								"lba": 4845999
+							}
+						},
+						{
+							"command_name": "READ MULTIPLE EXT",
+							"powerup_milliseconds": 17205351,
+							"registers": {
+								"command": 41,
+								"count": 1,
+								"device": 224,
+								"device_control": 0,
+								"features": 0,
+								"lba": 4845999
+							}
+						}
+					]
+				},
+				{
+					"completion_registers": {
+						"count": 1,
+						"device": 231,
+						"error": 16,
+						"lba": 4843886,
+						"status": 81
+					},
+					"error_number": 94,
+					"lifetime_hours": 5168,
+					"previous_commands": [
+						{
+							"command_name": "SET NATIVE MAX ADDRESS EXT [OBS-ACS-3]",
+							"powerup_milliseconds": 8100540,
+							"registers": {
+								"command": 55,
+								"count": 1,
+								"device": 231,
+								"device_control": 0,
+								"features": 255,
+								"lba": 4843886
+							}
+						},
+						{
+							"command_name": "READ NATIVE MAX ADDRESS EXT [OBS-ACS-3]",
+							"powerup_milliseconds": 8100540,
+							"registers": {
+								"command": 39,
+								"count": 0,
+								"device": 224,
+								"device_control": 0,
+								"features": 255,
+								"lba": 4843886
+							}
+						},
+						{
+							"command_name": "SET NATIVE MAX ADDRESS EXT [OBS-ACS-3]",
+							"powerup_milliseconds": 8100540,
+							"registers": {
+								"command": 55,
+								"count": 0,
+								"device": 231,
+								"device_control": 0,
+								"features": 255,
+								"lba": 4843886
+							}
+						},
+						{
+							"command_name": "READ NATIVE MAX ADDRESS EXT [OBS-ACS-3]",
+							"powerup_milliseconds": 8106725,
+							"registers": {
+								"command": 39,
+								"count": 1,
+								"device": 224,
+								"device_control": 0,
+								"features": 255,
+								"lba": 4843886
+							}
+						},
+						{
+							"command_name": "SET NATIVE MAX ADDRESS EXT [OBS-ACS-3]",
+							"powerup_milliseconds": 8106666,
+							"registers": {
+								"command": 55,
+								"count": 1,
+								"device": 231,
+								"device_control": 0,
+								"features": 255,
+								"lba": 4843886
+							}
+						}
+					]
+				}
+			]
+		}
+	},
+	"ata_version": {
+		"major_value": 254,
+		"minor_value": 0,
+		"string": "ATA/ATAPI-7 (minor revision not indicated)"
+	},
+	"device": {
+		"info_name": "/dev/sdb [SAT]",
+		"name": "/dev/sdb",
+		"protocol": "ATA",
+		"type": "sat"
+	},
+	"firmware_version": "REDACTED",
+	"in_smartctl_database": true,
+	"json_format_version": [
+		1,
+		0
+	],
+	"local_time": {
+		"asctime": "Fri Feb 13 23:31:30 2009 UTC",
+		"time_t": 1234567890
+	},
+	"logical_block_size": 512,
+	"model_family": "Seagate Barracuda 7200.10",
+	"model_name": "ST3200820AS",
+	"physical_block_size": 512,
+	"power_cycle_count": 79,
+	"power_on_time": {
+		"hours": 100161
+	},
+	"serial_number": "REDACTED",
+	"smart_status": {
+		"passed": true
+	},
+	"smart_support": {
+		"available": true,
+		"enabled": true
+	},
+	"smartctl": {
+		"argv": [
+			"smartctl",
+			"--json",
+			"--info",
+			"--health",
+			"--attributes",
+			"--tolerance=verypermissive",
+			"--nocheck=standby",
+			"--format=brief",
+			"--log=error",
+			"/dev/sdb"
+		],
+		"build_info": "REDACTED",
+		"drive_database_version": {
+			"string": "7.3/5533"
+		},
+		"exit_status": 64,
+		"platform_info": "REDACTED",
+		"svn_revision": "5338",
+		"version": [
+			7,
+			3
+		]
+	},
+	"temperature": {
+		"current": 33
+	},
+	"trim": {
+		"supported": false
+	},
+	"user_capacity": {
+		"blocks": 390719855,
+		"bytes": 200048565760
+	}
+}

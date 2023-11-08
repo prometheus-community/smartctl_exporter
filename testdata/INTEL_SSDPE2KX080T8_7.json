@@ -1,0 +1,90 @@
+{
+	"device": {
+		"info_name": "/dev/nvme3",
+		"name": "/dev/nvme3",
+		"protocol": "NVMe",
+		"type": "nvme"
+	},
+	"firmware_version": "REDACTED",
+	"json_format_version": [
+		1,
+		0
+	],
+	"local_time": {
+		"asctime": "Fri Feb 13 23:31:30 2009 UTC",
+		"time_t": 1234567890
+	},
+	"model_name": "INTEL SSDPE2KX080T8",
+	"nvme_controller_id": 0,
+	"nvme_ieee_oui_identifier": 6083300,
+	"nvme_number_of_namespaces": 128,
+	"nvme_pci_vendor": {
+		"id": 32902,
+		"subsystem_id": 32902
+	},
+	"nvme_smart_health_information_log": {
+		"available_spare": 100,
+		"available_spare_threshold": 10,
+		"controller_busy_time": 181,
+		"critical_comp_time": 0,
+		"critical_warning": 0,
+		"data_units_read": 17419632,
+		"data_units_written": 171147998,
+		"host_reads": 188762875,
+		"host_writes": 4953155968,
+		"media_errors": 0,
+		"num_err_log_entries": 0,
+		"percentage_used": 0,
+		"power_cycles": 39,
+		"power_on_hours": 12671,
+		"temperature": 31,
+		"unsafe_shutdowns": 16,
+		"warning_temp_time": 0
+	},
+	"nvme_total_capacity": 8001563222016,
+	"nvme_unallocated_capacity": 0,
+	"nvme_version": {
+		"string": "1.2",
+		"value": 66048
+	},
+	"power_cycle_count": 39,
+	"power_on_time": {
+		"hours": 12671
+	},
+	"serial_number": "REDACTED",
+	"smart_status": {
+		"nvme": {
+			"value": 0
+		},
+		"passed": true
+	},
+	"smart_support": {
+		"available": true,
+		"enabled": true
+	},
+	"smartctl": {
+		"argv": [
+			"smartctl",
+			"--json",
+			"--info",
+			"--health",
+			"--attributes",
+			"--tolerance=verypermissive",
+			"--nocheck=standby",
+			"--format=brief",
+			"--log=error",
+			"/dev/nvme3"
+		],
+		"build_info": "REDACTED",
+		"exit_status": 0,
+		"platform_info": "REDACTED",
+		"svn_revision": "5338",
+		"version": [
+			7,
+			3
+		]
+	},
+	"temperature": {
+		"current": 31
+	}
+}
