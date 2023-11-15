@@ -1,0 +1,120 @@
+{
+	"device": {
+		"info_name": "/dev/sdb",
+		"name": "/dev/sdb",
+		"protocol": "SCSI",
+		"type": "scsi"
+	},
+	"device_type": {
+		"name": "disk",
+		"scsi_terminology": "Peripheral Device Type [PDT]",
+		"scsi_value": 0
+	},
+	"form_factor": {
+		"name": "2.5 inches",
+		"scsi_value": 3
+	},
+	"json_format_version": [
+		1,
+		0
+	],
+	"local_time": {
+		"asctime": "Fri Feb 13 23:31:30 2009 UTC",
+		"time_t": 1234567890
+	},
+	"logical_block_size": 512,
+	"logical_unit_id": "0x1234567890abcdef",
+	"power_on_time": {
+		"hours": 22364,
+		"minutes": 52
+	},
+	"rotation_rate": 10020,
+	"scsi_error_counter_log": {
+		"read": {
+			"correction_algorithm_invocations": 304122,
+			"errors_corrected_by_eccdelayed": 40247,
+			"errors_corrected_by_eccfast": 0,
+			"errors_corrected_by_rereads_rewrites": 0,
+			"gigabytes_processed": "162438.759",
+			"total_errors_corrected": 40247,
+			"total_uncorrected_errors": 0
+		},
+		"verify": {
+			"correction_algorithm_invocations": 838388,
+			"errors_corrected_by_eccdelayed": 87,
+			"errors_corrected_by_eccfast": 0,
+			"errors_corrected_by_rereads_rewrites": 0,
+			"gigabytes_processed": "1.525",
+			"total_errors_corrected": 87,
+			"total_uncorrected_errors": 0
+		},
+		"write": {
+			"correction_algorithm_invocations": 4187545,
+			"errors_corrected_by_eccdelayed": 26762907,
+			"errors_corrected_by_eccfast": 0,
+			"errors_corrected_by_rereads_rewrites": 0,
+			"gigabytes_processed": "127551.260",
+			"total_errors_corrected": 26762907,
+			"total_uncorrected_errors": 0
+		}
+	},
+	"scsi_grown_defect_list": 0,
+	"scsi_model_name": "HITACHI H109060SESUN600G",
+	"scsi_product": "H109060SESUN600G",
+	"scsi_revision": "A31A",
+	"scsi_start_stop_cycle_counter": {
+		"accumulated_load_unload_cycles": 3472,
+		"accumulated_start_stop_cycles": 70,
+		"specified_cycle_count_over_device_lifetime": 50000,
+		"specified_load_unload_count_over_device_lifetime": 600000,
+		"week_of_manufacture": "05",
+		"year_of_manufacture": "2013"
+	},
+	"scsi_transport_protocol": {
+		"name": "SAS (SPL-4)",
+		"value": 6
+	},
+	"scsi_vendor": "HITACHI",
+	"scsi_version": "SPC-4",
+	"serial_number": "REDACTED",
+	"smart_status": {
+		"passed": true
+	},
+	"smart_support": {
+		"available": true,
+		"enabled": true
+	},
+	"smartctl": {
+		"argv": [
+			"smartctl",
+			"--json",
+			"--info",
+			"--health",
+			"--attributes",
+			"--tolerance=verypermissive",
+			"--nocheck=standby",
+			"--format=brief",
+			"--log=error",
+			"/dev/sdb"
+		],
+		"build_info": "REDACTED",
+		"exit_status": 0,
+		"platform_info": "REDACTED",
+		"svn_revision": "5338",
+		"version": [
+			7,
+			3
+		]
+	},
+	"temperature": {
+		"current": 26,
+		"drive_trip": 85
+	},
+	"temperature_warning": {
+		"enabled": true
+	},
+	"user_capacity": {
+		"blocks": 1172123568,
+		"bytes": 600127266816
+	}
+}

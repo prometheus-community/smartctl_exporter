@@ -1,0 +1,118 @@
+{
+	"device": {
+		"info_name": "/dev/nvme0",
+		"name": "/dev/nvme0",
+		"protocol": "NVMe",
+		"type": "nvme"
+	},
+	"firmware_version": "REDACTED",
+	"json_format_version": [
+		1,
+		0
+	],
+	"local_time": {
+		"asctime": "Fri Feb 13 23:31:30 2009 UTC",
+		"time_t": 1234567890
+	},
+	"logical_block_size": 512,
+	"model_name": "SAMSUNG MZQLB1T9HAJR-00007",
+	"nvme_controller_id": 4,
+	"nvme_ieee_oui_identifier": 9528,
+	"nvme_namespaces": [
+		{
+			"capacity": {
+				"blocks": 3750748848,
+				"bytes": 1920383410176
+			},
+			"formatted_lba_size": 512,
+			"id": 1,
+			"size": {
+				"blocks": 3750748848,
+				"bytes": 1920383410176
+			},
+			"utilization": {
+				"blocks": 284186528,
+				"bytes": 145503502336
+			}
+		}
+	],
+	"nvme_number_of_namespaces": 1,
+	"nvme_pci_vendor": {
+		"id": 5197,
+		"subsystem_id": 5197
+	},
+	"nvme_smart_health_information_log": {
+		"available_spare": 100,
+		"available_spare_threshold": 10,
+		"controller_busy_time": 223,
+		"critical_comp_time": 0,
+		"critical_warning": 0,
+		"data_units_read": 12345514,
+		"data_units_written": 44965392,
+		"host_reads": 81115611,
+		"host_writes": 508465316,
+		"media_errors": 0,
+		"num_err_log_entries": 14,
+		"percentage_used": 0,
+		"power_cycles": 6,
+		"power_on_hours": 20701,
+		"temperature": 40,
+		"temperature_sensors": [
+			40,
+			43,
+			48
+		],
+		"unsafe_shutdowns": 0,
+		"warning_temp_time": 0
+	},
+	"nvme_total_capacity": 1920383410176,
+	"nvme_unallocated_capacity": 0,
+	"nvme_version": {
+		"string": "1.2",
+		"value": 66048
+	},
+	"power_cycle_count": 6,
+	"power_on_time": {
+		"hours": 20701
+	},
+	"serial_number": "REDACTED",
+	"smart_status": {
+		"nvme": {
+			"value": 0
+		},
+		"passed": true
+	},
+	"smart_support": {
+		"available": true,
+		"enabled": true
+	},
+	"smartctl": {
+		"argv": [
+			"smartctl",
+			"--json",
+			"--info",
+			"--health",
+			"--attributes",
+			"--tolerance=verypermissive",
+			"--nocheck=standby",
+			"--format=brief",
+			"--log=error",
+			"/dev/nvme0"
+		],
+		"build_info": "REDACTED",
+		"exit_status": 0,
+		"platform_info": "REDACTED",
+		"svn_revision": "5338",
+		"version": [
+			7,
+			3
+		]
+	},
+	"temperature": {
+		"current": 40
+	},
+	"user_capacity": {
+		"blocks": 3750748848,
+		"bytes": 1920383410176
+	}
+}

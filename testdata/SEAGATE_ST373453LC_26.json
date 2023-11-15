@@ -1,0 +1,98 @@
+{
+	"device": {
+		"info_name": "/dev/sdb",
+		"name": "/dev/sdb",
+		"protocol": "SCSI",
+		"type": "scsi"
+	},
+	"device_type": {
+		"name": "disk",
+		"scsi_terminology": "Peripheral Device Type [PDT]",
+		"scsi_value": 0
+	},
+	"json_format_version": [
+		1,
+		0
+	],
+	"local_time": {
+		"asctime": "Fri Feb 13 23:31:30 2009 UTC",
+		"time_t": 1234567890
+	},
+	"logical_block_size": 512,
+	"power_on_time": {
+		"hours": 102880,
+		"minutes": 59
+	},
+	"rotation_rate": 15015,
+	"scsi_error_counter_log": {
+		"read": {
+			"correction_algorithm_invocations": 5332649,
+			"errors_corrected_by_eccdelayed": 1,
+			"errors_corrected_by_eccfast": 5330255,
+			"errors_corrected_by_rereads_rewrites": 41,
+			"gigabytes_processed": "11523.849",
+			"total_errors_corrected": 5330297,
+			"total_uncorrected_errors": 1
+		},
+		"write": {
+			"correction_algorithm_invocations": 128473,
+			"errors_corrected_by_eccdelayed": 0,
+			"errors_corrected_by_eccfast": 0,
+			"errors_corrected_by_rereads_rewrites": 1973,
+			"gigabytes_processed": "11151.772",
+			"total_errors_corrected": 1973,
+			"total_uncorrected_errors": 535
+		}
+	},
+	"scsi_grown_defect_list": 260,
+	"scsi_model_name": "SEAGATE ST373453LC",
+	"scsi_product": "ST373453LC",
+	"scsi_revision": "DX10",
+	"scsi_transport_protocol": {
+		"name": "Parallel SCSI (SPI-4)",
+		"value": 1
+	},
+	"scsi_vendor": "SEAGATE",
+	"serial_number": "REDACTED",
+	"smart_status": {
+		"passed": true
+	},
+	"smart_support": {
+		"available": true,
+		"enabled": true
+	},
+	"smartctl": {
+		"argv": [
+			"smartctl",
+			"--json",
+			"--info",
+			"--health",
+			"--attributes",
+			"--tolerance=verypermissive",
+			"--nocheck=standby",
+			"--format=brief",
+			"--log=error",
+			"/dev/sdb"
+		],
+		"build_info": "REDACTED",
+		"exit_status": 0,
+		"platform_info": "REDACTED",
+		"pre_release": false,
+		"svn_revision": "5530",
+		"version": [
+			7,
+			4
+		]
+	},
+	"temperature": {
+		"current": 33,
+		"drive_trip": 68
+	},
+	"temperature_warning": {
+		"enabled": false
+	},
+	"user_capacity": {
+		"blocks": 143374650,
+		"bytes": 73407820800
+	}
+}

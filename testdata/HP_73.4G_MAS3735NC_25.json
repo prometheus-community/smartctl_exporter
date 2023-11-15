@@ -1,0 +1,101 @@
+{
+	"device": {
+		"info_name": "/dev/sdc",
+		"name": "/dev/sdc",
+		"protocol": "SCSI",
+		"type": "scsi"
+	},
+	"device_type": {
+		"name": "disk",
+		"scsi_terminology": "Peripheral Device Type [PDT]",
+		"scsi_value": 0
+	},
+	"json_format_version": [
+		1,
+		0
+	],
+	"local_time": {
+		"asctime": "Fri Feb 13 23:31:30 2009 UTC",
+		"time_t": 1234567890
+	},
+	"logical_block_size": 512,
+	"logical_unit_id": "0x1234567890abcdef",
+	"rotation_rate": 15000,
+	"scsi_error_counter_log": {
+		"read": {
+			"correction_algorithm_invocations": 0,
+			"errors_corrected_by_eccdelayed": 1020,
+			"errors_corrected_by_eccfast": 0,
+			"errors_corrected_by_rereads_rewrites": 0,
+			"gigabytes_processed": "64396.534",
+			"total_errors_corrected": 0,
+			"total_uncorrected_errors": 0
+		},
+		"write": {
+			"correction_algorithm_invocations": 0,
+			"errors_corrected_by_eccdelayed": 338,
+			"errors_corrected_by_eccfast": 0,
+			"errors_corrected_by_rereads_rewrites": 0,
+			"gigabytes_processed": "28837.334",
+			"total_errors_corrected": 0,
+			"total_uncorrected_errors": 0
+		}
+	},
+	"scsi_grown_defect_list": 0,
+	"scsi_model_name": "HP 73.4G MAS3735NC",
+	"scsi_product": "MAS3735NC",
+	"scsi_revision": "HPC3",
+	"scsi_start_stop_cycle_counter": {
+		"accumulated_start_stop_cycles": 184,
+		"specified_cycle_count_over_device_lifetime": 10000,
+		"week_of_manufacture": "25",
+		"year_of_manufacture": "2004"
+	},
+	"scsi_transport_protocol": {
+		"name": "Parallel SCSI (SPI-4)",
+		"value": 1
+	},
+	"scsi_vendor": "HP 73.4G",
+	"serial_number": "REDACTED",
+	"smart_status": {
+		"passed": true
+	},
+	"smart_support": {
+		"available": true,
+		"enabled": true
+	},
+	"smartctl": {
+		"argv": [
+			"smartctl",
+			"--json",
+			"--info",
+			"--health",
+			"--attributes",
+			"--tolerance=verypermissive",
+			"--nocheck=standby",
+			"--format=brief",
+			"--log=error",
+			"/dev/sdc"
+		],
+		"build_info": "REDACTED",
+		"exit_status": 0,
+		"platform_info": "REDACTED",
+		"pre_release": false,
+		"svn_revision": "5530",
+		"version": [
+			7,
+			4
+		]
+	},
+	"temperature": {
+		"current": 28,
+		"drive_trip": 65
+	},
+	"temperature_warning": {
+		"enabled": true
+	},
+	"user_capacity": {
+		"blocks": 143374738,
+		"bytes": 73407865856
+	}
+}
