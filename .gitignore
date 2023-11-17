@@ -2,8 +2,7 @@
 /.build
 /.release
 /.tarballs
-debug
-*.json
+debug/
 
 Manifest
 smartctl_exporter
