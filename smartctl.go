@@ -29,6 +29,9 @@ type SMARTDevice struct {
 	serial string
 	family string
 	model  string
+	// These are used to select types of metrics.
+	interface_ string
+	protocol   string
 }
 
 // SMARTctl object
@@ -41,15 +44,28 @@ type SMARTctl struct {
 
 // NewSMARTctl is smartctl constructor
 func NewSMARTctl(logger log.Logger, json gjson.Result, ch chan<- prometheus.Metric) SMARTctl {
+	var model_name string
+	if obj := json.Get("model_name"); obj.Exists() {
+		model_name = obj.String()
+	} else if obj := json.Get("scsi_model_name"); obj.Exists() {
+		model_name = obj.String()
+	}
+	// If the drive returns an empty model name, replace that with unknown.
+	if model_name == "" {
+		model_name = "unknown"
+	}
+
 	return SMARTctl{
 		ch:     ch,
 		json:   json,
 		logger: logger,
 		device: SMARTDevice{
-			device: strings.TrimPrefix(strings.TrimSpace(json.Get("device.name").String()), "/dev/"),
-			serial: strings.TrimSpace(json.Get("serial_number").String()),
-			family: strings.TrimSpace(GetStringIfExists(json, "model_family", "unknown")),
-			model:  strings.TrimSpace(json.Get("model_name").String()),
+			device:     strings.TrimPrefix(strings.TrimSpace(json.Get("device.name").String()), "/dev/"),
+			serial:     strings.TrimSpace(json.Get("serial_number").String()),
+			family:     strings.TrimSpace(GetStringIfExists(json, "model_family", "unknown")),
+			model:      strings.TrimSpace(model_name),
+			interface_: strings.TrimSpace(json.Get("device.type").String()),
+			protocol:   strings.TrimSpace(json.Get("device.protocol").String()),
 		},
 	}
 }
@@ -66,23 +82,31 @@ func (smart *SMARTctl) Collect() {
 	smart.minePowerOnSeconds()
 	smart.mineRotationRate()
 	smart.mineTemperatures()
-	smart.minePowerCycleCount()
+	smart.minePowerCycleCount() // ATA/SATA, NVME, SCSI, SAS
 	smart.mineDeviceSCTStatus()
 	smart.mineDeviceStatistics()
 	smart.mineDeviceErrorLog()
 	smart.mineDeviceSelfTestLog()
 	smart.mineDeviceERC()
-	smart.mineNvmePercentageUsed()
-	smart.mineNvmeAvailableSpare()
-	smart.mineNvmeAvailableSpareThreshold()
-	smart.mineNvmeCriticalWarning()
-	smart.mineNvmeMediaErrors()
-	smart.mineNvmeNumErrLogEntries()
-	smart.mineNvmeBytesRead()
-	smart.mineNvmeBytesWritten()
 	smart.mineSmartStatus()
-	smart.mineSCSIGrownDefectList()
-	smart.mineSCSIErrorCounterLog()
+
+	if smart.device.interface_ == "nvme" {
+		smart.mineNvmePercentageUsed()
+		smart.mineNvmeAvailableSpare()
+		smart.mineNvmeAvailableSpareThreshold()
+		smart.mineNvmeCriticalWarning()
+		smart.mineNvmeMediaErrors()
+		smart.mineNvmeNumErrLogEntries()
+		smart.mineNvmeBytesRead()
+		smart.mineNvmeBytesWritten()
+	}
+	// SCSI, SAS
+	if smart.device.interface_ == "scsi" {
+		smart.mineSCSIGrownDefectList()
+		smart.mineSCSIErrorCounterLog()
+		smart.mineSCSIBytesRead()
+		smart.mineSCSIBytesWritten()
+	}
 }
 
 func (smart *SMARTctl) mineExitStatus() {
@@ -95,14 +119,13 @@ func (smart *SMARTctl) mineExitStatus() {
 }
 
 func (smart *SMARTctl) mineDevice() {
-	device := smart.json.Get("device")
 	smart.ch <- prometheus.MustNewConstMetric(
 		metricDeviceModel,
 		prometheus.GaugeValue,
 		1,
 		smart.device.device,
-		device.Get("type").String(),
-		device.Get("protocol").String(),
+		smart.device.interface_,
+		smart.device.protocol,
 		smart.device.family,
 		smart.device.model,
 		smart.device.serial,
@@ -111,6 +134,11 @@ func (smart *SMARTctl) mineDevice() {
 		smart.json.Get("ata_version.string").String(),
 		smart.json.Get("sata_version.string").String(),
 		smart.json.Get("form_factor.name").String(),
+		// scsi_model_name is mapped into model_name
+		smart.json.Get("scsi_vendor").String(),
+		smart.json.Get("scsi_product").String(),
+		smart.json.Get("scsi_revision").String(),
+		smart.json.Get("scsi_version").String(),
 	)
 }
 
@@ -130,12 +158,15 @@ func (smart *SMARTctl) mineCapacity() {
 		smart.json.Get("user_capacity.bytes").Float(),
 		smart.device.device,
 	)
-	smart.ch <- prometheus.MustNewConstMetric(
-		metricDeviceTotalCapacityBytes,
-		prometheus.GaugeValue,
-		smart.json.Get("nvme_total_capacity").Float(),
-		smart.device.device,
-	)
+	nvme_total_capacity := smart.json.Get("nvme_total_capacity")
+	if nvme_total_capacity.Exists() {
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricDeviceTotalCapacityBytes,
+			prometheus.GaugeValue,
+			nvme_total_capacity.Float(),
+			smart.device.device,
+		)
+	}
 }
 
 func (smart *SMARTctl) mineBlockSize() {
@@ -151,16 +182,21 @@ func (smart *SMARTctl) mineBlockSize() {
 }
 
 func (smart *SMARTctl) mineInterfaceSpeed() {
+	// TODO: Support scsi_sas_port_[01].phy_N.negotiated_logical_link_rate
 	iSpeed := smart.json.Get("interface_speed")
-	for _, speedType := range []string{"max", "current"} {
-		tSpeed := iSpeed.Get(speedType)
-		smart.ch <- prometheus.MustNewConstMetric(
-			metricDeviceInterfaceSpeed,
-			prometheus.GaugeValue,
-			tSpeed.Get("units_per_second").Float()*tSpeed.Get("bits_per_unit").Float(),
-			smart.device.device,
-			speedType,
-		)
+	if iSpeed.Exists() {
+		for _, speedType := range []string{"max", "current"} {
+			tSpeed := iSpeed.Get(speedType)
+			if tSpeed.Exists() {
+				smart.ch <- prometheus.MustNewConstMetric(
+					metricDeviceInterfaceSpeed,
+					prometheus.GaugeValue,
+					tSpeed.Get("units_per_second").Float()*tSpeed.Get("bits_per_unit").Float(),
+					smart.device.device,
+					speedType,
+				)
+			}
+		}
 	}
 }
 
@@ -200,16 +236,21 @@ func (smart *SMARTctl) mineDeviceAttribute() {
 
 func (smart *SMARTctl) minePowerOnSeconds() {
 	pot := smart.json.Get("power_on_time")
-	smart.ch <- prometheus.MustNewConstMetric(
-		metricDevicePowerOnSeconds,
-		prometheus.CounterValue,
-		GetFloatIfExists(pot, "hours", 0)*60*60+GetFloatIfExists(pot, "minutes", 0)*60,
-		smart.device.device,
-	)
+	// If the power_on_time is NOT present, do not report as 0.
+	if pot.Exists() {
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricDevicePowerOnSeconds,
+			prometheus.CounterValue,
+			GetFloatIfExists(pot, "hours", 0)*60*60+GetFloatIfExists(pot, "minutes", 0)*60,
+			smart.device.device,
+		)
+	}
 }
 
 func (smart *SMARTctl) mineRotationRate() {
 	rRate := GetFloatIfExists(smart.json, "rotation_rate", 0)
+	// TODO: what should be done if this is absent vs really zero (for
+	// solid-state drives)?
 	if rRate > 0 {
 		smart.ch <- prometheus.MustNewConstMetric(
 			metricDeviceRotationRate,
@@ -222,6 +263,7 @@ func (smart *SMARTctl) mineRotationRate() {
 
 func (smart *SMARTctl) mineTemperatures() {
 	temperatures := smart.json.Get("temperature")
+	// TODO: Implement scsi_environmental_reports
 	if temperatures.Exists() {
 		temperatures.ForEach(func(key, value gjson.Result) bool {
 			smart.ch <- prometheus.MustNewConstMetric(
@@ -237,12 +279,29 @@ func (smart *SMARTctl) mineTemperatures() {
 }
 
 func (smart *SMARTctl) minePowerCycleCount() {
-	smart.ch <- prometheus.MustNewConstMetric(
-		metricDevicePowerCycleCount,
-		prometheus.CounterValue,
-		smart.json.Get("power_cycle_count").Float(),
-		smart.device.device,
-	)
+	// ATA & NVME
+	powerCycleCount := smart.json.Get("power_cycle_count")
+	if powerCycleCount.Exists() {
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricDevicePowerCycleCount,
+			prometheus.CounterValue,
+			powerCycleCount.Float(),
+			smart.device.device,
+		)
+		return
+	}
+
+	// SCSI
+	powerCycleCount = smart.json.Get("scsi_start_stop_cycle_counter.accumulated_start_stop_cycles")
+	if powerCycleCount.Exists() {
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricDevicePowerCycleCount,
+			prometheus.CounterValue,
+			powerCycleCount.Float(),
+			smart.device.device,
+		)
+		return
+	}
 }
 
 func (smart *SMARTctl) mineDeviceSCTStatus() {
@@ -312,27 +371,65 @@ func (smart *SMARTctl) mineNvmeNumErrLogEntries() {
 }
 
 func (smart *SMARTctl) mineNvmeBytesRead() {
-	blockSize := smart.json.Get("logical_block_size").Float()
+	blockSize := smart.json.Get("logical_block_size")
+	data_units_read := smart.json.Get("nvme_smart_health_information_log.data_units_read")
+	if !blockSize.Exists() || !data_units_read.Exists() {
+		return
+	}
 	smart.ch <- prometheus.MustNewConstMetric(
 		metricDeviceBytesRead,
 		prometheus.CounterValue,
 		// This value is reported in thousands (i.e., a value of 1 corresponds to 1000 units of 512 bytes written) and is rounded up.
 		// When the LBA size is a value other than 512 bytes, the controller shall convert the amount of data written to 512 byte units.
-		smart.json.Get("nvme_smart_health_information_log.data_units_read").Float()*1000.0*blockSize,
+		data_units_read.Float()*1000.0*blockSize.Float(),
 		smart.device.device,
 	)
 }
 
 func (smart *SMARTctl) mineNvmeBytesWritten() {
-	blockSize := smart.json.Get("logical_block_size").Float()
+	blockSize := smart.json.Get("logical_block_size")
+	data_units_written := smart.json.Get("nvme_smart_health_information_log.data_units_written")
+	if !blockSize.Exists() || !data_units_written.Exists() {
+		return
+	}
 	smart.ch <- prometheus.MustNewConstMetric(
 		metricDeviceBytesWritten,
 		prometheus.CounterValue,
 		// This value is reported in thousands (i.e., a value of 1 corresponds to 1000 units of 512 bytes written) and is rounded up.
 		// When the LBA size is a value other than 512 bytes, the controller shall convert the amount of data written to 512 byte units.
-		smart.json.Get("nvme_smart_health_information_log.data_units_written").Float()*1000.0*blockSize,
+		data_units_written.Float()*1000.0*blockSize.Float(),
 		smart.device.device,
 	)
+}
+
+func (smart *SMARTctl) mineSCSIBytesRead() {
+	SCSIHealth := smart.json.Get("scsi_error_counter_log")
+	if SCSIHealth.Exists() {
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricDeviceBytesRead,
+			prometheus.CounterValue,
+			// This value is reported by SMARTctl in GB [10^9].
+			// It is possible that some drives mis-report the value, but
+			// that is not the responsibility of the exporter or smartctl
+			SCSIHealth.Get("read.gigabytes_processed").Float()*1e9,
+			smart.device.device,
+		)
+	}
+}
+
+func (smart *SMARTctl) mineSCSIBytesWritten() {
+	SCSIHealth := smart.json.Get("scsi_error_counter_log")
+	if SCSIHealth.Exists() {
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricDeviceBytesWritten,
+			prometheus.CounterValue,
+			// This value is reported by SMARTctl in GB [10^9].
+			// It is possible that some drives mis-report the value, but
+			// that is not the responsibility of the exporter or smartctl
+			SCSIHealth.Get("write.gigabytes_processed").Float()*1e9,
+			smart.device.device,
+		)
+	}
 }
 
 func (smart *SMARTctl) mineSmartStatus() {
@@ -461,6 +558,18 @@ func (smart *SMARTctl) mineSCSIErrorCounterLog() {
 			smart.device.device,
 		)
 		smart.ch <- prometheus.MustNewConstMetric(
+			metricReadErrorsCorrectedByEccFast,
+			prometheus.GaugeValue,
+			SCSIHealth.Get("read.errors_corrected_by_eccfast").Float(),
+			smart.device.device,
+		)
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricReadErrorsCorrectedByEccDelayed,
+			prometheus.GaugeValue,
+			SCSIHealth.Get("read.errors_corrected_by_eccdelayed").Float(),
+			smart.device.device,
+		)
+		smart.ch <- prometheus.MustNewConstMetric(
 			metricReadTotalUncorrectedErrors,
 			prometheus.GaugeValue,
 			SCSIHealth.Get("read.total_uncorrected_errors").Float(),
@@ -473,10 +582,23 @@ func (smart *SMARTctl) mineSCSIErrorCounterLog() {
 			smart.device.device,
 		)
 		smart.ch <- prometheus.MustNewConstMetric(
+			metricWriteErrorsCorrectedByEccFast,
+			prometheus.GaugeValue,
+			SCSIHealth.Get("write.errors_corrected_by_eccfast").Float(),
+			smart.device.device,
+		)
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricWriteErrorsCorrectedByEccDelayed,
+			prometheus.GaugeValue,
+			SCSIHealth.Get("write.errors_corrected_by_eccdelayed").Float(),
+			smart.device.device,
+		)
+		smart.ch <- prometheus.MustNewConstMetric(
 			metricWriteTotalUncorrectedErrors,
 			prometheus.GaugeValue,
 			SCSIHealth.Get("write.total_uncorrected_errors").Float(),
 			smart.device.device,
 		)
+		// TODO: Should we also export the verify category?
 	}
 }

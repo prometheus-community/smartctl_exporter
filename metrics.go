@@ -44,6 +44,11 @@ var (
 			"ata_version",
 			"sata_version",
 			"form_factor",
+			// scsi_model_name is mapped into model_name
+			"scsi_vendor",
+			"scsi_product",
+			"scsi_revision",
+			"scsi_version",
 		},
 		nil,
 	)
@@ -293,6 +298,22 @@ var (
 		},
 		nil,
 	)
+	metricReadErrorsCorrectedByEccFast = prometheus.NewDesc(
+		"smartctl_read_errors_corrected_by_eccfast",
+		"Read Errors Corrected by ECC Fast",
+		[]string{
+			"device",
+		},
+		nil,
+	)
+	metricReadErrorsCorrectedByEccDelayed = prometheus.NewDesc(
+		"smartctl_read_errors_corrected_by_eccdelayed",
+		"Read Errors Corrected by ECC Delayed",
+		[]string{
+			"device",
+		},
+		nil,
+	)
 	metricReadTotalUncorrectedErrors = prometheus.NewDesc(
 		"smartctl_read_total_uncorrected_errors",
 		"Read Total Uncorrected Errors",
@@ -304,6 +325,22 @@ var (
 	metricWriteErrorsCorrectedByRereadsRewrites = prometheus.NewDesc(
 		"smartctl_write_errors_corrected_by_rereads_rewrites",
 		"Write Errors Corrected by ReReads/ReWrites",
+		[]string{
+			"device",
+		},
+		nil,
+	)
+	metricWriteErrorsCorrectedByEccFast = prometheus.NewDesc(
+		"smartctl_write_errors_corrected_by_eccfast",
+		"Write Errors Corrected by ECC Fast",
+		[]string{
+			"device",
+		},
+		nil,
+	)
+	metricWriteErrorsCorrectedByEccDelayed = prometheus.NewDesc(
+		"smartctl_write_errors_corrected_by_eccdelayed",
+		"Write Errors Corrected by ECC Delayed",
 		[]string{
 			"device",
 		},
