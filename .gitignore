@@ -4,6 +4,9 @@
 /.tarballs
 debug/
 
+# .cache is used to store transient data (bash history) in devcontainers.
+.cache/
+
 Manifest
 smartctl_exporter
 *.exe
