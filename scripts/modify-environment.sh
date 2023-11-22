@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# This script modifies the environemnt, namely ~/.bashrc, to preserve the bash history.
+# This script modifies the environment, namely ~/.bashrc, to preserve the bash history.
 
 # The workspace in the devcontainer is preserved across rebuilds.
 # Use .cache to keep history and local scripts.
