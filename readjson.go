@@ -113,6 +113,7 @@ func readData(logger log.Logger, device string) gjson.Result {
 // Parse smartctl return code
 func resultCodeIsOk(logger log.Logger, device string, SMARTCtlResult int64) bool {
 	result := true
+	level.Debug(logger).Log("msg", "smartctl result for device", "SMARTCtlResult", SMARTCtlResult, "device", device)
 	if SMARTCtlResult > 0 {
 		b := SMARTCtlResult
 		if (b & 1) != 0 {
