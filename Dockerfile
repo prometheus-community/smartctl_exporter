@@ -11,7 +11,7 @@ FROM ${BUILD_IMAGE} as base
 
 SHELL ["/bin/sh", "-e", "-u", "-o", "pipefail", "-o", "errexit", "-o", "nounset", "-c"]
 
-WORKDIR /src/smartctl-exporter
+WORKDIR /src/prometheus-smartctl-exporter
 
 ARG GO111MODULE="on"
 ARG CGO_ENABLED="0"
@@ -22,8 +22,8 @@ ENV GO111MODULE="${GO111MODULE}" \
     GOARCH="${GOARCH}" \
     GOOS="${GOOS}"
 
-RUN --mount=type=bind,source=./smartctl-exporter/go.mod,target=./go.mod \
-    --mount=type=bind,source=./smartctl-exporter/go.sum,target=./go.sum \
+RUN --mount=type=bind,source=./prometheus-smartctl-exporter/go.mod,target=./go.mod \
+    --mount=type=bind,source=./prometheus-smartctl-exporter/go.sum,target=./go.sum \
     --mount=type=cache,target=/go/pkg/mod \
     go mod download
 
@@ -33,7 +33,7 @@ FROM ${GOLANGCI_LINT_IMAGE} AS lint-base
 # =============================================================================
 FROM base AS lint
 
-RUN --mount=type=bind,source=./smartctl-exporter/,target=./ \
+RUN --mount=type=bind,source=./prometheus-smartctl-exporter/,target=./ \
     --mount=from=lint-base,src=/usr/bin/golangci-lint,target=/usr/bin/golangci-lint \
     --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
@@ -46,7 +46,7 @@ RUN --mount=type=bind,source=./smartctl-exporter/,target=./ \
 # =============================================================================
 FROM base AS test
 
-RUN --mount=type=bind,source=./smartctl-exporter/,target=./ \
+RUN --mount=type=bind,source=./prometheus-smartctl-exporter/,target=./ \
     --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
     go test -v -coverprofile=/cover.out ./...
@@ -56,7 +56,7 @@ FROM base as build
 
 ARG APP_VERSION="docker"
 
-RUN --mount=type=bind,source=./smartctl-exporter/,target=./ \
+RUN --mount=type=bind,source=./prometheus-smartctl-exporter/,target=./ \
     --mount=from=lint-base,src=/usr/bin/golangci-lint,target=/usr/bin/golangci-lint \
     --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
