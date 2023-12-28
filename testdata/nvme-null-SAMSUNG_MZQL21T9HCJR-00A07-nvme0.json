@@ -1,0 +1,93 @@
+{
+	"device": {
+		"info_name": "/dev/nvme0",
+		"name": "/dev/nvme0",
+		"protocol": "NVMe",
+		"type": "nvme"
+	},
+	"firmware_version": "REDACTED",
+	"json_format_version": [
+		1,
+		0
+	],
+	"local_time": {
+		"asctime": "Fri Feb 13 23:31:30 2009 UTC",
+		"time_t": 1234567890
+	},
+	"model_name": "SAMSUNG MZQL21T9HCJR-00A07",
+	"nvme_controller_id": 6,
+	"nvme_ieee_oui_identifier": 9528,
+	"nvme_number_of_namespaces": 32,
+	"nvme_pci_vendor": {
+		"id": 5197,
+		"subsystem_id": 5197
+	},
+	"nvme_smart_health_information_log": {
+		"available_spare": 100,
+		"available_spare_threshold": 10,
+		"controller_busy_time": 3970,
+		"critical_comp_time": 0,
+		"critical_warning": 0,
+		"data_units_read": 70487783,
+		"data_units_written": 267397176,
+		"host_reads": 1980393839,
+		"host_writes": 9358693660,
+		"media_errors": 0,
+		"num_err_log_entries": 0,
+		"percentage_used": 3,
+		"power_cycles": 63,
+		"power_on_hours": 13113,
+		"temperature": 22,
+		"temperature_sensors": [
+			22,
+			29
+		],
+		"unsafe_shutdowns": 34,
+		"warning_temp_time": 0
+	},
+	"nvme_total_capacity": 1920383410176,
+	"nvme_unallocated_capacity": 0,
+	"nvme_version": {
+		"string": "1.4",
+		"value": 66560
+	},
+	"power_cycle_count": 63,
+	"power_on_time": {
+		"hours": 13113
+	},
+	"serial_number": "REDACTED",
+	"smart_status": {
+		"nvme": {
+			"value": 0
+		},
+		"passed": true
+	},
+	"smart_support": {
+		"available": true,
+		"enabled": true
+	},
+	"smartctl": {
+		"argv": [
+			"smartctl",
+			"--json",
+			"--info",
+			"--health",
+			"--attributes",
+			"--tolerance=verypermissive",
+			"--nocheck=standby",
+			"--format=brief",
+			"--log=error",
+			"/dev/nvme0"
+		],
+		"build_info": "REDACTED",
+		"exit_status": 0,
+		"platform_info": "REDACTED",
+		"version": [
+			7,
+			3
+		]
+	},
+	"temperature": {
+		"current": 22
+	}
+}

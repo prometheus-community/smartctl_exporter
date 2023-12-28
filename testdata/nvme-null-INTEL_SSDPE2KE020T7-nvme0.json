@@ -1,0 +1,116 @@
+{
+	"device": {
+		"info_name": "/dev/nvme0",
+		"name": "/dev/nvme0",
+		"protocol": "NVMe",
+		"type": "nvme"
+	},
+	"firmware_version": "REDACTED",
+	"json_format_version": [
+		1,
+		0
+	],
+	"local_time": {
+		"asctime": "Fri Feb 13 23:31:30 2009 UTC",
+		"time_t": 1234567890
+	},
+	"logical_block_size": 512,
+	"model_name": "INTEL SSDPE2KE020T7",
+	"nvme_controller_id": 0,
+	"nvme_ieee_oui_identifier": 6083300,
+	"nvme_namespaces": [
+		{
+			"capacity": {
+				"blocks": 3907029168,
+				"bytes": 2000398934016
+			},
+			"eui64": {
+				"ext_id": 276138426624,
+				"oui": 6083300
+			},
+			"formatted_lba_size": 512,
+			"id": 1,
+			"size": {
+				"blocks": 3907029168,
+				"bytes": 2000398934016
+			},
+			"utilization": {
+				"blocks": 3907029168,
+				"bytes": 2000398934016
+			}
+		}
+	],
+	"nvme_number_of_namespaces": 1,
+	"nvme_pci_vendor": {
+		"id": 32902,
+		"subsystem_id": 32902
+	},
+	"nvme_smart_health_information_log": {
+		"available_spare": 99,
+		"available_spare_threshold": 10,
+		"controller_busy_time": 1120,
+		"critical_comp_time": 0,
+		"critical_warning": 0,
+		"data_units_read": 788753289,
+		"data_units_written": 577364942,
+		"host_reads": 18069915709,
+		"host_writes": 31991278795,
+		"media_errors": 0,
+		"num_err_log_entries": 0,
+		"percentage_used": 3,
+		"power_cycles": 121,
+		"power_on_hours": 26055,
+		"temperature": 14,
+		"unsafe_shutdowns": 98,
+		"warning_temp_time": 0
+	},
+	"nvme_total_capacity": 2000398934016,
+	"nvme_unallocated_capacity": 0,
+	"nvme_version": {
+		"string": "1.2",
+		"value": 66048
+	},
+	"power_cycle_count": 121,
+	"power_on_time": {
+		"hours": 26055
+	},
+	"serial_number": "REDACTED",
+	"smart_status": {
+		"nvme": {
+			"value": 0
+		},
+		"passed": true
+	},
+	"smart_support": {
+		"available": true,
+		"enabled": true
+	},
+	"smartctl": {
+		"argv": [
+			"smartctl",
+			"--json",
+			"--info",
+			"--health",
+			"--attributes",
+			"--tolerance=verypermissive",
+			"--nocheck=standby",
+			"--format=brief",
+			"--log=error",
+			"/dev/nvme0"
+		],
+		"build_info": "REDACTED",
+		"exit_status": 0,
+		"platform_info": "REDACTED",
+		"version": [
+			7,
+			3
+		]
+	},
+	"temperature": {
+		"current": 14
+	},
+	"user_capacity": {
+		"blocks": 3907029168,
+		"bytes": 2000398934016
+	}
+}

@@ -1,0 +1,116 @@
+{
+	"device": {
+		"info_name": "/dev/nvme6",
+		"name": "/dev/nvme6",
+		"protocol": "NVMe",
+		"type": "nvme"
+	},
+	"firmware_version": "REDACTED",
+	"json_format_version": [
+		1,
+		0
+	],
+	"local_time": {
+		"asctime": "Fri Feb 13 23:31:30 2009 UTC",
+		"time_t": 1234567890
+	},
+	"logical_block_size": 4096,
+	"model_name": "INTEL SSDPE2KX020T7",
+	"nvme_controller_id": 0,
+	"nvme_ieee_oui_identifier": 6083300,
+	"nvme_namespaces": [
+		{
+			"capacity": {
+				"blocks": 488378646,
+				"bytes": 2000398934016
+			},
+			"eui64": {
+				"ext_id": 193695907840,
+				"oui": 6083300
+			},
+			"formatted_lba_size": 4096,
+			"id": 1,
+			"size": {
+				"blocks": 488378646,
+				"bytes": 2000398934016
+			},
+			"utilization": {
+				"blocks": 488378646,
+				"bytes": 2000398934016
+			}
+		}
+	],
+	"nvme_number_of_namespaces": 1,
+	"nvme_pci_vendor": {
+		"id": 32902,
+		"subsystem_id": 32902
+	},
+	"nvme_smart_health_information_log": {
+		"available_spare": 99,
+		"available_spare_threshold": 10,
+		"controller_busy_time": 21955,
+		"critical_comp_time": 0,
+		"critical_warning": 0,
+		"data_units_read": 1031973760,
+		"data_units_written": 5014522069,
+		"host_reads": 22445737117,
+		"host_writes": 112598062434,
+		"media_errors": 0,
+		"num_err_log_entries": 0,
+		"percentage_used": 75,
+		"power_cycles": 121,
+		"power_on_hours": 49441,
+		"temperature": 19,
+		"unsafe_shutdowns": 106,
+		"warning_temp_time": 0
+	},
+	"nvme_total_capacity": 2000398934016,
+	"nvme_unallocated_capacity": 0,
+	"nvme_version": {
+		"string": "1.2",
+		"value": 66048
+	},
+	"power_cycle_count": 121,
+	"power_on_time": {
+		"hours": 49441
+	},
+	"serial_number": "REDACTED",
+	"smart_status": {
+		"nvme": {
+			"value": 0
+		},
+		"passed": true
+	},
+	"smart_support": {
+		"available": true,
+		"enabled": true
+	},
+	"smartctl": {
+		"argv": [
+			"smartctl",
+			"--json",
+			"--info",
+			"--health",
+			"--attributes",
+			"--tolerance=verypermissive",
+			"--nocheck=standby",
+			"--format=brief",
+			"--log=error",
+			"/dev/nvme6"
+		],
+		"build_info": "REDACTED",
+		"exit_status": 0,
+		"platform_info": "REDACTED",
+		"version": [
+			7,
+			3
+		]
+	},
+	"temperature": {
+		"current": 19
+	},
+	"user_capacity": {
+		"blocks": 488378646,
+		"bytes": 2000398934016
+	}
+}

@@ -1,0 +1,120 @@
+{
+	"device": {
+		"info_name": "/dev/nvme3",
+		"name": "/dev/nvme3",
+		"protocol": "NVMe",
+		"type": "nvme"
+	},
+	"firmware_version": "REDACTED",
+	"json_format_version": [
+		1,
+		0
+	],
+	"local_time": {
+		"asctime": "Fri Feb 13 23:31:30 2009 UTC",
+		"time_t": 1234567890
+	},
+	"logical_block_size": 4096,
+	"model_name": "Micron_7300_MTFDHBE3T8TDF",
+	"nvme_controller_id": 1,
+	"nvme_ieee_oui_identifier": 41077,
+	"nvme_namespaces": [
+		{
+			"capacity": {
+				"blocks": 937684566,
+				"bytes": 3840755982336
+			},
+			"eui64": {
+				"ext_id": 5137678885,
+				"oui": 41077
+			},
+			"formatted_lba_size": 4096,
+			"id": 1,
+			"size": {
+				"blocks": 937684566,
+				"bytes": 3840755982336
+			},
+			"utilization": {
+				"blocks": 937684566,
+				"bytes": 3840755982336
+			}
+		}
+	],
+	"nvme_number_of_namespaces": 1,
+	"nvme_pci_vendor": {
+		"id": 4932,
+		"subsystem_id": 4932
+	},
+	"nvme_smart_health_information_log": {
+		"available_spare": 99,
+		"available_spare_threshold": 5,
+		"controller_busy_time": 322317,
+		"critical_comp_time": 0,
+		"critical_warning": 0,
+		"data_units_read": 176835984,
+		"data_units_written": 891511465,
+		"host_reads": 3997799320,
+		"host_writes": 22147613604,
+		"media_errors": 0,
+		"num_err_log_entries": 0,
+		"percentage_used": 2,
+		"power_cycles": 44,
+		"power_on_hours": 8833,
+		"temperature": 26,
+		"temperature_sensors": [
+			35,
+			28
+		],
+		"unsafe_shutdowns": 32,
+		"warning_temp_time": 0
+	},
+	"nvme_total_capacity": 3840755982336,
+	"nvme_unallocated_capacity": 0,
+	"nvme_version": {
+		"string": "1.3",
+		"value": 66304
+	},
+	"power_cycle_count": 44,
+	"power_on_time": {
+		"hours": 8833
+	},
+	"serial_number": "REDACTED",
+	"smart_status": {
+		"nvme": {
+			"value": 0
+		},
+		"passed": true
+	},
+	"smart_support": {
+		"available": true,
+		"enabled": true
+	},
+	"smartctl": {
+		"argv": [
+			"smartctl",
+			"--json",
+			"--info",
+			"--health",
+			"--attributes",
+			"--tolerance=verypermissive",
+			"--nocheck=standby",
+			"--format=brief",
+			"--log=error",
+			"/dev/nvme3"
+		],
+		"build_info": "REDACTED",
+		"exit_status": 0,
+		"platform_info": "REDACTED",
+		"version": [
+			7,
+			3
+		]
+	},
+	"temperature": {
+		"current": 26
+	},
+	"user_capacity": {
+		"blocks": 937684566,
+		"bytes": 3840755982336
+	}
+}

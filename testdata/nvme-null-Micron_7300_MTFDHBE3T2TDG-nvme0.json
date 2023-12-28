@@ -1,0 +1,113 @@
+{
+	"device": {
+		"info_name": "/dev/nvme0",
+		"name": "/dev/nvme0",
+		"protocol": "NVMe",
+		"type": "nvme"
+	},
+	"firmware_version": "REDACTED",
+	"json_format_version": [
+		1,
+		0
+	],
+	"local_time": {
+		"asctime": "Fri Feb 13 23:31:30 2009 UTC",
+		"time_t": 1234567890
+	},
+	"logical_block_size": 4096,
+	"model_name": "Micron_7300_MTFDHBE3T2TDG",
+	"nvme_controller_id": 1,
+	"nvme_ieee_oui_identifier": 41077,
+	"nvme_namespaces": [
+		{
+			"capacity": {
+				"blocks": 781404246,
+				"bytes": 3200631791616
+			},
+			"eui64": {
+				"ext_id": 5122290698,
+				"oui": 41077
+			},
+			"formatted_lba_size": 4096,
+			"id": 1,
+			"size": {
+				"blocks": 781404246,
+				"bytes": 3200631791616
+			},
+			"utilization": {
+				"blocks": 781404246,
+				"bytes": 3200631791616
+			}
+		}
+	],
+	"nvme_number_of_namespaces": 1,
+	"nvme_pci_vendor": {
+		"id": 4932,
+		"subsystem_id": 4932
+	},
+	"nvme_smart_health_information_log": {
+		"available_spare": 100,
+		"available_spare_threshold": 5,
+		"controller_busy_time": 227837,
+		"critical_comp_time": 0,
+		"critical_warning": 0,
+		"data_units_read": 16302695,
+		"data_units_written": 165795201,
+		"host_reads": 190918064,
+		"host_writes": 3849300883,
+		"media_errors": 0,
+		"num_err_log_entries": 1,
+		"percentage_used": 0,
+		"power_cycles": 8,
+		"power_on_hours": 3820,
+		"temperature": 38,
+		"temperature_sensors": [
+			46,
+			40
+		],
+		"unsafe_shutdowns": 1,
+		"warning_temp_time": 0
+	},
+	"nvme_total_capacity": 3200631791616,
+	"nvme_unallocated_capacity": 0,
+	"power_cycle_count": 8,
+	"power_on_time": {
+		"hours": 3820
+	},
+	"serial_number": "REDACTED",
+	"smart_status": {
+		"nvme": {
+			"value": 0
+		},
+		"passed": true
+	},
+	"smartctl": {
+		"argv": [
+			"smartctl",
+			"--json",
+			"--info",
+			"--health",
+			"--attributes",
+			"--tolerance=verypermissive",
+			"--nocheck=standby",
+			"--format=brief",
+			"--log=error",
+			"/dev/nvme0"
+		],
+		"build_info": "REDACTED",
+		"exit_status": 0,
+		"platform_info": "REDACTED",
+		"svn_revision": "5022",
+		"version": [
+			7,
+			1
+		]
+	},
+	"temperature": {
+		"current": 38
+	},
+	"user_capacity": {
+		"blocks": 781404246,
+		"bytes": 3200631791616
+	}
+}

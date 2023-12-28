@@ -1,0 +1,89 @@
+{
+	"device": {
+		"info_name": "/dev/nvme0",
+		"name": "/dev/nvme0",
+		"protocol": "NVMe",
+		"type": "nvme"
+	},
+	"firmware_version": "REDACTED",
+	"json_format_version": [
+		1,
+		0
+	],
+	"local_time": {
+		"asctime": "Fri Feb 13 23:31:30 2009 UTC",
+		"time_t": 1234567890
+	},
+	"model_name": "INTEL SSDPF2KE032T1",
+	"nvme_controller_id": 0,
+	"nvme_ieee_oui_identifier": 6083300,
+	"nvme_number_of_namespaces": 128,
+	"nvme_pci_vendor": {
+		"id": 32902,
+		"subsystem_id": 32902
+	},
+	"nvme_smart_health_information_log": {
+		"available_spare": 100,
+		"available_spare_threshold": 10,
+		"controller_busy_time": 8,
+		"critical_comp_time": 0,
+		"critical_warning": 0,
+		"data_units_read": 24934456,
+		"data_units_written": 39452691,
+		"host_reads": 766457016,
+		"host_writes": 863371502,
+		"media_errors": 0,
+		"num_err_log_entries": 0,
+		"percentage_used": 0,
+		"power_cycles": 12,
+		"power_on_hours": 4637,
+		"temperature": 38,
+		"unsafe_shutdowns": 7,
+		"warning_temp_time": 0
+	},
+	"nvme_total_capacity": 3200631791616,
+	"nvme_unallocated_capacity": 0,
+	"nvme_version": {
+		"string": "1.4",
+		"value": 66560
+	},
+	"power_cycle_count": 12,
+	"power_on_time": {
+		"hours": 4637
+	},
+	"serial_number": "REDACTED",
+	"smart_status": {
+		"nvme": {
+			"value": 0
+		},
+		"passed": true
+	},
+	"smart_support": {
+		"available": true,
+		"enabled": true
+	},
+	"smartctl": {
+		"argv": [
+			"smartctl",
+			"--json",
+			"--info",
+			"--health",
+			"--attributes",
+			"--tolerance=verypermissive",
+			"--nocheck=standby",
+			"--format=brief",
+			"--log=error",
+			"/dev/nvme0"
+		],
+		"build_info": "REDACTED",
+		"exit_status": 0,
+		"platform_info": "REDACTED",
+		"version": [
+			7,
+			3
+		]
+	},
+	"temperature": {
+		"current": 38
+	}
+}

@@ -1,0 +1,108 @@
+{
+	"device": {
+		"info_name": "/dev/nvme0",
+		"name": "/dev/nvme0",
+		"protocol": "NVMe",
+		"type": "nvme"
+	},
+	"firmware_version": "REDACTED",
+	"json_format_version": [
+		1,
+		0
+	],
+	"local_time": {
+		"asctime": "Fri Feb 13 23:31:30 2009 UTC",
+		"time_t": 1234567890
+	},
+	"logical_block_size": 512,
+	"model_name": "INTEL SSDPEDMD016T4",
+	"nvme_controller_id": 0,
+	"nvme_ieee_oui_identifier": 6083300,
+	"nvme_namespaces": [
+		{
+			"capacity": {
+				"blocks": 3125627568,
+				"bytes": 1600321314816
+			},
+			"formatted_lba_size": 512,
+			"id": 1,
+			"size": {
+				"blocks": 3125627568,
+				"bytes": 1600321314816
+			},
+			"utilization": {
+				"blocks": 3125627568,
+				"bytes": 1600321314816
+			}
+		}
+	],
+	"nvme_number_of_namespaces": 1,
+	"nvme_pci_vendor": {
+		"id": 32902,
+		"subsystem_id": 32902
+	},
+	"nvme_smart_health_information_log": {
+		"available_spare": 99,
+		"available_spare_threshold": 10,
+		"controller_busy_time": 16,
+		"critical_warning": 0,
+		"data_units_read": 6933871372,
+		"data_units_written": 32381395004,
+		"host_reads": 337375119290,
+		"host_writes": 1694335138991,
+		"media_errors": 0,
+		"num_err_log_entries": 0,
+		"percentage_used": 41,
+		"power_cycles": 27,
+		"power_on_hours": 57288,
+		"temperature": 21,
+		"unsafe_shutdowns": 0
+	},
+	"nvme_version": {
+		"string": "<1.2",
+		"value": 0
+	},
+	"power_cycle_count": 27,
+	"power_on_time": {
+		"hours": 57288
+	},
+	"serial_number": "REDACTED",
+	"smart_status": {
+		"nvme": {
+			"value": 0
+		},
+		"passed": true
+	},
+	"smart_support": {
+		"available": true,
+		"enabled": true
+	},
+	"smartctl": {
+		"argv": [
+			"smartctl",
+			"--json",
+			"--info",
+			"--health",
+			"--attributes",
+			"--tolerance=verypermissive",
+			"--nocheck=standby",
+			"--format=brief",
+			"--log=error",
+			"/dev/nvme0"
+		],
+		"build_info": "REDACTED",
+		"exit_status": 0,
+		"platform_info": "REDACTED",
+		"version": [
+			7,
+			3
+		]
+	},
+	"temperature": {
+		"current": 21
+	},
+	"user_capacity": {
+		"blocks": 3125627568,
+		"bytes": 1600321314816
+	}
+}

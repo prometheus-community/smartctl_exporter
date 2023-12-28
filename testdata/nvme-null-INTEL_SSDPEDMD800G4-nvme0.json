@@ -1,0 +1,108 @@
+{
+	"device": {
+		"info_name": "/dev/nvme0",
+		"name": "/dev/nvme0",
+		"protocol": "NVMe",
+		"type": "nvme"
+	},
+	"firmware_version": "REDACTED",
+	"json_format_version": [
+		1,
+		0
+	],
+	"local_time": {
+		"asctime": "Fri Feb 13 23:31:30 2009 UTC",
+		"time_t": 1234567890
+	},
+	"logical_block_size": 4096,
+	"model_name": "INTEL SSDPEDMD800G4",
+	"nvme_controller_id": 0,
+	"nvme_ieee_oui_identifier": 6083300,
+	"nvme_namespaces": [
+		{
+			"capacity": {
+				"blocks": 195353046,
+				"bytes": 800166076416
+			},
+			"formatted_lba_size": 4096,
+			"id": 1,
+			"size": {
+				"blocks": 195353046,
+				"bytes": 800166076416
+			},
+			"utilization": {
+				"blocks": 195353046,
+				"bytes": 800166076416
+			}
+		}
+	],
+	"nvme_number_of_namespaces": 1,
+	"nvme_pci_vendor": {
+		"id": 32902,
+		"subsystem_id": 32902
+	},
+	"nvme_smart_health_information_log": {
+		"available_spare": 93,
+		"available_spare_threshold": 10,
+		"controller_busy_time": 1116,
+		"critical_warning": 0,
+		"data_units_read": 1662103356,
+		"data_units_written": 15055091656,
+		"host_reads": 160426723773,
+		"host_writes": 495846288226,
+		"media_errors": 0,
+		"num_err_log_entries": 0,
+		"percentage_used": 51,
+		"power_cycles": 12,
+		"power_on_hours": 54704,
+		"temperature": 30,
+		"unsafe_shutdowns": 0
+	},
+	"nvme_version": {
+		"string": "<1.2",
+		"value": 0
+	},
+	"power_cycle_count": 12,
+	"power_on_time": {
+		"hours": 54704
+	},
+	"serial_number": "REDACTED",
+	"smart_status": {
+		"nvme": {
+			"value": 0
+		},
+		"passed": true
+	},
+	"smart_support": {
+		"available": true,
+		"enabled": true
+	},
+	"smartctl": {
+		"argv": [
+			"smartctl",
+			"--json",
+			"--info",
+			"--health",
+			"--attributes",
+			"--tolerance=verypermissive",
+			"--nocheck=standby",
+			"--format=brief",
+			"--log=error",
+			"/dev/nvme0"
+		],
+		"build_info": "REDACTED",
+		"exit_status": 0,
+		"platform_info": "REDACTED",
+		"version": [
+			7,
+			3
+		]
+	},
+	"temperature": {
+		"current": 30
+	},
+	"user_capacity": {
+		"blocks": 195353046,
+		"bytes": 800166076416
+	}
+}
