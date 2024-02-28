@@ -30,6 +30,7 @@ import (
 	"github.com/prometheus/common/version"
 	"github.com/prometheus/exporter-toolkit/web"
 	webflag "github.com/prometheus/exporter-toolkit/web/kingpinflag"
+	_ "go.uber.org/automaxprocs"
 )
 
 // SMARTctlManagerCollector implements the Collector interface.

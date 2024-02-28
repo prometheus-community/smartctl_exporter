@@ -9,6 +9,7 @@ require (
 	github.com/prometheus/common v0.46.0
 	github.com/prometheus/exporter-toolkit v0.11.0
 	github.com/tidwall/gjson v1.17.0
+	go.uber.org/automaxprocs v1.5.3
 )
 
 require (
