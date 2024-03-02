@@ -1,0 +1,674 @@
+{
+	"ata_smart_attributes": {
+		"revision": 1,
+		"table": [
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": true,
+					"string": "PO--CK ",
+					"updated_online": true,
+					"value": 51
+				},
+				"id": 5,
+				"name": "Reallocated_Sector_Ct",
+				"raw": {
+					"string": "0",
+					"value": 0
+				},
+				"thresh": 10,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 9,
+				"name": "Power_On_Hours",
+				"raw": {
+					"string": "10786",
+					"value": 10786
+				},
+				"thresh": 0,
+				"value": 97,
+				"when_failed": "",
+				"worst": 97
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 12,
+				"name": "Power_Cycle_Count",
+				"raw": {
+					"string": "10",
+					"value": 10
+				},
+				"thresh": 0,
+				"value": 99,
+				"when_failed": "",
+				"worst": 99
+			},
+			{
+				"flags": {
+					"auto_keep": false,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": true,
+					"string": "PO--C- ",
+					"updated_online": true,
+					"value": 19
+				},
+				"id": 177,
+				"name": "Wear_Leveling_Count",
+				"raw": {
+					"string": "129",
+					"value": 129
+				},
+				"thresh": 5,
+				"value": 98,
+				"when_failed": "",
+				"worst": 98
+			},
+			{
+				"flags": {
+					"auto_keep": false,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": true,
+					"string": "PO--C- ",
+					"updated_online": true,
+					"value": 19
+				},
+				"id": 179,
+				"name": "Used_Rsvd_Blk_Cnt_Tot",
+				"raw": {
+					"string": "0",
+					"value": 0
+				},
+				"thresh": 10,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": false,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": true,
+					"string": "PO--C- ",
+					"updated_online": true,
+					"value": 19
+				},
+				"id": 180,
+				"name": "Unused_Rsvd_Blk_Cnt_Tot",
+				"raw": {
+					"string": "435",
+					"value": 435
+				},
+				"thresh": 10,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 181,
+				"name": "Program_Fail_Cnt_Total",
+				"raw": {
+					"string": "0",
+					"value": 0
+				},
+				"thresh": 10,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 182,
+				"name": "Erase_Fail_Count_Total",
+				"raw": {
+					"string": "0",
+					"value": 0
+				},
+				"thresh": 10,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": false,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": true,
+					"string": "PO--C- ",
+					"updated_online": true,
+					"value": 19
+				},
+				"id": 183,
+				"name": "Runtime_Bad_Block",
+				"raw": {
+					"string": "0",
+					"value": 0
+				},
+				"thresh": 10,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": true,
+					"string": "PO--CK ",
+					"updated_online": true,
+					"value": 51
+				},
+				"id": 184,
+				"name": "End-to-End_Error",
+				"raw": {
+					"string": "0",
+					"value": 0
+				},
+				"thresh": 97,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 187,
+				"name": "Reported_Uncorrect",
+				"raw": {
+					"string": "0",
+					"value": 0
+				},
+				"thresh": 0,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 190,
+				"name": "Airflow_Temperature_Cel",
+				"raw": {
+					"string": "29",
+					"value": 29
+				},
+				"thresh": 0,
+				"value": 71,
+				"when_failed": "",
+				"worst": 57
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": false,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O---K ",
+					"updated_online": true,
+					"value": 34
+				},
+				"id": 194,
+				"name": "Temperature_Celsius",
+				"raw": {
+					"string": "29 (Min/Max 23/43)",
+					"value": 184685101085
+				},
+				"thresh": 0,
+				"value": 71,
+				"when_failed": "",
+				"worst": 57
+			},
+			{
+				"flags": {
+					"auto_keep": false,
+					"error_rate": true,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O-RC- ",
+					"updated_online": true,
+					"value": 26
+				},
+				"id": 195,
+				"name": "Hardware_ECC_Recovered",
+				"raw": {
+					"string": "0",
+					"value": 0
+				},
+				"thresh": 0,
+				"value": 200,
+				"when_failed": "",
+				"worst": 200
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 197,
+				"name": "Current_Pending_Sector",
+				"raw": {
+					"string": "0",
+					"value": 0
+				},
+				"thresh": 0,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": true,
+					"event_count": true,
+					"performance": true,
+					"prefailure": false,
+					"string": "-OSRCK ",
+					"updated_online": true,
+					"value": 62
+				},
+				"id": 199,
+				"name": "UDMA_CRC_Error_Count",
+				"raw": {
+					"string": "0",
+					"value": 0
+				},
+				"thresh": 0,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": true,
+					"string": "PO--CK ",
+					"updated_online": true,
+					"value": 51
+				},
+				"id": 202,
+				"name": "Unknown_SSD_Attribute",
+				"raw": {
+					"string": "0",
+					"value": 0
+				},
+				"thresh": 10,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": false,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--C- ",
+					"updated_online": true,
+					"value": 18
+				},
+				"id": 235,
+				"name": "Unknown_Attribute",
+				"raw": {
+					"string": "7",
+					"value": 7
+				},
+				"thresh": 0,
+				"value": 99,
+				"when_failed": "",
+				"worst": 99
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 241,
+				"name": "Total_LBAs_Written",
+				"raw": {
+					"string": "1304884573",
+					"value": 1304884573
+				},
+				"thresh": 0,
+				"value": 99,
+				"when_failed": "",
+				"worst": 99
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 242,
+				"name": "Total_LBAs_Read",
+				"raw": {
+					"string": "50913750",
+					"value": 50913750
+				},
+				"thresh": 0,
+				"value": 99,
+				"when_failed": "",
+				"worst": 99
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 243,
+				"name": "Unknown_Attribute",
+				"raw": {
+					"string": "0",
+					"value": 0
+				},
+				"thresh": 0,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 244,
+				"name": "Unknown_Attribute",
+				"raw": {
+					"string": "0",
+					"value": 0
+				},
+				"thresh": 0,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 245,
+				"name": "Unknown_Attribute",
+				"raw": {
+					"string": "65535",
+					"value": 65535
+				},
+				"thresh": 0,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 246,
+				"name": "Unknown_Attribute",
+				"raw": {
+					"string": "65535",
+					"value": 65535
+				},
+				"thresh": 0,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 247,
+				"name": "Unknown_Attribute",
+				"raw": {
+					"string": "65535",
+					"value": 65535
+				},
+				"thresh": 0,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 251,
+				"name": "Unknown_Attribute",
+				"raw": {
+					"string": "1792412160",
+					"value": 1792412160
+				},
+				"thresh": 0,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			}
+		]
+	},
+	"ata_smart_error_log": {
+		"summary": {
+			"count": 0,
+			"revision": 1
+		}
+	},
+	"ata_version": {
+		"major_value": 4092,
+		"minor_value": 94,
+		"string": "ACS-4 T13/BSR INCITS 529 revision 5"
+	},
+	"device": {
+		"info_name": "/dev/sda [SAT]",
+		"name": "/dev/sda",
+		"protocol": "ATA",
+		"type": "sat"
+	},
+	"firmware_version": "REDACTED",
+	"form_factor": {
+		"ata_value": 3,
+		"name": "2.5 inches"
+	},
+	"in_smartctl_database": false,
+	"interface_speed": {
+		"current": {
+			"bits_per_unit": 100000000,
+			"sata_value": 3,
+			"string": "6.0 Gb/s",
+			"units_per_second": 60
+		},
+		"max": {
+			"bits_per_unit": 100000000,
+			"sata_value": 14,
+			"string": "6.0 Gb/s",
+			"units_per_second": 60
+		}
+	},
+	"json_format_version": [
+		1,
+		0
+	],
+	"local_time": {
+		"asctime": "Fri Feb 13 23:31:30 2009 UTC",
+		"time_t": 1234567890
+	},
+	"logical_block_size": 512,
+	"model_name": "SAMSUNG MZ7L3480HCHQ-00A07",
+	"physical_block_size": 4096,
+	"power_cycle_count": 10,
+	"power_on_time": {
+		"hours": 10786
+	},
+	"rotation_rate": 0,
+	"sata_version": {
+		"string": "SATA 3.2",
+		"value": 255
+	},
+	"serial_number": "REDACTED",
+	"smart_status": {
+		"passed": true
+	},
+	"smartctl": {
+		"argv": [
+			"smartctl",
+			"--json",
+			"--info",
+			"--health",
+			"--attributes",
+			"--tolerance=verypermissive",
+			"--nocheck=standby",
+			"--format=brief",
+			"--log=error",
+			"/dev/sda"
+		],
+		"build_info": "REDACTED",
+		"exit_status": 0,
+		"platform_info": "REDACTED",
+		"svn_revision": "5049",
+		"version": [
+			7,
+			1
+		]
+	},
+	"temperature": {
+		"current": 29
+	},
+	"user_capacity": {
+		"blocks": 937703088,
+		"bytes": 480103981056
+	},
+	"wwn": {
+		"id": 1234567890,
+		"naa": 5,
+		"oui": 9528
+	}
+}

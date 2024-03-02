@@ -1,0 +1,683 @@
+{
+	"ata_smart_attributes": {
+		"revision": 1,
+		"table": [
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 5,
+				"name": "Reallocated_Sector_Ct",
+				"raw": {
+					"string": "0",
+					"value": 0
+				},
+				"thresh": 0,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 9,
+				"name": "Power_On_Hours",
+				"raw": {
+					"string": "68009",
+					"value": 68009
+				},
+				"thresh": 0,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 12,
+				"name": "Power_Cycle_Count",
+				"raw": {
+					"string": "27",
+					"value": 27
+				},
+				"thresh": 0,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": true,
+					"string": "PO--CK ",
+					"updated_online": true,
+					"value": 51
+				},
+				"id": 170,
+				"name": "Available_Reservd_Space",
+				"raw": {
+					"string": "0",
+					"value": 0
+				},
+				"thresh": 10,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 171,
+				"name": "Program_Fail_Count",
+				"raw": {
+					"string": "0",
+					"value": 0
+				},
+				"thresh": 0,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 172,
+				"name": "Erase_Fail_Count",
+				"raw": {
+					"string": "0",
+					"value": 0
+				},
+				"thresh": 0,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 174,
+				"name": "Unsafe_Shutdown_Count",
+				"raw": {
+					"string": "17",
+					"value": 17
+				},
+				"thresh": 0,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": true,
+					"string": "PO--CK ",
+					"updated_online": true,
+					"value": 51
+				},
+				"id": 175,
+				"name": "Power_Loss_Cap_Test",
+				"raw": {
+					"string": "6710 (395 5453)",
+					"value": 1696869456438
+				},
+				"thresh": 10,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 183,
+				"name": "SATA_Downshift_Count",
+				"raw": {
+					"string": "0",
+					"value": 0
+				},
+				"thresh": 0,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": true,
+					"string": "PO--CK ",
+					"updated_online": true,
+					"value": 51
+				},
+				"id": 184,
+				"name": "End-to-End_Error",
+				"raw": {
+					"string": "0",
+					"value": 0
+				},
+				"thresh": 90,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 187,
+				"name": "Reported_Uncorrect",
+				"raw": {
+					"string": "0",
+					"value": 0
+				},
+				"thresh": 0,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": false,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O---K ",
+					"updated_online": true,
+					"value": 34
+				},
+				"id": 190,
+				"name": "Temperature_Case",
+				"raw": {
+					"string": "30 (Min/Max 28/39)",
+					"value": 656146462
+				},
+				"thresh": 0,
+				"value": 70,
+				"when_failed": "",
+				"worst": 62
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 192,
+				"name": "Unsafe_Shutdown_Count",
+				"raw": {
+					"string": "17",
+					"value": 17
+				},
+				"thresh": 0,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": false,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O---K ",
+					"updated_online": true,
+					"value": 34
+				},
+				"id": 194,
+				"name": "Temperature_Internal",
+				"raw": {
+					"string": "30",
+					"value": 30
+				},
+				"thresh": 0,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": false,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--C- ",
+					"updated_online": true,
+					"value": 18
+				},
+				"id": 197,
+				"name": "Current_Pending_Sector",
+				"raw": {
+					"string": "0",
+					"value": 0
+				},
+				"thresh": 0,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": true,
+					"event_count": true,
+					"performance": true,
+					"prefailure": false,
+					"string": "-OSRCK ",
+					"updated_online": true,
+					"value": 62
+				},
+				"id": 199,
+				"name": "CRC_Error_Count",
+				"raw": {
+					"string": "0",
+					"value": 0
+				},
+				"thresh": 0,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 225,
+				"name": "Host_Writes_32MiB",
+				"raw": {
+					"string": "27887319",
+					"value": 27887319
+				},
+				"thresh": 0,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 226,
+				"name": "Workld_Media_Wear_Indic",
+				"raw": {
+					"string": "48455",
+					"value": 48455
+				},
+				"thresh": 0,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 227,
+				"name": "Workld_Host_Reads_Perc",
+				"raw": {
+					"string": "27",
+					"value": 27
+				},
+				"thresh": 0,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 228,
+				"name": "Workload_Minutes",
+				"raw": {
+					"string": "4080377",
+					"value": 4080377
+				},
+				"thresh": 0,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": true,
+					"string": "PO--CK ",
+					"updated_online": true,
+					"value": 51
+				},
+				"id": 232,
+				"name": "Available_Reservd_Space",
+				"raw": {
+					"string": "0",
+					"value": 0
+				},
+				"thresh": 10,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 233,
+				"name": "Media_Wearout_Indicator",
+				"raw": {
+					"string": "0",
+					"value": 0
+				},
+				"thresh": 0,
+				"value": 53,
+				"when_failed": "",
+				"worst": 53
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 234,
+				"name": "Thermal_Throttle",
+				"raw": {
+					"string": "0/0",
+					"value": 0
+				},
+				"thresh": 0,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 241,
+				"name": "Host_Writes_32MiB",
+				"raw": {
+					"string": "27887319",
+					"value": 27887319
+				},
+				"thresh": 0,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 242,
+				"name": "Host_Reads_32MiB",
+				"raw": {
+					"string": "10569812",
+					"value": 10569812
+				},
+				"thresh": 0,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			},
+			{
+				"flags": {
+					"auto_keep": true,
+					"error_rate": false,
+					"event_count": true,
+					"performance": false,
+					"prefailure": false,
+					"string": "-O--CK ",
+					"updated_online": true,
+					"value": 50
+				},
+				"id": 243,
+				"name": "NAND_Writes_32MiB",
+				"raw": {
+					"string": "38991517",
+					"value": 38991517
+				},
+				"thresh": 0,
+				"value": 100,
+				"when_failed": "",
+				"worst": 100
+			}
+		]
+	},
+	"ata_smart_error_log": {
+		"summary": {
+			"count": 0,
+			"revision": 1
+		}
+	},
+	"ata_version": {
+		"major_value": 1020,
+		"minor_value": 272,
+		"string": "ACS-2 T13/2015-D revision 3"
+	},
+	"device": {
+		"info_name": "/dev/sdb [SAT]",
+		"name": "/dev/sdb",
+		"protocol": "ATA",
+		"type": "sat"
+	},
+	"firmware_version": "REDACTED",
+	"form_factor": {
+		"ata_value": 3,
+		"name": "2.5 inches"
+	},
+	"in_smartctl_database": true,
+	"interface_speed": {
+		"current": {
+			"bits_per_unit": 100000000,
+			"sata_value": 3,
+			"string": "6.0 Gb/s",
+			"units_per_second": 60
+		},
+		"max": {
+			"bits_per_unit": 100000000,
+			"sata_value": 14,
+			"string": "6.0 Gb/s",
+			"units_per_second": 60
+		}
+	},
+	"json_format_version": [
+		1,
+		0
+	],
+	"local_time": {
+		"asctime": "Fri Feb 13 23:31:30 2009 UTC",
+		"time_t": 1234567890
+	},
+	"logical_block_size": 512,
+	"model_family": "Intel 730 and DC S35x0/3610/3700 Series SSDs",
+	"model_name": "INTEL SSDSC2BB800G6",
+	"physical_block_size": 4096,
+	"power_cycle_count": 27,
+	"power_on_time": {
+		"hours": 68009
+	},
+	"rotation_rate": 0,
+	"sata_version": {
+		"string": "SATA 2.6",
+		"value": 31
+	},
+	"serial_number": "REDACTED",
+	"smart_status": {
+		"passed": true
+	},
+	"smart_support": {
+		"available": true,
+		"enabled": true
+	},
+	"smartctl": {
+		"argv": [
+			"smartctl",
+			"--json",
+			"--info",
+			"--health",
+			"--attributes",
+			"--tolerance=verypermissive",
+			"--nocheck=standby",
+			"--format=brief",
+			"--log=error",
+			"/dev/sdb"
+		],
+		"build_info": "REDACTED",
+		"exit_status": 0,
+		"platform_info": "REDACTED",
+		"version": [
+			7,
+			3
+		]
+	},
+	"temperature": {
+		"current": 30
+	},
+	"trim": {
+		"deterministic": true,
+		"supported": true,
+		"zeroed": true
+	},
+	"user_capacity": {
+		"blocks": 1562824368,
+		"bytes": 800166076416
+	},
+	"wwn": {
+		"id": 1234567890,
+		"naa": 5,
+		"oui": 6083300
+	}
+}

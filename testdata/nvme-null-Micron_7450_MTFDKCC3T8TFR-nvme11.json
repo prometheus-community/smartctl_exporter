@@ -1,0 +1,87 @@
+{
+	"device": {
+		"info_name": "/dev/nvme11",
+		"name": "/dev/nvme11",
+		"protocol": "NVMe",
+		"type": "nvme"
+	},
+	"firmware_version": "REDACTED",
+	"json_format_version": [
+		1,
+		0
+	],
+	"local_time": {
+		"asctime": "Fri Feb 13 23:31:30 2009 UTC",
+		"time_t": 1234567890
+	},
+	"model_name": "Micron_7450_MTFDKCC3T8TFR",
+	"nvme_controller_id": 0,
+	"nvme_ieee_oui_identifier": 41077,
+	"nvme_number_of_namespaces": 132,
+	"nvme_pci_vendor": {
+		"id": 4932,
+		"subsystem_id": 4932
+	},
+	"nvme_smart_health_information_log": {
+		"available_spare": 100,
+		"available_spare_threshold": 10,
+		"controller_busy_time": 928,
+		"critical_comp_time": 0,
+		"critical_warning": 0,
+		"data_units_read": 34195414,
+		"data_units_written": 60979236,
+		"host_reads": 358762506,
+		"host_writes": 1016731250,
+		"media_errors": 0,
+		"num_err_log_entries": 0,
+		"percentage_used": 0,
+		"power_cycles": 20,
+		"power_on_hours": 2436,
+		"temperature": 25,
+		"temperature_sensors": [
+			29,
+			26,
+			25
+		],
+		"unsafe_shutdowns": 15,
+		"warning_temp_time": 0
+	},
+	"nvme_total_capacity": 3840755982336,
+	"nvme_unallocated_capacity": 0,
+	"power_cycle_count": 20,
+	"power_on_time": {
+		"hours": 2436
+	},
+	"serial_number": "REDACTED",
+	"smart_status": {
+		"nvme": {
+			"value": 0
+		},
+		"passed": true
+	},
+	"smartctl": {
+		"argv": [
+			"smartctl",
+			"--json",
+			"--info",
+			"--health",
+			"--attributes",
+			"--tolerance=verypermissive",
+			"--nocheck=standby",
+			"--format=brief",
+			"--log=error",
+			"/dev/nvme11"
+		],
+		"build_info": "REDACTED",
+		"exit_status": 0,
+		"platform_info": "REDACTED",
+		"svn_revision": "5022",
+		"version": [
+			7,
+			1
+		]
+	},
+	"temperature": {
+		"current": 25
+	}
+}

@@ -1,0 +1,87 @@
+{
+	"device": {
+		"info_name": "/dev/nvme2",
+		"name": "/dev/nvme2",
+		"protocol": "NVMe",
+		"type": "nvme"
+	},
+	"firmware_version": "REDACTED",
+	"json_format_version": [
+		1,
+		0
+	],
+	"local_time": {
+		"asctime": "Fri Feb 13 23:31:30 2009 UTC",
+		"time_t": 1234567890
+	},
+	"model_name": "Micron_7400_MTFDKCB1T6TFC",
+	"nvme_controller_id": 0,
+	"nvme_ieee_oui_identifier": 41077,
+	"nvme_number_of_namespaces": 128,
+	"nvme_pci_vendor": {
+		"id": 4932,
+		"subsystem_id": 4932
+	},
+	"nvme_smart_health_information_log": {
+		"available_spare": 100,
+		"available_spare_threshold": 10,
+		"controller_busy_time": 39003,
+		"critical_comp_time": 0,
+		"critical_warning": 0,
+		"data_units_read": 1087990952,
+		"data_units_written": 1136100893,
+		"host_reads": 19755987150,
+		"host_writes": 20204186058,
+		"media_errors": 0,
+		"num_err_log_entries": 40,
+		"percentage_used": 4,
+		"power_cycles": 44,
+		"power_on_hours": 13108,
+		"temperature": 35,
+		"temperature_sensors": [
+			42,
+			37,
+			34
+		],
+		"unsafe_shutdowns": 40,
+		"warning_temp_time": 0
+	},
+	"nvme_total_capacity": 1600321314816,
+	"nvme_unallocated_capacity": 0,
+	"power_cycle_count": 44,
+	"power_on_time": {
+		"hours": 13108
+	},
+	"serial_number": "REDACTED",
+	"smart_status": {
+		"nvme": {
+			"value": 0
+		},
+		"passed": true
+	},
+	"smartctl": {
+		"argv": [
+			"smartctl",
+			"--json",
+			"--info",
+			"--health",
+			"--attributes",
+			"--tolerance=verypermissive",
+			"--nocheck=standby",
+			"--format=brief",
+			"--log=error",
+			"/dev/nvme2"
+		],
+		"build_info": "REDACTED",
+		"exit_status": 0,
+		"platform_info": "REDACTED",
+		"svn_revision": "5022",
+		"version": [
+			7,
+			1
+		]
+	},
+	"temperature": {
+		"current": 35
+	}
+}
