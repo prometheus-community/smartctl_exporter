@@ -1,3 +1,10 @@
+## 0.12.0 / 2024-03-03
+
+* [CHANGE] Better SCSI/SAS support, and removing confused metrics #168
+* [ENHANCEMENT] Impvoe the JSON collection script; now requires jq/yq #176
+* [BUGFIX] Shell fixes for `collect-smartctl-json.sh` #178
+* [BUGFIX] Various fixes to `collect_fake_json.sh` #159
+
 ## 0.11.0 / 2023-08-27
 
 * [CHANGE] Remove redundant meta labels from SCSI metrics #154
