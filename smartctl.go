@@ -370,34 +370,57 @@ func (smart *SMARTctl) mineNvmeNumErrLogEntries() {
 	)
 }
 
+// https://nvmexpress.org/wp-content/uploads/NVM-Express-NVM-Command-Set-Specification-1.0d-2023.12.28-Ratified.pdf
+// 4.1.4.2 SMART / Health Information (02h)
+// The SMART / Health Information log page is as defined in the NVM Express Base Specification. For the
+// Data Units Read and Data Units Written fields, when the logical block size is a value other than 512 bytes,
+// the controller shall convert the amount of data read to 512 byte units.
+
+// https://nvmexpress.org/wp-content/uploads/NVM-Express-Base-Specification-2.0d-2024.01.11-Ratified.pdf
+// Figure 208: SMART / Health Information Log Page
+// Bytes 47:32
+// Data Units Read: Contains the number of 512 byte data units the host has read from the
+// controller as part of processing a SMART Data Units Read Command; this value does not
+// include metadata. This value is reported in thousands (i.e., a value of 1 corresponds to 1,000
+// units of 512 bytes read) and is rounded up (e.g., one indicates that the number of 512 byte
+// data units read is from 1 to 1,000, three indicates that the number of 512 byte data units read
+// is from 2,001 to 3,000).
+//
+// A value of 0h in this field indicates that the number of SMART Data Units Read is not reported.
+//
+// Bytes 63:48
+//
+// Data Units Written: Contains the number of 512 byte data units the host has written to the ...
+// (the same as Data Units Read)
+
 func (smart *SMARTctl) mineNvmeBytesRead() {
-	blockSize := smart.json.Get("logical_block_size")
 	data_units_read := smart.json.Get("nvme_smart_health_information_log.data_units_read")
-	if !blockSize.Exists() || !data_units_read.Exists() {
+	// 0 => not reported by underlying hardware
+	if !data_units_read.Exists() || data_units_read.Int() == 0 {
 		return
 	}
 	smart.ch <- prometheus.MustNewConstMetric(
 		metricDeviceBytesRead,
 		prometheus.CounterValue,
-		// This value is reported in thousands (i.e., a value of 1 corresponds to 1000 units of 512 bytes written) and is rounded up.
-		// When the LBA size is a value other than 512 bytes, the controller shall convert the amount of data written to 512 byte units.
-		data_units_read.Float()*1000.0*blockSize.Float(),
+		// WARNING: Float64 will lose precision when drives reach ~32EiB read/write
+		// The underlying data_units_written,data_units_read are 128-bit integers
+		data_units_read.Float()*1000.0*512.0,
 		smart.device.device,
 	)
 }
 
 func (smart *SMARTctl) mineNvmeBytesWritten() {
-	blockSize := smart.json.Get("logical_block_size")
 	data_units_written := smart.json.Get("nvme_smart_health_information_log.data_units_written")
-	if !blockSize.Exists() || !data_units_written.Exists() {
+	// 0 => not reported by underlying hardware
+	if !data_units_written.Exists() || data_units_written.Int() == 0 {
 		return
 	}
 	smart.ch <- prometheus.MustNewConstMetric(
 		metricDeviceBytesWritten,
 		prometheus.CounterValue,
-		// This value is reported in thousands (i.e., a value of 1 corresponds to 1000 units of 512 bytes written) and is rounded up.
-		// When the LBA size is a value other than 512 bytes, the controller shall convert the amount of data written to 512 byte units.
-		data_units_written.Float()*1000.0*blockSize.Float(),
+		// WARNING: Float64 will lose precision when drives reach ~32EiB read/write
+		// The underlying data_units_written,data_units_read are 128-bit integers
+		data_units_written.Float()*1000.0*512.0,
 		smart.device.device,
 	)
 }
