@@ -3,6 +3,7 @@
 /.release
 /.tarballs
 debug/
+.idea/
 
 Manifest
 smartctl_exporter
