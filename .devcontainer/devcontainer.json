@@ -1,0 +1,38 @@
+{
+	"name": "Default dev container",
+	"image": "mcr.microsoft.com/devcontainers/go:1.20",
+    // GitHub's devcontainers are in increments of 2 core/8GB memory. Specifying less will use the minimum.
+    // https://docs.github.com/en/billing/managing-billing-for-github-codespaces/about-billing-for-github-codespaces#pricing-for-paid-usage
+	"hostRequirements": {
+		"cpus": 1,
+		"memory": "4gb"
+	},
+	"waitFor": "onCreateCommand",
+	"updateContentCommand": {
+		"install": "sudo apt-get update && sudo apt-get install --no-install-recommends -y smartmontools vim",
+		// Modify the environment to provide better developer experience.
+		"modify-environment": "${PWD}/scripts/modify-environment.sh"
+	},
+	"postCreateCommand": {
+	},
+	"customizations": {
+		"codespaces": {
+			// Open files upon start
+			"openFiles": [
+				"metrics.go",
+				"smartctl.go"
+			]
+		},
+		"vscode": {
+			// VS Code extensions to install
+			"extensions": [
+				"streetsidesoftware.code-spell-checker",
+				"timonwong.shellcheck",
+				"golang.Go"
+			],
+			"settings": {
+				"shellcheck.customArgs": ["-x"]
+			}
+		}
+	}
+}
