@@ -11,6 +11,9 @@ data_dir="${script_dir}/smartctl-data"
 smartctl_args="--json --info --health --attributes --tolerance=verypermissive \
 --nocheck=standby --format=brief --log=error"
 
+# Ignore this devices
+smartctl_ignore_dev_regex="^(/dev/bus)"
+
 # Determine the json query tool to use
 if command -v jq >/dev/null; then
 	json_tool="jq"
@@ -42,7 +45,7 @@ if [[ $# -ne 0 ]]; then
 	devices="${1}"
 else
 	devices="$(smartctl --scan --json | "${json_tool}" "${json_args}" \
-'.devices[].name')"
+".devices[].name | select(test(\"${smartctl_ignore_dev_regex}\") | not)")"
   mapfile -t devices <<< "${devices[@]}"
 fi
 
@@ -53,9 +56,10 @@ for device in "${devices[@]}"
 	data="$($SUDO smartctl ${smartctl_args} ${device})"
 	type="$(echo "${data}" | "${json_tool}" "${json_args}" '.device.type')"
 	family="$(echo "${data}" | "${json_tool}" "${json_args}" \
-'select(.model_family != null) | .model_family | sub(" |/" ; "_" ; "g")')"
+'select(.model_family != null) | .model_family | sub(" |/" ; "_" ; "g")
+ | sub("\"|\\(|\\)" ; "" ; "g")')"
 	model="$(echo "${data}" | "${json_tool}" "${json_args}" \
-'.model_name | sub(" |/" ; "_" ; "g")')"
+'.model_name | sub(" |/" ; "_" ; "g") | sub("\"|\\(|\\)" ; "" ; "g")')"
 	device_name="$(basename "${device}")"
 	echo -e "\tSaving to ${type}-${family:=null}-${model}-${device_name}.json"
 	echo "${data}" > \
