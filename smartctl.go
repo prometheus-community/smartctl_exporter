@@ -15,6 +15,7 @@ package main
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/go-kit/log"
@@ -42,6 +43,30 @@ type SMARTctl struct {
 	device SMARTDevice
 }
 
+func extractDiskName(input string) string {
+	re := regexp.MustCompile(`^(?:/dev/(?P<bus_name>\S+)/(?P<bus_num>\S+)\s\[|/dev/|\[)(?:\s\[|)(?P<disk>[a-z0-9_]+)(?:\].*|)$`)
+	match := re.FindStringSubmatch(input)
+
+	if len(match) > 0 {
+		busNameIndex := re.SubexpIndex("bus_name")
+		busNumIndex := re.SubexpIndex("bus_num")
+		diskIndex := re.SubexpIndex("disk")
+		var name []string
+		if busNameIndex != -1 && match[busNameIndex] != "" {
+			name = append(name, match[busNameIndex])
+		}
+		if busNumIndex != -1 && match[busNumIndex] != "" {
+			name = append(name, match[busNumIndex])
+		}
+		if diskIndex != -1 && match[diskIndex] != "" {
+			name = append(name, match[diskIndex])
+		}
+
+		return strings.Join(name, "_")
+	}
+	return ""
+}
+
 // NewSMARTctl is smartctl constructor
 func NewSMARTctl(logger log.Logger, json gjson.Result, ch chan<- prometheus.Metric) SMARTctl {
 	var model_name string
@@ -60,7 +85,7 @@ func NewSMARTctl(logger log.Logger, json gjson.Result, ch chan<- prometheus.Metr
 		json:   json,
 		logger: logger,
 		device: SMARTDevice{
-			device:     strings.TrimPrefix(strings.TrimSpace(json.Get("device.name").String()), "/dev/"),
+			device:     extractDiskName(strings.TrimSpace(json.Get("device.info_name").String())),
 			serial:     strings.TrimSpace(json.Get("serial_number").String()),
 			family:     strings.TrimSpace(GetStringIfExists(json, "model_family", "unknown")),
 			model:      strings.TrimSpace(model_name),
