@@ -32,12 +32,27 @@ type JSONCache struct {
 	LastCollect time.Time
 }
 
+type SMARTresult struct {
+	device string
+	JSON   gjson.Result
+	ok     bool
+}
+
+type SMARTctlWorkerPool struct {
+	results  chan SMARTresult
+	expected int
+}
+
 var (
 	jsonCache sync.Map
 )
 
 func init() {
 	jsonCache.Store("", JSONCache{})
+}
+
+func createPool() SMARTctlWorkerPool {
+	return SMARTctlWorkerPool{make(chan SMARTresult), 0}
 }
 
 // Parse json to gjson object
@@ -62,7 +77,7 @@ func readFakeSMARTctl(logger log.Logger, device string) gjson.Result {
 }
 
 // Get json from smartctl and parse it
-func readSMARTctl(logger log.Logger, device string) (gjson.Result, bool) {
+func readSMARTctl(logger log.Logger, device string, results chan<- SMARTresult) {
 	start := time.Now()
 	out, err := exec.Command(*smartctlPath, "--json", "--info", "--health", "--attributes", "--tolerance=verypermissive", "--nocheck=standby", "--format=brief", "--log=error", device).Output()
 	if err != nil {
@@ -72,7 +87,7 @@ func readSMARTctl(logger log.Logger, device string) (gjson.Result, bool) {
 	rcOk := resultCodeIsOk(logger, device, json.Get("smartctl.exit_status").Int())
 	jsonOk := jsonIsOk(logger, json)
 	level.Debug(logger).Log("msg", "Collected S.M.A.R.T. json data", "device", device, "duration", time.Since(start))
-	return json, rcOk && jsonOk
+	results <- SMARTresult{device, json, rcOk && jsonOk}
 }
 
 func readSMARTctlDevices(logger log.Logger) gjson.Result {
@@ -89,23 +104,43 @@ func readSMARTctlDevices(logger log.Logger) gjson.Result {
 	return parseJSON(string(out))
 }
 
+// Refresh all devices' json
+func refreshAllDevices(logger log.Logger, devices []string) {
+	if *smartctlFakeData {
+		return
+	}
+
+	pool := createPool()
+	for _, device := range devices {
+		refreshData(logger, device, &pool)
+	}
+	for pool.expected > 0 {
+		result := <-pool.results
+		if result.ok {
+			jsonCache.Store(result.device, JSONCache{JSON: result.JSON, LastCollect: time.Now()})
+		}
+		pool.expected--
+	}
+	close(pool.results)
+}
+
 // Select json source and parse
+func refreshData(logger log.Logger, device string, pool *SMARTctlWorkerPool) {
+	cacheValue, cacheOk := jsonCache.Load(device)
+	if !cacheOk || time.Now().After(cacheValue.(JSONCache).LastCollect.Add(*smartctlInterval)) {
+		go readSMARTctl(logger, device, pool.results)
+		pool.expected++
+	}
+}
+
 func readData(logger log.Logger, device string) gjson.Result {
 	if *smartctlFakeData {
 		return readFakeSMARTctl(logger, device)
 	}
 
-	cacheValue, cacheOk := jsonCache.Load(device)
-	if !cacheOk || time.Now().After(cacheValue.(JSONCache).LastCollect.Add(*smartctlInterval)) {
-		json, ok := readSMARTctl(logger, device)
-		if ok {
-			jsonCache.Store(device, JSONCache{JSON: json, LastCollect: time.Now()})
-			j, found := jsonCache.Load(device)
-			if !found {
-				level.Warn(logger).Log("msg", "device not found", "device", device)
-			}
-			return j.(JSONCache).JSON
-		}
+	cacheValue, found := jsonCache.Load(device)
+	if !found {
+		level.Warn(logger).Log("msg", "device not found", "device", device)
 		return gjson.Result{}
 	}
 	return cacheValue.(JSONCache).JSON
