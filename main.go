@@ -114,10 +114,14 @@ func scanDevices(logger log.Logger) []string {
 	var scanDeviceResult []string
 	for _, d := range scanDevices {
 		deviceName := d.Get("name").String()
-		if filter.ignored(deviceName) {
-			level.Info(logger).Log("msg", "Ignoring device", "name", deviceName)
+		deviceType := d.Get("type").String()
+		deviceProtocol := d.Get("protocol").String()
+		// filter schema "name=<deviceName>;type=<deviceType>;protocol=<deviceProtocol>"
+		device := "name=" + deviceName + ";type=" + deviceType + ";protocol=" + deviceProtocol
+		if filter.ignored(device) {
+			level.Info(logger).Log("msg", "Ignoring device", "name", deviceName, "type", deviceType, "protocol", deviceProtocol)
 		} else {
-			level.Info(logger).Log("msg", "Found device", "name", deviceName)
+			level.Info(logger).Log("msg", "Found device", "name", deviceName, "type", deviceType, "protocol", deviceProtocol)
 			scanDeviceResult = append(scanDeviceResult, deviceName)
 		}
 	}
