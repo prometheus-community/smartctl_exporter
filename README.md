@@ -160,7 +160,7 @@ to see the data generated.
 ./collect_fake_json.sh
 
 # copy the test JSON into one of the files in debug/
-#cat > debug/sda.json
+cp extracted-from-above-sda.json debug/sda.json
 
 # Make sure you have the latest version
 go build
