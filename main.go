@@ -16,6 +16,7 @@ package main
 import (
 	"net/http"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -32,11 +33,18 @@ import (
 	webflag "github.com/prometheus/exporter-toolkit/web/kingpinflag"
 )
 
+// Device
+type Device struct {
+	Name      string `json:"name"`
+	Info_Name string `json:"info_name"`
+	Type      string `json:"type"`
+}
+
 // SMARTctlManagerCollector implements the Collector interface.
 type SMARTctlManagerCollector struct {
 	CollectPeriod         string
 	CollectPeriodDuration time.Duration
-	Devices               []string
+	Devices               []Device
 
 	logger log.Logger
 	mutex  sync.Mutex
@@ -106,22 +114,41 @@ var (
 )
 
 // scanDevices uses smartctl to gather the list of available devices.
-func scanDevices(logger log.Logger) []string {
+func scanDevices(logger log.Logger) []Device {
 	filter := newDeviceFilter(*smartctlDeviceExclude, *smartctlDeviceInclude)
 
 	json := readSMARTctlDevices(logger)
 	scanDevices := json.Get("devices").Array()
-	var scanDeviceResult []string
+	var scanDeviceResult []Device
 	for _, d := range scanDevices {
-		deviceName := d.Get("name").String()
+		deviceName := extractDiskName(strings.TrimSpace(d.Get("info_name").String()))
 		if filter.ignored(deviceName) {
 			level.Info(logger).Log("msg", "Ignoring device", "name", deviceName)
 		} else {
 			level.Info(logger).Log("msg", "Found device", "name", deviceName)
-			scanDeviceResult = append(scanDeviceResult, deviceName)
+			device := Device{
+				Name:      d.Get("name").String(),
+				Info_Name: deviceName,
+				Type:      d.Get("type").String(),
+			}
+			scanDeviceResult = append(scanDeviceResult, device)
 		}
 	}
 	return scanDeviceResult
+}
+
+func filterDevices(logger log.Logger, devices []Device, filters []string) []Device {
+	var filtered []Device
+	for _, d := range devices {
+		for _, filter := range filters {
+			level.Debug(logger).Log("msg", "filterDevices", "device", d.Info_Name, "filter", filter)
+			if strings.Contains(d.Info_Name, filter) {
+				filtered = append(filtered, d)
+				break
+			}
+		}
+	}
+	return filtered
 }
 
 func main() {
@@ -140,13 +167,13 @@ func main() {
 	level.Info(logger).Log("msg", "Starting smartctl_exporter", "version", version.Info())
 	level.Info(logger).Log("msg", "Build context", "build_context", version.BuildContext())
 
-	var devices []string
+	var devices []Device
+	devices = scanDevices(logger)
+	level.Info(logger).Log("msg", "Number of devices found", "count", len(devices))
 	if len(*smartctlDevices) > 0 {
-		devices = *smartctlDevices
-	} else {
-		level.Info(logger).Log("msg", "No devices specified, trying to load them automatically")
-		devices = scanDevices(logger)
-		level.Info(logger).Log("msg", "Number of devices found", "count", len(devices))
+		level.Info(logger).Log("msg", "Devices specified", "devices", strings.Join(*smartctlDevices, ", "))
+		devices = filterDevices(logger, devices, *smartctlDevices)
+		level.Info(logger).Log("msg", "Devices filtered", "count", len(devices))
 	}
 
 	collector := SMARTctlManagerCollector{
@@ -154,7 +181,7 @@ func main() {
 		logger:  logger,
 	}
 
-	if *smartctlRescanInterval >= 1*time.Second && len(*smartctlDevices) == 0 {
+	if *smartctlRescanInterval >= 1*time.Second {
 		level.Info(logger).Log("msg", "Start background scan process")
 		level.Info(logger).Log("msg", "Rescanning for devices every", "rescanInterval", *smartctlRescanInterval)
 		go collector.RescanForDevices()
