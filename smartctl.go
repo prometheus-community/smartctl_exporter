@@ -42,28 +42,16 @@ type SMARTctl struct {
 	device SMARTDevice
 }
 
-func extractDiskName(input string) string {
-	re := regexp.MustCompile(`^(?:/dev/(?P<bus_name>\S+)/(?P<bus_num>\S+)\s\[|/dev/(?:disk\/by-id\/|disk\/by-path\/|)|\[)(?:\s\[|)(?P<disk>[A-Za-z0-9_\-]+)(?:\].*|)$`)
-	match := re.FindStringSubmatch(input)
+func buildDeviceLabel(inputName string, inputType string) string {
+	// Strip /dev prefix and replace / with _ (/dev/bus/0 becomes bus_0, /dev/disk/by-id/abcd becomes abcd)
+	devReg := regexp.MustCompile(`^/dev/(?:disk/by-id/|disk/by-path/|)`)
+	deviceName := strings.ReplaceAll(devReg.ReplaceAllString(inputName, ""), "/", "_")
 
-	if len(match) > 0 {
-		busNameIndex := re.SubexpIndex("bus_name")
-		busNumIndex := re.SubexpIndex("bus_num")
-		diskIndex := re.SubexpIndex("disk")
-		var name []string
-		if busNameIndex != -1 && match[busNameIndex] != "" {
-			name = append(name, match[busNameIndex])
-		}
-		if busNumIndex != -1 && match[busNumIndex] != "" {
-			name = append(name, match[busNumIndex])
-		}
-		if diskIndex != -1 && match[diskIndex] != "" {
-			name = append(name, match[diskIndex])
-		}
-
-		return strings.Join(name, "_")
+	if strings.Contains(inputType, ",") {
+		return deviceName + "_" + strings.ReplaceAll(inputType, ",", "_")
 	}
-	return ""
+
+	return deviceName
 }
 
 // NewSMARTctl is smartctl constructor
@@ -84,7 +72,7 @@ func NewSMARTctl(logger *slog.Logger, json gjson.Result, ch chan<- prometheus.Me
 		json:   json,
 		logger: logger,
 		device: SMARTDevice{
-			device:     extractDiskName(strings.TrimSpace(json.Get("device.info_name").String())),
+			device:     buildDeviceLabel(json.Get("device.name").String(), json.Get("device.type").String()),
 			serial:     strings.TrimSpace(json.Get("serial_number").String()),
 			family:     strings.TrimSpace(GetStringIfExists(json, "model_family", "unknown")),
 			model:      strings.TrimSpace(model_name),

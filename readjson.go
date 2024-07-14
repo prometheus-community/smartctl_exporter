@@ -63,23 +63,26 @@ func readFakeSMARTctl(logger *slog.Logger, device Device) gjson.Result {
 // Get json from smartctl and parse it
 func readSMARTctl(logger *slog.Logger, device Device) (gjson.Result, bool) {
 	start := time.Now()
-	out, err := exec.Command(*smartctlPath, "--json", "--info", "--health", "--attributes", "--tolerance=verypermissive", "--nocheck=standby", "--format=brief", "--log=error", "--device="+device.Type, device.Name).Output()
+	var smartctlArgs = []string{"--json", "--info", "--health", "--attributes", "--tolerance=verypermissive", "--nocheck=standby", "--format=brief", "--log=error", "--device=" + device.Type, device.Name}
+
+	logger.Debug("Calling smartctl with args", "args", strings.Join(smartctlArgs, " "))
+	out, err := exec.Command(*smartctlPath, smartctlArgs...).Output()
 	if err != nil {
-		logger.Warn("S.M.A.R.T. output reading", "err", err, "device", device.Info_Name)
+		logger.Warn("S.M.A.R.T. output reading", "err", err, "device", device)
 	}
 	// Accommodate a smartmontools pre-7.3 bug
 	cleaned_out := strings.TrimPrefix(string(out), "  Pending defect count:")
 	json := parseJSON(cleaned_out)
 	rcOk := resultCodeIsOk(logger, device, json.Get("smartctl.exit_status").Int())
 	jsonOk := jsonIsOk(logger, json)
-	logger.Debug("Collected S.M.A.R.T. json data", "device", device.Info_Name, "duration", time.Since(start))
+	logger.Debug("Collected S.M.A.R.T. json data", "device", device, "duration", time.Since(start))
 	return json, rcOk && jsonOk
 }
 
 func readSMARTctlDevices(logger *slog.Logger) gjson.Result {
 	logger.Debug("Scanning for devices")
 	var scanArgs []string = []string{"--json", "--scan"}
-	for _, d := range *smartctlDeviceTypes {
+	for _, d := range *smartctlScanDeviceTypes {
 		scanArgs = append(scanArgs, "--device", d)
 	}
 	out, err := exec.Command(*smartctlPath, scanArgs...).Output()
@@ -110,7 +113,7 @@ func readData(logger *slog.Logger, device Device) gjson.Result {
 			jsonCache.Store(device, JSONCache{JSON: json, LastCollect: time.Now()})
 			j, found := jsonCache.Load(device)
 			if !found {
-				logger.Warn("device not found", "device", device.Info_Name)
+				logger.Warn("device not found", "device", device)
 			}
 			return j.(JSONCache).JSON
 		}
@@ -125,30 +128,30 @@ func resultCodeIsOk(logger *slog.Logger, device Device, SMARTCtlResult int64) bo
 	if SMARTCtlResult > 0 {
 		b := SMARTCtlResult
 		if (b & 1) != 0 {
-			logger.Error("Command line did not parse", "device", device.Info_Name)
+			logger.Error("Command line did not parse", "device", device)
 			result = false
 		}
 		if (b & (1 << 1)) != 0 {
-			logger.Error("Device open failed, device did not return an IDENTIFY DEVICE structure, or device is in a low-power mode", "device", device.Info_Name)
+			logger.Error("Device open failed, device did not return an IDENTIFY DEVICE structure, or device is in a low-power mode", "device", device)
 			result = false
 		}
 		if (b & (1 << 2)) != 0 {
-			logger.Warn("Some SMART or other ATA command to the disk failed, or there was a checksum error in a SMART data structure", "device", device.Info_Name)
+			logger.Warn("Some SMART or other ATA command to the disk failed, or there was a checksum error in a SMART data structure", "device", device)
 		}
 		if (b & (1 << 3)) != 0 {
-			logger.Warn("SMART status check returned 'DISK FAILING'", "device", device.Info_Name)
+			logger.Warn("SMART status check returned 'DISK FAILING'", "device", device)
 		}
 		if (b & (1 << 4)) != 0 {
-			logger.Warn("We found prefail Attributes <= threshold", "device", device.Info_Name)
+			logger.Warn("We found prefail Attributes <= threshold", "device", device)
 		}
 		if (b & (1 << 5)) != 0 {
-			logger.Warn("SMART status check returned 'DISK OK' but we found that some (usage or prefail) Attributes have been <= threshold at some time in the past", "device", device.Info_Name)
+			logger.Warn("SMART status check returned 'DISK OK' but we found that some (usage or prefail) Attributes have been <= threshold at some time in the past", "device", device)
 		}
 		if (b & (1 << 6)) != 0 {
-			logger.Warn("The device error log contains records of errors", "device", device.Info_Name)
+			logger.Warn("The device error log contains records of errors", "device", device)
 		}
 		if (b & (1 << 7)) != 0 {
-			logger.Warn("The device self-test log contains records of errors. [ATA only] Failed self-tests outdated by a newer successful extended self-test are ignored", "device", device.Info_Name)
+			logger.Warn("The device self-test log contains records of errors. [ATA only] Failed self-tests outdated by a newer successful extended self-test are ignored", "device", device)
 		}
 	}
 	return result
