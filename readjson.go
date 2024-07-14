@@ -86,6 +86,9 @@ func readSMARTctlDevices(logger *slog.Logger) gjson.Result {
 			logger.Warn("S.M.A.R.T. output reading error", "err", err)
 			return gjson.Result{}
 		}
+	} else if err != nil {
+		level.Warn(logger).Log("msg", "S.M.A.R.T. output reading error", "err", err)
+		return gjson.Result{}
 	}
 	return parseJSON(string(out))
 }
