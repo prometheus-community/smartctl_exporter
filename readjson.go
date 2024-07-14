@@ -77,7 +77,11 @@ func readSMARTctl(logger log.Logger, device Device) (gjson.Result, bool) {
 
 func readSMARTctlDevices(logger log.Logger) gjson.Result {
 	level.Debug(logger).Log("msg", "Scanning for devices")
-	out, err := exec.Command(*smartctlPath, "--json", "--scan").Output()
+	var scanArgs []string = []string{"--json", "--scan"}
+	for _, d := range *smartctlDeviceTypes {
+		scanArgs = append(scanArgs, "--device", d)
+	}
+	out, err := exec.Command(*smartctlPath, scanArgs...).Output()
 	if exiterr, ok := err.(*exec.ExitError); ok {
 		level.Debug(logger).Log("msg", "Exit Status", "exit_code", exiterr.ExitCode())
 		// The smartctl command returns 2 if devices are sleeping, ignore this error.

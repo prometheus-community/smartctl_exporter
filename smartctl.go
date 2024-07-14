@@ -44,7 +44,7 @@ type SMARTctl struct {
 }
 
 func extractDiskName(input string) string {
-	re := regexp.MustCompile(`^(?:/dev/(?P<bus_name>\S+)/(?P<bus_num>\S+)\s\[|/dev/|\[)(?:\s\[|)(?P<disk>[a-z0-9_]+)(?:\].*|)$`)
+	re := regexp.MustCompile(`^(?:/dev/(?P<bus_name>\S+)/(?P<bus_num>\S+)\s\[|/dev/(?:disk\/by-id\/|disk\/by-path\/|)|\[)(?:\s\[|)(?P<disk>[A-Za-z0-9_\-]+)(?:\].*|)$`)
 	match := re.FindStringSubmatch(input)
 
 	if len(match) > 0 {
