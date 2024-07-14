@@ -107,6 +107,10 @@ var (
 		"smartctl.device-include",
 		"Regexp of devices to exclude from automatic scanning. (mutually exclusive to device-exclude)",
 	).Default("").String()
+	smartctlDeviceTypes = kingpin.Flag(
+		"smartctl.device-type",
+		"Device type to use during automatic scan. Special by-id value forces predictable device names. (repeatable)",
+	).Strings()
 	smartctlFakeData = kingpin.Flag("smartctl.fake-data",
 		"The device to monitor (repeatable)",
 	).Default("false").Hidden().Bool()
