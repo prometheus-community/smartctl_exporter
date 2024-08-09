@@ -54,6 +54,8 @@ for device in "${devices[@]}"
 	echo -n "Collecting data for '${device}'..."
 	# shellcheck disable=SC2086
 	data="$($SUDO smartctl ${smartctl_args} ${device})"
+	# Accomodate a smartmontools pre-7.3 bug
+	data=${data#"  Pending defect count:"}
 	type="$(echo "${data}" | "${json_tool}" "${json_args}" '.device.type')"
 	family="$(echo "${data}" | "${json_tool}" "${json_args}" \
 'select(.model_family != null) | .model_family | sub(" |/" ; "_" ; "g")
