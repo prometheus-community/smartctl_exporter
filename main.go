@@ -14,6 +14,7 @@
 package main
 
 import (
+	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
@@ -120,6 +121,9 @@ var (
 	smartctlFakeData = kingpin.Flag("smartctl.fake-data",
 		"The device to monitor (repeatable)",
 	).Default("false").Hidden().Bool()
+	smartctlPowerModeCheck = kingpin.Flag("smartctl.powermode-check",
+		"Whether or not to check powermode before fetching data",
+	).Default("standby").String()
 )
 
 // scanDevices uses smartctl to gather the list of available devices.
@@ -171,6 +175,15 @@ func buildDevicesFromFlag(devices []Device) []Device {
 	return devices
 }
 
+func validatePowerMode(mode string) error {
+	switch strings.ToLower(mode) {
+	case "never", "sleep", "standby", "idle":
+		return nil
+	default:
+		return fmt.Errorf("invalid power mode: %s. Must be one of: never, sleep, standby, idle", mode)
+	}
+}
+
 func main() {
 	metricsPath := kingpin.Flag(
 		"web.telemetry-path", "Path under which to expose metrics",
@@ -184,9 +197,12 @@ func main() {
 	kingpin.Parse()
 	logger := promslog.New(promslogConfig)
 
+	if err := validatePowerMode(*smartctlPowerModeCheck); err != nil {
+		logger.Error(err.Error())
+		os.Exit(1)
+	}
 	logger.Info("Starting smartctl_exporter", "version", version.Info())
 	logger.Info("Build context", "build_context", version.BuildContext())
-
 	var devices []Device
 
 	if len(*smartctlDevices) == 0 {
