@@ -111,6 +111,9 @@ var (
 	smartctlFakeData = kingpin.Flag("smartctl.fake-data",
 		"The device to monitor (repeatable)",
 	).Default("false").Hidden().Bool()
+	smartctlPowerModeCheck = kingpin.Flag("smartctl.powermode-check",
+		"Whether or not to check powermode before fetching data",
+	).Default("standby").String()
 )
 
 // scanDevices uses smartctl to gather the list of available devices.
