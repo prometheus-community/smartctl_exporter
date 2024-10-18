@@ -15,11 +15,10 @@ package main
 
 import (
 	"fmt"
+	"log/slog"
 	"regexp"
 	"strings"
 
-	"github.com/go-kit/log"
-	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/tidwall/gjson"
 )
@@ -39,7 +38,7 @@ type SMARTDevice struct {
 type SMARTctl struct {
 	ch     chan<- prometheus.Metric
 	json   gjson.Result
-	logger log.Logger
+	logger *slog.Logger
 	device SMARTDevice
 }
 
@@ -68,7 +67,7 @@ func extractDiskName(input string) string {
 }
 
 // NewSMARTctl is smartctl constructor
-func NewSMARTctl(logger log.Logger, json gjson.Result, ch chan<- prometheus.Metric) SMARTctl {
+func NewSMARTctl(logger *slog.Logger, json gjson.Result, ch chan<- prometheus.Metric) SMARTctl {
 	var model_name string
 	if obj := json.Get("model_name"); obj.Exists() {
 		model_name = obj.String()
@@ -97,7 +96,7 @@ func NewSMARTctl(logger log.Logger, json gjson.Result, ch chan<- prometheus.Metr
 
 // Collect metrics
 func (smart *SMARTctl) Collect() {
-	level.Debug(smart.logger).Log("msg", "Collecting metrics from", "device", smart.device.device, "family", smart.device.family, "model", smart.device.model)
+	smart.logger.Debug("Collecting metrics from", "device", smart.device.device, "family", smart.device.family, "model", smart.device.model)
 	smart.mineExitStatus()
 	smart.mineDevice()
 	smart.mineCapacity()

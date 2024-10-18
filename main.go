@@ -14,6 +14,7 @@
 package main
 
 import (
+	"log/slog"
 	"net/http"
 	"os"
 	"strings"
@@ -21,13 +22,11 @@ import (
 	"time"
 
 	kingpin "github.com/alecthomas/kingpin/v2"
-	"github.com/go-kit/log"
-	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/collectors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/prometheus/common/promlog"
-	"github.com/prometheus/common/promlog/flag"
+	"github.com/prometheus/common/promslog"
+	"github.com/prometheus/common/promslog/flag"
 	"github.com/prometheus/common/version"
 	"github.com/prometheus/exporter-toolkit/web"
 	webflag "github.com/prometheus/exporter-toolkit/web/kingpinflag"
@@ -46,7 +45,7 @@ type SMARTctlManagerCollector struct {
 	CollectPeriodDuration time.Duration
 	Devices               []Device
 
-	logger log.Logger
+	logger *slog.Logger
 	mutex  sync.Mutex
 }
 
@@ -79,7 +78,7 @@ func (i *SMARTctlManagerCollector) Collect(ch chan<- prometheus.Metric) {
 func (i *SMARTctlManagerCollector) RescanForDevices() {
 	for {
 		time.Sleep(*smartctlRescanInterval)
-		level.Info(i.logger).Log("msg", "Rescanning for devices")
+		i.logger.Info("Rescanning for devices")
 		devices := scanDevices(i.logger)
 		i.mutex.Lock()
 		i.Devices = devices
@@ -114,7 +113,7 @@ var (
 )
 
 // scanDevices uses smartctl to gather the list of available devices.
-func scanDevices(logger log.Logger) []Device {
+func scanDevices(logger *slog.Logger) []Device {
 	filter := newDeviceFilter(*smartctlDeviceExclude, *smartctlDeviceInclude)
 
 	json := readSMARTctlDevices(logger)
@@ -123,9 +122,9 @@ func scanDevices(logger log.Logger) []Device {
 	for _, d := range scanDevices {
 		deviceName := extractDiskName(strings.TrimSpace(d.Get("info_name").String()))
 		if filter.ignored(deviceName) {
-			level.Info(logger).Log("msg", "Ignoring device", "name", deviceName)
+			logger.Info("Ignoring device", "name", deviceName)
 		} else {
-			level.Info(logger).Log("msg", "Found device", "name", deviceName)
+			logger.Info("Found device", "name", deviceName)
 			device := Device{
 				Name:      d.Get("name").String(),
 				Info_Name: deviceName,
@@ -137,11 +136,11 @@ func scanDevices(logger log.Logger) []Device {
 	return scanDeviceResult
 }
 
-func filterDevices(logger log.Logger, devices []Device, filters []string) []Device {
+func filterDevices(logger *slog.Logger, devices []Device, filters []string) []Device {
 	var filtered []Device
 	for _, d := range devices {
 		for _, filter := range filters {
-			level.Debug(logger).Log("msg", "filterDevices", "device", d.Info_Name, "filter", filter)
+			logger.Debug("filterDevices", "device", d.Info_Name, "filter", filter)
 			if strings.Contains(d.Info_Name, filter) {
 				filtered = append(filtered, d)
 				break
@@ -157,23 +156,23 @@ func main() {
 	).Default("/metrics").String()
 	toolkitFlags := webflag.AddFlags(kingpin.CommandLine, ":9633")
 
-	promlogConfig := &promlog.Config{}
-	flag.AddFlags(kingpin.CommandLine, promlogConfig)
+	promslogConfig := &promslog.Config{}
+	flag.AddFlags(kingpin.CommandLine, promslogConfig)
 	kingpin.Version(version.Print("smartctl_exporter"))
 	kingpin.HelpFlag.Short('h')
 	kingpin.Parse()
-	logger := promlog.New(promlogConfig)
+	logger := promslog.New(promslogConfig)
 
-	level.Info(logger).Log("msg", "Starting smartctl_exporter", "version", version.Info())
-	level.Info(logger).Log("msg", "Build context", "build_context", version.BuildContext())
+	logger.Info("Starting smartctl_exporter", "version", version.Info())
+	logger.Info("Build context", "build_context", version.BuildContext())
 
 	var devices []Device
 	devices = scanDevices(logger)
-	level.Info(logger).Log("msg", "Number of devices found", "count", len(devices))
+	logger.Info("Number of devices found", "count", len(devices))
 	if len(*smartctlDevices) > 0 {
-		level.Info(logger).Log("msg", "Devices specified", "devices", strings.Join(*smartctlDevices, ", "))
+		logger.Info("Devices specified", "devices", strings.Join(*smartctlDevices, ", "))
 		devices = filterDevices(logger, devices, *smartctlDevices)
-		level.Info(logger).Log("msg", "Devices filtered", "count", len(devices))
+		logger.Info("Devices filtered", "count", len(devices))
 	}
 
 	collector := SMARTctlManagerCollector{
@@ -182,8 +181,8 @@ func main() {
 	}
 
 	if *smartctlRescanInterval >= 1*time.Second {
-		level.Info(logger).Log("msg", "Start background scan process")
-		level.Info(logger).Log("msg", "Rescanning for devices every", "rescanInterval", *smartctlRescanInterval)
+		logger.Info("Start background scan process")
+		logger.Info("Rescanning for devices every", "rescanInterval", *smartctlRescanInterval)
 		go collector.RescanForDevices()
 	}
 
@@ -211,7 +210,7 @@ func main() {
 		}
 		landingPage, err := web.NewLandingPage(landingConfig)
 		if err != nil {
-			level.Error(logger).Log("err", err)
+			logger.Error("error creating landing page", "err", err)
 			os.Exit(1)
 		}
 		http.Handle("/", landingPage)
@@ -219,7 +218,7 @@ func main() {
 
 	srv := &http.Server{}
 	if err := web.ListenAndServe(srv, toolkitFlags, logger); err != nil {
-		level.Error(logger).Log("err", err)
+		logger.Error("error running HTTP server", "err", err)
 		os.Exit(1)
 	}
 }
