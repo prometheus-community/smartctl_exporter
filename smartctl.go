@@ -63,7 +63,9 @@ func extractDiskName(input string) string {
 
 		return strings.Join(name, "_")
 	}
-	return ""
+
+	// If the regex doesn't match, return the entire input string
+	return input
 }
 
 // NewSMARTctl is smartctl constructor
