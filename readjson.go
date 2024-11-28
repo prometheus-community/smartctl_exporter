@@ -154,6 +154,12 @@ func jsonIsOk(logger *slog.Logger, json gjson.Result) bool {
 	if messages.Exists() {
 		for _, message := range messages.Array() {
 			if message.Get("severity").String() == "error" {
+				// if the string contains "GetLogPage failed", then ignore it
+				// this is a known issue with Apple internal SSDs
+				if strings.Contains(message.Get("string").String(), "GetLogPage failed") {
+					logger.Warn("Ignoring GetLogPage failed error", "device", json.Get("device.name").String(), "message", message.Get("string").String())
+					continue
+				}
 				logger.Error(message.Get("string").String())
 				return false
 			}
