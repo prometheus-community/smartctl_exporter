@@ -90,14 +90,13 @@ func readSMARTctlDevices(logger *slog.Logger) gjson.Result {
 	return parseJSON(string(out))
 }
 
-func checkSMARTSupport(logger *slog.Logger, deviceName string) bool {
-	logger.Debug("Checking S.M.A.R.T. support for device", "deviceName", deviceName)
-	out, err := exec.Command(*smartctlPath, "--json", "--info", "--device="+deviceName).Output()
+func checkSMARTSupport(logger *slog.Logger, device Device) bool {
+	logger.Debug("Checking S.M.A.R.T. support for device", "deviceName", device.Name, "deviceType", device.Type)
+	out, err := exec.Command(*smartctlPath, "--json", "--info", "--device="+device.Type, device.Name).Output()
 	if err != nil {
 		return false
 	}
-	json := parseJSON(string(out))
-	return json.Get("smart_support.available").Bool()
+	return parseJSON(string(out)).Get("smart_support.available").Bool()
 }
 
 // Select json source and parse
