@@ -91,7 +91,7 @@ func readSMARTctlDevices(logger *slog.Logger) gjson.Result {
 }
 
 func checkSMARTSupport(logger *slog.Logger, deviceName string) bool {
-	logger.Debug("Checking S.M.A.R.T. support for", deviceName)
+	logger.Debug("Checking S.M.A.R.T. support for device", "deviceName", deviceName)
 	out, err := exec.Command(*smartctlPath, "--json", "--info", "--device="+deviceName).Output()
 	if err != nil {
 		logger.Warn("S.M.A.R.T. output reading", "err", err, "device", deviceName)
