@@ -121,9 +121,10 @@ func scanDevices(logger *slog.Logger) []Device {
 	var scanDeviceResult []Device
 	for _, d := range scanDevices {
 		deviceName := extractDiskName(strings.TrimSpace(d.Get("info_name").String()))
+		smartSupport := checkSMARTSupport(logger, deviceName)
 		if filter.ignored(deviceName) {
 			logger.Info("Ignoring device", "name", deviceName)
-		} else if !d.Get("smart_support.available").Bool() {
+		} else if !smartSupport {
 			logger.Info("Ignoring device", "name", deviceName, "reason:", "SMART not available")
 		} else {
 			logger.Info("Found device", "name", deviceName)
