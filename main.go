@@ -120,16 +120,22 @@ func scanDevices(logger *slog.Logger) []Device {
 	scanDevices := json.Get("devices").Array()
 	var scanDeviceResult []Device
 	for _, d := range scanDevices {
-		deviceName := extractDiskName(strings.TrimSpace(d.Get("info_name").String()))
-		if filter.ignored(deviceName) {
-			logger.Info("Ignoring device", "name", deviceName)
+		deviceInfoName := extractDiskName(strings.TrimSpace(d.Get("info_name").String()))
+		deviceName := d.Get("name").String()
+		deviceType := d.Get("type").String()
+		device := Device{
+			Name:      deviceName,
+			Info_Name: deviceInfoName,
+			Type:      deviceType,
+		}
+		smartSupported := checkSMARTSupport(logger, device)
+
+		if filter.ignored(deviceInfoName) {
+			logger.Info("Ignoring device", "name", deviceInfoName)
+		} else if !smartSupported {
+			logger.Info("Ignoring device", "name", deviceInfoName, "reason", "S.M.A.R.T. not available")
 		} else {
-			logger.Info("Found device", "name", deviceName)
-			device := Device{
-				Name:      d.Get("name").String(),
-				Info_Name: deviceName,
-				Type:      d.Get("type").String(),
-			}
+			logger.Info("Found device", "name", deviceInfoName)
 			scanDeviceResult = append(scanDeviceResult, device)
 		}
 	}

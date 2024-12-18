@@ -90,6 +90,26 @@ func readSMARTctlDevices(logger *slog.Logger) gjson.Result {
 	return parseJSON(string(out))
 }
 
+func checkSMARTSupport(logger *slog.Logger, device Device) bool {
+	logger.Debug("Checking S.M.A.R.T. support for device", "deviceName", device.Name, "deviceType", device.Type)
+	deviceTypeArg := ""
+	if device.Type != "ata" && device.Type != "scsi" {
+		deviceTypeArg = "--device=" + device.Type
+	}
+
+	args := []string{"--json", "--info", device.Name}
+	if deviceTypeArg != "" {
+		args = append(args, deviceTypeArg)
+	}
+
+	out, err := exec.Command(*smartctlPath, args...).Output()
+	if err != nil {
+		logger.Warn("S.M.A.R.T. output reading", "err", err, "device", device.Info_Name)
+		return false
+	}
+	return parseJSON(string(out)).Get("smart_support.available").Bool()
+}
+
 // Select json source and parse
 func readData(logger *slog.Logger, device Device) gjson.Result {
 	if *smartctlFakeData {
