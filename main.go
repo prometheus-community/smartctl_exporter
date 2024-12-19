@@ -34,9 +34,13 @@ import (
 
 // Device
 type Device struct {
-	Name      string `json:"name"`
-	Info_Name string `json:"info_name"`
-	Type      string `json:"type"`
+	Name  string
+	Type  string
+	Label string
+}
+
+func (d Device) String() string {
+	return d.Name + ";" + d.Type + " (" + d.Label + ")"
 }
 
 // SMARTctlManagerCollector implements the Collector interface.
@@ -80,6 +84,7 @@ func (i *SMARTctlManagerCollector) RescanForDevices() {
 		time.Sleep(*smartctlRescanInterval)
 		i.logger.Info("Rescanning for devices")
 		devices := scanDevices(i.logger)
+		devices = buildDevicesFromFlag(devices)
 		i.mutex.Lock()
 		i.Devices = devices
 		i.mutex.Unlock()
@@ -96,8 +101,9 @@ var (
 	smartctlRescanInterval = kingpin.Flag("smartctl.rescan",
 		"The interval between rescanning for new/disappeared devices. If the interval is smaller than 1s no rescanning takes place. If any devices are configured with smartctl.device also no rescanning takes place.",
 	).Default("10m").Duration()
+	smartctlScan    = kingpin.Flag("smartctl.scan", "Enable scanning. This is a default if no devices are specified").Default("false").Bool()
 	smartctlDevices = kingpin.Flag("smartctl.device",
-		"The device to monitor (repeatable)",
+		"The device to monitor. Device type can be specified after a semicolon, eg. '/dev/bus/0;megaraid,1' (repeatable)",
 	).Strings()
 	smartctlDeviceExclude = kingpin.Flag(
 		"smartctl.device-exclude",
@@ -107,6 +113,10 @@ var (
 		"smartctl.device-include",
 		"Regexp of devices to exclude from automatic scanning. (mutually exclusive to device-exclude)",
 	).Default("").String()
+	smartctlScanDeviceTypes = kingpin.Flag(
+		"smartctl.scan-device-type",
+		"Device type to use during automatic scan. Special by-id value forces predictable device names. (repeatable)",
+	).Strings()
 	smartctlFakeData = kingpin.Flag("smartctl.fake-data",
 		"The device to monitor (repeatable)",
 	).Default("false").Hidden().Bool()
@@ -120,15 +130,23 @@ func scanDevices(logger *slog.Logger) []Device {
 	scanDevices := json.Get("devices").Array()
 	var scanDeviceResult []Device
 	for _, d := range scanDevices {
-		deviceName := extractDiskName(strings.TrimSpace(d.Get("info_name").String()))
-		if filter.ignored(deviceName) {
-			logger.Info("Ignoring device", "name", deviceName)
+		deviceName := d.Get("name").String()
+		deviceType := d.Get("type").String()
+
+		// SATA devices are reported as SCSI during scan - fallback to auto scraping
+		if deviceType == "scsi" {
+			deviceType = "auto"
+		}
+
+		deviceLabel := buildDeviceLabel(deviceName, deviceType)
+		if filter.ignored(deviceLabel) {
+			logger.Info("Ignoring device", "name", deviceLabel)
 		} else {
-			logger.Info("Found device", "name", deviceName)
+			logger.Info("Found device", "name", deviceLabel)
 			device := Device{
-				Name:      d.Get("name").String(),
-				Info_Name: deviceName,
-				Type:      d.Get("type").String(),
+				Name:  deviceName,
+				Type:  deviceType,
+				Label: deviceLabel,
 			}
 			scanDeviceResult = append(scanDeviceResult, device)
 		}
@@ -136,18 +154,21 @@ func scanDevices(logger *slog.Logger) []Device {
 	return scanDeviceResult
 }
 
-func filterDevices(logger *slog.Logger, devices []Device, filters []string) []Device {
-	var filtered []Device
-	for _, d := range devices {
-		for _, filter := range filters {
-			logger.Debug("filterDevices", "device", d.Info_Name, "filter", filter)
-			if strings.Contains(d.Info_Name, filter) {
-				filtered = append(filtered, d)
-				break
-			}
+func buildDevicesFromFlag(devices []Device) []Device {
+	// TODO: deduplication?
+	for _, device := range *smartctlDevices {
+		deviceName, deviceType, _ := strings.Cut(device, ";")
+		if deviceType == "" {
+			deviceType = "auto"
 		}
+
+		devices = append(devices, Device{
+			Name:  deviceName,
+			Type:  deviceType,
+			Label: buildDeviceLabel(deviceName, deviceType),
+		})
 	}
-	return filtered
+	return devices
 }
 
 func main() {
@@ -167,11 +188,19 @@ func main() {
 	logger.Info("Build context", "build_context", version.BuildContext())
 
 	var devices []Device
-	devices = scanDevices(logger)
-	logger.Info("Number of devices found", "count", len(devices))
+
+	if len(*smartctlDevices) == 0 {
+		*smartctlScan = true
+	}
+
+	if *smartctlScan {
+		devices = scanDevices(logger)
+		logger.Info("Number of devices found", "count", len(devices))
+	}
+
 	if len(*smartctlDevices) > 0 {
 		logger.Info("Devices specified", "devices", strings.Join(*smartctlDevices, ", "))
-		devices = filterDevices(logger, devices, *smartctlDevices)
+		devices = buildDevicesFromFlag(devices)
 		logger.Info("Devices filtered", "count", len(devices))
 	}
 
@@ -180,7 +209,7 @@ func main() {
 		logger:  logger,
 	}
 
-	if *smartctlRescanInterval >= 1*time.Second {
+	if *smartctlScan && *smartctlRescanInterval >= 1*time.Second {
 		logger.Info("Start background scan process")
 		logger.Info("Rescanning for devices every", "rescanInterval", *smartctlRescanInterval)
 		go collector.RescanForDevices()
