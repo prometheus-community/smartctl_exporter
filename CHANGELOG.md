@@ -1,3 +1,10 @@
+## 0.13.0 / 2024-12-20
+
+* [CHANGE] `slog` used for logging instead go logger #246
+* [ENHANCEMENT] Added support for `megaraid` devices and device types #205 #257
+* [BUGFIX] Better support for smartmontools < 7.3 #238
+* [BUGFIX] Corrected NVMe read/write bytes to NVMe metrics #211
+
 ## 0.12.0 / 2024-03-03
 
 * [CHANGE] Better SCSI/SAS support, and removing confused metrics #168
