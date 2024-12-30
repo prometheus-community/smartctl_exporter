@@ -468,12 +468,15 @@ func (smart *SMARTctl) mineSCSIBytesWritten() {
 }
 
 func (smart *SMARTctl) mineSmartStatus() {
-	smart.ch <- prometheus.MustNewConstMetric(
-		metricDeviceSmartStatus,
-		prometheus.GaugeValue,
-		smart.json.Get("smart_status.passed").Float(),
-		smart.device.device,
-	)
+	smartStatus := smart.json.Get("smart_status")
+	if smartStatus.Exists() {
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricDeviceSmartStatus,
+			prometheus.GaugeValue,
+			smartStatus.Get("passed").Float(),
+			smart.device.device,
+		)
+	}
 }
 
 func (smart *SMARTctl) mineDeviceStatistics() {
