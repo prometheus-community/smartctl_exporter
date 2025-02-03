@@ -556,6 +556,32 @@ func (smart *SMARTctl) mineDeviceSelfTestLog() {
 			smart.device.device,
 			logType,
 		)
+
+		// Get the first (most recent) test from the table if it exists
+		table := status.Get("table")
+		if table.Exists() && len(table.Array()) > 0 {
+			lastTest := table.Array()[0]
+			smart.ch <- prometheus.MustNewConstMetric(
+				metricDeviceLastSelfTest,
+				prometheus.GaugeValue,
+				lastTest.Get("status.value").Float(),
+				smart.device.device,
+				lastTest.Get("type.string").String(),
+				fmt.Sprintf("%d", lastTest.Get("lifetime_hours").Int()),
+			)
+
+			smart.ch <- prometheus.MustNewConstMetric(
+				metricDeviceLastSelfTestInfo,
+				prometheus.GaugeValue,
+				1,
+				smart.device.device,
+				lastTest.Get("type.string").String(),
+				fmt.Sprintf("%d", lastTest.Get("lifetime_hours").Int()),
+				fmt.Sprintf("%d", lastTest.Get("status.value").Int()),
+				lastTest.Get("status.string").String(),
+			)
+
+		}
 	}
 }
 

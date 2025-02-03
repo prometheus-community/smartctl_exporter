@@ -20,7 +20,7 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	dto "github.com/prometheus/client_model/go"
-	// "github.com/golang/protobuf/proto"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestBuildDeviceLabel(t *testing.T) {
@@ -57,29 +57,60 @@ func readTestFile(path string) []byte {
 	return data
 }
 
+func getLabelValue(labels []*dto.LabelPair, key string) *string {
+	for _, label := range labels {
+		if label.GetName() == key {
+			s := label.GetValue()
+			return &s
+		}
+	}
+	return nil
+}
+
+func getMetricsFromChannel(ch chan prometheus.Metric) map[*prometheus.Desc]*dto.Metric {
+	metricMap := make(map[*prometheus.Desc]*dto.Metric)
+	for m := range ch {
+		metric := new(dto.Metric)
+		m.Write(metric)
+		metricMap[m.Desc()] = metric
+	}
+	return metricMap
+}
+
 func TestMineDeviceSelfTestLog(t *testing.T) {
 	tests := []struct {
 		name     string
 		jsonFile string
-		want     map[string]struct {
-			count      float64
-			errorTotal float64
-			logType    string
+		want     struct {
+			count          float64
+			errorTotal     float64
+			logType        string
+			lastTestType   string
+			lastTestHours  string
+			lastStatus     float64
+			lastStatusDesc string
 		}
 	}{
 		{
 			name:     "Exos X16 self-test log parsing",
 			jsonFile: "testdata/sat-Segate_Exos_X16-ST10000NM001G-2MW103.json",
-			want: map[string]struct {
-				count      float64
-				errorTotal float64
-				logType    string
+			want: struct {
+				count          float64
+				errorTotal     float64
+				logType        string
+				lastTestType   string
+				lastTestHours  string
+				lastStatus     float64
+				lastStatusDesc string
 			}{
-				"standard": {
-					count:      21,
-					errorTotal: 0,
-					logType:    "standard",
-				},
+
+				count:          21,
+				errorTotal:     0,
+				logType:        "standard",
+				lastTestType:   "Short offline",
+				lastTestHours:  "33600",
+				lastStatus:     0,
+				lastStatusDesc: "Completed without error",
 			},
 		},
 	}
@@ -96,83 +127,26 @@ func TestMineDeviceSelfTestLog(t *testing.T) {
 			smart.mineDeviceSelfTestLog()
 			close(ch)
 
-			// Verify metrics
-			metricsFound := make(map[string]bool)
-			for m := range ch {
-				metric := new(dto.Metric)
-				m.Write(metric)
+			metricMap := getMetricsFromChannel(ch)
+			expected := tt.want
 
-				var deviceName, logType string
-				for _, label := range metric.GetLabel() {
-					switch *label.Name {
-					case "device":
-						deviceName = *label.Value
-					case "self_test_log_type":
-						logType = *label.Value
-					}
-				}
+			metric := metricMap[metricDeviceSelfTestLogCount]
+			assert.NotNil(t, metric, "Missing metricDeviceSelfTestLogCount")
+			assert.Equal(t, expected.count, metric.GetGauge().GetValue())
+			assert.Equal(t, "sdc", *getLabelValue(metric.GetLabel(), "device"))
+			assert.Equal(t, "standard", *getLabelValue(metric.GetLabel(), "self_test_log_type"))
 
-				// Verify device name matches JSON contents
-				if deviceName != "sdc" {
-					t.Errorf("Unexpected device name: got %s want sdc", deviceName)
-				}
+			metric = metricMap[metricDeviceSelfTestLogErrorCount]
+			assert.NotNil(t, metric, "Missing metricDeviceSelfTestLogErrorCount")
+			assert.Equal(t, expected.errorTotal, metric.GetGauge().GetValue())
+			assert.Equal(t, "sdc", *getLabelValue(metric.GetLabel(), "device"))
+			assert.Equal(t, "standard", *getLabelValue(metric.GetLabel(), "self_test_log_type"))
 
-				// Check log type and values
-				expected, ok := tt.want[logType]
-				if !ok {
-					t.Errorf("Unexpected log type: %s", logType)
-					continue
-				}
-
-				metricType := getMetricType(metric)
-				if metricType == nil {
-					t.Errorf("Unknown metric type")
-				}
-				switch *metricType {
-				case dto.MetricType_GAUGE:
-					value := metric.GetGauge().GetValue()
-					if logType == "standard" {
-						switch m.Desc() {
-						case metricDeviceSelfTestLogCount:
-							if value != expected.count {
-								t.Errorf("count mismatch: got %v want %v", value, expected.count)
-							}
-						case metricDeviceSelfTestLogErrorCount:
-							if value != expected.errorTotal {
-								t.Errorf("error_count_total mismatch: got %v want %v", value, expected.errorTotal)
-							}
-						default:
-							t.Errorf("Metric unkown")
-						}
-
-					}
-					metricsFound[logType] = true
-				}
-			}
-
-			// Verify we found all expected log types
-			for logType := range tt.want {
-				if !metricsFound[logType] {
-					t.Errorf("Missing metrics for log type: %s", logType)
-				}
-			}
+			metric = metricMap[metricDeviceLastSelfTest]
+			assert.NotNil(t, metric, "Missing metricDeviceLastSelfTest")
+			assert.Equal(t, expected.lastStatus, metric.GetGauge().GetValue())
+			assert.Equal(t, "sdc", *getLabelValue(metric.GetLabel(), "device"))
+			assert.Equal(t, expected.lastTestHours, *getLabelValue(metric.GetLabel(), "lifetime_hours"))
 		})
 	}
-}
-
-// Helper to determine metric type
-func getMetricType(m *dto.Metric) *dto.MetricType {
-	if m.Counter != nil {
-		return dto.MetricType_COUNTER.Enum()
-	}
-	if m.Gauge != nil {
-		return dto.MetricType_GAUGE.Enum()
-	}
-	if m.Histogram != nil {
-		return dto.MetricType_HISTOGRAM.Enum()
-	}
-	if m.Summary != nil {
-		return dto.MetricType_SUMMARY.Enum()
-	}
-	return nil
 }
