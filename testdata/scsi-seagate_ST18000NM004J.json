@@ -1,0 +1,411 @@
+{
+    "json_format_version": [
+      1,
+      0
+    ],
+    "smartctl": {
+      "version": [
+        7,
+        4
+      ],
+      "pre_release": false,
+      "svn_revision": "5530",
+      "platform_info": "x86_64-linux-6.8.0-51-generic",
+      "build_info": "(local build)",
+      "argv": [
+        "smartctl",
+        "--json",
+        "--info",
+        "--health",
+        "--attributes",
+        "--tolerance=verypermissive",
+        "--nocheck=standby",
+        "--format=brief",
+        "--log=error",
+        "--log=selftest",
+        "/dev/sdb"
+      ],
+      "exit_status": 0
+    },
+    "local_time": {
+      "time_t": 1738581435,
+      "asctime": "Mon Feb  3 12:17:15 2025 CET"
+    },
+    "device": {
+      "name": "/dev/sdb",
+      "info_name": "/dev/sdb",
+      "type": "scsi",
+      "protocol": "SCSI"
+    },
+    "scsi_vendor": "SEAGATE",
+    "scsi_product": "ST18000NM004J",
+    "scsi_model_name": "SEAGATE ST18000NM004J",
+    "scsi_revision": "E002",
+    "scsi_version": "SPC-5",
+    "user_capacity": {
+      "blocks": 35156656128,
+      "bytes": 18000207937536
+    },
+    "logical_block_size": 512,
+    "physical_block_size": 4096,
+    "scsi_lb_provisioning": {
+      "name": "fully provisioned",
+      "value": 0,
+      "management_enabled": {
+        "name": "LBPME",
+        "value": 0
+      },
+      "read_zeros": {
+        "name": "LBPRZ",
+        "value": 0
+      }
+    },
+    "rotation_rate": 7200,
+    "form_factor": {
+      "scsi_value": 2,
+      "name": "3.5 inches"
+    },
+    "logical_unit_id": "0x5000c500d7c94dff",
+    "serial_number": "ZR51ZEKN0000C2061A1W",
+    "device_type": {
+      "scsi_terminology": "Peripheral Device Type [PDT]",
+      "scsi_value": 0,
+      "name": "disk"
+    },
+    "scsi_transport_protocol": {
+      "name": "SAS (SPL-4)",
+      "value": 6
+    },
+    "smart_support": {
+      "available": true,
+      "enabled": true
+    },
+    "temperature_warning": {
+      "enabled": true
+    },
+    "smart_status": {
+      "passed": true
+    },
+    "temperature": {
+      "current": 33,
+      "drive_trip": 60
+    },
+    "power_on_time": {
+      "hours": 1249,
+      "minutes": 29
+    },
+    "scsi_start_stop_cycle_counter": {
+      "year_of_manufacture": "2021",
+      "week_of_manufacture": "36",
+      "specified_cycle_count_over_device_lifetime": 50000,
+      "accumulated_start_stop_cycles": 4,
+      "specified_load_unload_count_over_device_lifetime": 600000,
+      "accumulated_load_unload_cycles": 54
+    },
+    "scsi_grown_defect_list": 0,
+    "scsi_error_counter_log": {
+      "read": {
+        "errors_corrected_by_eccfast": 0,
+        "errors_corrected_by_eccdelayed": 0,
+        "errors_corrected_by_rereads_rewrites": 0,
+        "total_errors_corrected": 0,
+        "correction_algorithm_invocations": 0,
+        "gigabytes_processed": "9235.838",
+        "total_uncorrected_errors": 0
+      },
+      "write": {
+        "errors_corrected_by_eccfast": 0,
+        "errors_corrected_by_eccdelayed": 0,
+        "errors_corrected_by_rereads_rewrites": 0,
+        "total_errors_corrected": 0,
+        "correction_algorithm_invocations": 0,
+        "gigabytes_processed": "13467.004",
+        "total_uncorrected_errors": 0
+      }
+    },
+    "scsi_pending_defects": {
+      "count": 0
+    },
+    "scsi_self_test_0": {
+      "code": {
+        "value": 1,
+        "string": "Background short"
+      },
+      "result": {
+        "value": 0,
+        "string": "Completed"
+      },
+      "power_on_time": {
+        "hours": 1239,
+        "aka": "accumulated_power_on_hours"
+      }
+    },
+    "scsi_self_test_1": {
+      "code": {
+        "value": 2,
+        "string": "Background long"
+      },
+      "result": {
+        "value": 0,
+        "string": "Completed"
+      },
+      "power_on_time": {
+        "hours": 1218,
+        "aka": "accumulated_power_on_hours"
+      }
+    },
+    "scsi_self_test_2": {
+      "code": {
+        "value": 1,
+        "string": "Background short"
+      },
+      "result": {
+        "value": 0,
+        "string": "Completed"
+      },
+      "power_on_time": {
+        "hours": 1191,
+        "aka": "accumulated_power_on_hours"
+      }
+    },
+    "scsi_self_test_3": {
+      "code": {
+        "value": 1,
+        "string": "Background short"
+      },
+      "result": {
+        "value": 0,
+        "string": "Completed"
+      },
+      "power_on_time": {
+        "hours": 1168,
+        "aka": "accumulated_power_on_hours"
+      }
+    },
+    "scsi_self_test_4": {
+      "code": {
+        "value": 1,
+        "string": "Background short"
+      },
+      "result": {
+        "value": 0,
+        "string": "Completed"
+      },
+      "power_on_time": {
+        "hours": 1144,
+        "aka": "accumulated_power_on_hours"
+      }
+    },
+    "scsi_self_test_5": {
+      "code": {
+        "value": 1,
+        "string": "Background short"
+      },
+      "result": {
+        "value": 0,
+        "string": "Completed"
+      },
+      "power_on_time": {
+        "hours": 1120,
+        "aka": "accumulated_power_on_hours"
+      }
+    },
+    "scsi_self_test_6": {
+      "code": {
+        "value": 1,
+        "string": "Background short"
+      },
+      "result": {
+        "value": 0,
+        "string": "Completed"
+      },
+      "power_on_time": {
+        "hours": 1095,
+        "aka": "accumulated_power_on_hours"
+      }
+    },
+    "scsi_self_test_7": {
+      "code": {
+        "value": 1,
+        "string": "Background short"
+      },
+      "result": {
+        "value": 0,
+        "string": "Completed"
+      },
+      "power_on_time": {
+        "hours": 1072,
+        "aka": "accumulated_power_on_hours"
+      }
+    },
+    "scsi_self_test_8": {
+      "code": {
+        "value": 2,
+        "string": "Background long"
+      },
+      "result": {
+        "value": 0,
+        "string": "Completed"
+      },
+      "power_on_time": {
+        "hours": 1053,
+        "aka": "accumulated_power_on_hours"
+      }
+    },
+    "scsi_self_test_9": {
+      "code": {
+        "value": 1,
+        "string": "Background short"
+      },
+      "result": {
+        "value": 0,
+        "string": "Completed"
+      },
+      "power_on_time": {
+        "hours": 1024,
+        "aka": "accumulated_power_on_hours"
+      }
+    },
+    "scsi_self_test_10": {
+      "code": {
+        "value": 1,
+        "string": "Background short"
+      },
+      "result": {
+        "value": 0,
+        "string": "Completed"
+      },
+      "power_on_time": {
+        "hours": 1000,
+        "aka": "accumulated_power_on_hours"
+      }
+    },
+    "scsi_self_test_11": {
+      "code": {
+        "value": 1,
+        "string": "Background short"
+      },
+      "result": {
+        "value": 0,
+        "string": "Completed"
+      },
+      "power_on_time": {
+        "hours": 976,
+        "aka": "accumulated_power_on_hours"
+      }
+    },
+    "scsi_self_test_12": {
+      "code": {
+        "value": 1,
+        "string": "Background short"
+      },
+      "result": {
+        "value": 0,
+        "string": "Completed"
+      },
+      "power_on_time": {
+        "hours": 952,
+        "aka": "accumulated_power_on_hours"
+      }
+    },
+    "scsi_self_test_13": {
+      "code": {
+        "value": 1,
+        "string": "Background short"
+      },
+      "result": {
+        "value": 0,
+        "string": "Completed"
+      },
+      "power_on_time": {
+        "hours": 928,
+        "aka": "accumulated_power_on_hours"
+      }
+    },
+    "scsi_self_test_14": {
+      "code": {
+        "value": 1,
+        "string": "Background short"
+      },
+      "result": {
+        "value": 0,
+        "string": "Completed"
+      },
+      "power_on_time": {
+        "hours": 904,
+        "aka": "accumulated_power_on_hours"
+      }
+    },
+    "scsi_self_test_15": {
+      "code": {
+        "value": 2,
+        "string": "Background long"
+      },
+      "result": {
+        "value": 0,
+        "string": "Completed"
+      },
+      "power_on_time": {
+        "hours": 884,
+        "aka": "accumulated_power_on_hours"
+      }
+    },
+    "scsi_self_test_16": {
+      "code": {
+        "value": 1,
+        "string": "Background short"
+      },
+      "result": {
+        "value": 0,
+        "string": "Completed"
+      },
+      "power_on_time": {
+        "hours": 856,
+        "aka": "accumulated_power_on_hours"
+      }
+    },
+    "scsi_self_test_17": {
+      "code": {
+        "value": 1,
+        "string": "Background short"
+      },
+      "result": {
+        "value": 0,
+        "string": "Completed"
+      },
+      "power_on_time": {
+        "hours": 832,
+        "aka": "accumulated_power_on_hours"
+      }
+    },
+    "scsi_self_test_18": {
+      "code": {
+        "value": 1,
+        "string": "Background short"
+      },
+      "result": {
+        "value": 0,
+        "string": "Completed"
+      },
+      "power_on_time": {
+        "hours": 808,
+        "aka": "accumulated_power_on_hours"
+      }
+    },
+    "scsi_self_test_19": {
+      "code": {
+        "value": 1,
+        "string": "Background short"
+      },
+      "result": {
+        "value": 0,
+        "string": "Completed"
+      },
+      "power_on_time": {
+        "hours": 784,
+        "aka": "accumulated_power_on_hours"
+      }
+    },
+    "scsi_extended_self_test_seconds": 93300
+  }
+  
