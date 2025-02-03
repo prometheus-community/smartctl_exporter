@@ -17,6 +17,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -121,6 +122,10 @@ func TestMineDeviceSelfTestLog(t *testing.T) {
 			jsonRaw := readTestFile(tt.jsonFile)
 			jsonData := parseJSON(string(jsonRaw))
 
+			// Extract device name from JSON
+			deviceName := jsonData.Get("device.name").String()
+			deviceName = strings.TrimPrefix(deviceName, "/dev/")
+
 			// Create collector and mine data
 			ch := make(chan prometheus.Metric, 20) // Increased buffer size
 			smart := NewSMARTctl(nil, jsonData, ch)
@@ -135,7 +140,7 @@ func TestMineDeviceSelfTestLog(t *testing.T) {
 			assert.Equal(t, expected.count, metric.GetGauge().GetValue())
 			val, ok := getLabelValue(metric.GetLabel(), "device")
 			assert.True(t, ok)
-			assert.Equal(t, "sdc", val)
+			assert.Equal(t, deviceName, val)
 			val, ok = getLabelValue(metric.GetLabel(), "self_test_log_type")
 			assert.True(t, ok)
 			assert.Equal(t, "standard", val)
@@ -145,7 +150,7 @@ func TestMineDeviceSelfTestLog(t *testing.T) {
 			assert.Equal(t, expected.errorTotal, metric.GetGauge().GetValue())
 			val, ok = getLabelValue(metric.GetLabel(), "device")
 			assert.True(t, ok)
-			assert.Equal(t, "sdc", val)
+			assert.Equal(t, deviceName, val)
 			val, ok = getLabelValue(metric.GetLabel(), "self_test_log_type")
 			assert.True(t, ok)
 			assert.Equal(t, "standard", val)
@@ -155,7 +160,7 @@ func TestMineDeviceSelfTestLog(t *testing.T) {
 			assert.Equal(t, expected.lastTestStatus, metric.GetGauge().GetValue())
 			val, ok = getLabelValue(metric.GetLabel(), "device")
 			assert.True(t, ok)
-			assert.Equal(t, "sdc", val)
+			assert.Equal(t, deviceName, val)
 			val, ok = getLabelValue(metric.GetLabel(), "lifetime_hours")
 			assert.True(t, ok)
 			assert.Equal(t, expected.lastTestHours, val)
@@ -165,7 +170,7 @@ func TestMineDeviceSelfTestLog(t *testing.T) {
 			assert.Equal(t, 1.0, metric.GetGauge().GetValue())
 			val, ok = getLabelValue(metric.GetLabel(), "device")
 			assert.True(t, ok)
-			assert.Equal(t, "sdc", val)
+			assert.Equal(t, deviceName, val)
 			val, ok = getLabelValue(metric.GetLabel(), "lifetime_hours")
 			assert.True(t, ok)
 			assert.Equal(t, expected.lastTestHours, val)
