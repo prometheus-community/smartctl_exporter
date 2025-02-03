@@ -16,6 +16,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"testing"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -57,14 +58,13 @@ func readTestFile(path string) []byte {
 	return data
 }
 
-func getLabelValue(labels []*dto.LabelPair, key string) *string {
+func getLabelValue(labels []*dto.LabelPair, key string) (string, bool) {
 	for _, label := range labels {
 		if label.GetName() == key {
-			s := label.GetValue()
-			return &s
+			return label.GetValue(), true
 		}
 	}
-	return nil
+	return "", false
 }
 
 func getMetricsFromChannel(ch chan prometheus.Metric) map[*prometheus.Desc]*dto.Metric {
@@ -82,35 +82,35 @@ func TestMineDeviceSelfTestLog(t *testing.T) {
 		name     string
 		jsonFile string
 		want     struct {
-			count          float64
-			errorTotal     float64
-			logType        string
-			lastTestType   string
-			lastTestHours  string
-			lastStatus     float64
-			lastStatusDesc string
+			count              float64
+			errorTotal         float64
+			logType            string
+			lastTestType       string
+			lastTestHours      string
+			lastTestStatus     float64
+			lastTestStatusDesc string
 		}
 	}{
 		{
 			name:     "Exos X16 self-test log parsing",
 			jsonFile: "testdata/sat-Segate_Exos_X16-ST10000NM001G-2MW103.json",
 			want: struct {
-				count          float64
-				errorTotal     float64
-				logType        string
-				lastTestType   string
-				lastTestHours  string
-				lastStatus     float64
-				lastStatusDesc string
+				count              float64
+				errorTotal         float64
+				logType            string
+				lastTestType       string
+				lastTestHours      string
+				lastTestStatus     float64
+				lastTestStatusDesc string
 			}{
 
-				count:          21,
-				errorTotal:     0,
-				logType:        "standard",
-				lastTestType:   "Short offline",
-				lastTestHours:  "33600",
-				lastStatus:     0,
-				lastStatusDesc: "Completed without error",
+				count:              21,
+				errorTotal:         0,
+				logType:            "standard",
+				lastTestType:       "Short offline",
+				lastTestHours:      "33600",
+				lastTestStatus:     0,
+				lastTestStatusDesc: "Completed without error",
 			},
 		},
 	}
@@ -133,20 +133,53 @@ func TestMineDeviceSelfTestLog(t *testing.T) {
 			metric := metricMap[metricDeviceSelfTestLogCount]
 			assert.NotNil(t, metric, "Missing metricDeviceSelfTestLogCount")
 			assert.Equal(t, expected.count, metric.GetGauge().GetValue())
-			assert.Equal(t, "sdc", *getLabelValue(metric.GetLabel(), "device"))
-			assert.Equal(t, "standard", *getLabelValue(metric.GetLabel(), "self_test_log_type"))
+			val, ok := getLabelValue(metric.GetLabel(), "device")
+			assert.True(t, ok)
+			assert.Equal(t, "sdc", val)
+			val, ok = getLabelValue(metric.GetLabel(), "self_test_log_type")
+			assert.True(t, ok)
+			assert.Equal(t, "standard", val)
 
 			metric = metricMap[metricDeviceSelfTestLogErrorCount]
 			assert.NotNil(t, metric, "Missing metricDeviceSelfTestLogErrorCount")
 			assert.Equal(t, expected.errorTotal, metric.GetGauge().GetValue())
-			assert.Equal(t, "sdc", *getLabelValue(metric.GetLabel(), "device"))
-			assert.Equal(t, "standard", *getLabelValue(metric.GetLabel(), "self_test_log_type"))
+			val, ok = getLabelValue(metric.GetLabel(), "device")
+			assert.True(t, ok)
+			assert.Equal(t, "sdc", val)
+			val, ok = getLabelValue(metric.GetLabel(), "self_test_log_type")
+			assert.True(t, ok)
+			assert.Equal(t, "standard", val)
 
 			metric = metricMap[metricDeviceLastSelfTest]
 			assert.NotNil(t, metric, "Missing metricDeviceLastSelfTest")
-			assert.Equal(t, expected.lastStatus, metric.GetGauge().GetValue())
-			assert.Equal(t, "sdc", *getLabelValue(metric.GetLabel(), "device"))
-			assert.Equal(t, expected.lastTestHours, *getLabelValue(metric.GetLabel(), "lifetime_hours"))
+			assert.Equal(t, expected.lastTestStatus, metric.GetGauge().GetValue())
+			val, ok = getLabelValue(metric.GetLabel(), "device")
+			assert.True(t, ok)
+			assert.Equal(t, "sdc", val)
+			val, ok = getLabelValue(metric.GetLabel(), "lifetime_hours")
+			assert.True(t, ok)
+			assert.Equal(t, expected.lastTestHours, val)
+
+			metric = metricMap[metricDeviceLastSelfTestInfo]
+			assert.NotNil(t, metric, "Missing metricDeviceLastSelfTestInfo")
+			assert.Equal(t, 1.0, metric.GetGauge().GetValue())
+			val, ok = getLabelValue(metric.GetLabel(), "device")
+			assert.True(t, ok)
+			assert.Equal(t, "sdc", val)
+			val, ok = getLabelValue(metric.GetLabel(), "lifetime_hours")
+			assert.True(t, ok)
+			assert.Equal(t, expected.lastTestHours, val)
+			val, ok = getLabelValue(metric.GetLabel(), "status")
+			assert.True(t, ok)
+			assert.Equal(t, strconv.FormatFloat(expected.lastTestStatus, 'f', -1, 64), val)
+
+			val, ok = getLabelValue(metric.GetLabel(), "description")
+			assert.True(t, ok)
+			assert.Equal(t, expected.lastTestStatusDesc, val)
+			val, ok = getLabelValue(metric.GetLabel(), "type")
+			assert.True(t, ok)
+			assert.Equal(t, expected.lastTestType, val)
+
 		})
 	}
 }
