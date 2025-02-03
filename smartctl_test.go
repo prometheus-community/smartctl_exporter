@@ -114,6 +114,28 @@ func TestMineDeviceSelfTestLog(t *testing.T) {
 				lastTestStatusDesc: "Completed without error",
 			},
 		},
+		{
+			name:     "Scsi-seagate_ST18000NM004J",
+			jsonFile: "testdata/scsi-seagate_ST18000NM004J.json",
+			want: struct {
+				count              float64
+				errorTotal         float64
+				logType            string
+				lastTestType       string
+				lastTestHours      string
+				lastTestStatus     float64
+				lastTestStatusDesc string
+			}{
+
+				count:              -1,
+				errorTotal:         -1,
+				logType:            "",
+				lastTestType:       "Background short",
+				lastTestHours:      "1239",
+				lastTestStatus:     0,
+				lastTestStatusDesc: "Completed",
+			},
+		},
 	}
 
 	for _, tt := range tests {
@@ -135,30 +157,38 @@ func TestMineDeviceSelfTestLog(t *testing.T) {
 			metricMap := getMetricsFromChannel(ch)
 			expected := tt.want
 
-			metric := metricMap[metricDeviceSelfTestLogCount]
-			assert.NotNil(t, metric, "Missing metricDeviceSelfTestLogCount")
-			assert.Equal(t, expected.count, metric.GetGauge().GetValue())
-			val, ok := getLabelValue(metric.GetLabel(), "device")
-			assert.True(t, ok)
-			assert.Equal(t, deviceName, val)
-			val, ok = getLabelValue(metric.GetLabel(), "self_test_log_type")
-			assert.True(t, ok)
-			assert.Equal(t, "standard", val)
+			var metric *dto.Metric
 
-			metric = metricMap[metricDeviceSelfTestLogErrorCount]
-			assert.NotNil(t, metric, "Missing metricDeviceSelfTestLogErrorCount")
-			assert.Equal(t, expected.errorTotal, metric.GetGauge().GetValue())
-			val, ok = getLabelValue(metric.GetLabel(), "device")
-			assert.True(t, ok)
-			assert.Equal(t, deviceName, val)
-			val, ok = getLabelValue(metric.GetLabel(), "self_test_log_type")
-			assert.True(t, ok)
-			assert.Equal(t, "standard", val)
+			// Execute if we expect a metric
+			if expected.count > -0 {
+				metric = metricMap[metricDeviceSelfTestLogCount]
+				assert.NotNil(t, metric, "Missing metricDeviceSelfTestLogCount")
+				assert.Equal(t, expected.count, metric.GetGauge().GetValue())
+				val, ok := getLabelValue(metric.GetLabel(), "device")
+				assert.True(t, ok)
+				assert.Equal(t, deviceName, val)
+				val, ok = getLabelValue(metric.GetLabel(), "self_test_log_type")
+				assert.True(t, ok)
+				assert.Equal(t, "standard", val)
+			}
+
+			// Execute if we expect a metric
+			if expected.errorTotal > -0 {
+				metric = metricMap[metricDeviceSelfTestLogErrorCount]
+				assert.NotNil(t, metric, "Missing metricDeviceSelfTestLogErrorCount")
+				assert.Equal(t, expected.errorTotal, metric.GetGauge().GetValue())
+				val, ok := getLabelValue(metric.GetLabel(), "device")
+				assert.True(t, ok)
+				assert.Equal(t, deviceName, val)
+				val, ok = getLabelValue(metric.GetLabel(), "self_test_log_type")
+				assert.True(t, ok)
+				assert.Equal(t, "standard", val)
+			}
 
 			metric = metricMap[metricDeviceLastSelfTest]
 			assert.NotNil(t, metric, "Missing metricDeviceLastSelfTest")
 			assert.Equal(t, expected.lastTestStatus, metric.GetGauge().GetValue())
-			val, ok = getLabelValue(metric.GetLabel(), "device")
+			val, ok := getLabelValue(metric.GetLabel(), "device")
 			assert.True(t, ok)
 			assert.Equal(t, deviceName, val)
 			val, ok = getLabelValue(metric.GetLabel(), "lifetime_hours")

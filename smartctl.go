@@ -541,6 +541,48 @@ func (smart *SMARTctl) mineDeviceErrorLog() {
 }
 
 func (smart *SMARTctl) mineDeviceSelfTestLog() {
+	// For SCSI devices
+	if smart.device.interface_ == "scsi" {
+		var lastTest gjson.Result
+		var maxHours int64
+
+		// Find the most recent test by power_on_time.hours
+		smart.json.ForEach(func(key, entry gjson.Result) bool {
+			if strings.HasPrefix(key.String(), "scsi_self_test_") {
+				hours := entry.Get("power_on_time.hours").Int()
+				if hours > maxHours {
+					maxHours = hours
+					lastTest = entry
+				}
+			}
+			return true
+		})
+
+		if lastTest.Exists() {
+			smart.ch <- prometheus.MustNewConstMetric(
+				metricDeviceLastSelfTest,
+				prometheus.GaugeValue,
+				lastTest.Get("result.value").Float(),
+				smart.device.device,
+				lastTest.Get("code.string").String(),
+				fmt.Sprintf("%d", maxHours),
+			)
+
+			smart.ch <- prometheus.MustNewConstMetric(
+				metricDeviceLastSelfTestInfo,
+				prometheus.GaugeValue,
+				1.0,
+				smart.device.device,
+				lastTest.Get("code.string").String(),
+				fmt.Sprintf("%d", maxHours),
+				fmt.Sprintf("%d", lastTest.Get("result.value").Int()),
+				lastTest.Get("result.string").String(),
+			)
+		}
+		return
+	}
+
+	// Original ATA/SAS handling
 	for logType, status := range smart.json.Get("ata_smart_self_test_log").Map() {
 		smart.ch <- prometheus.MustNewConstMetric(
 			metricDeviceSelfTestLogCount,
@@ -580,7 +622,6 @@ func (smart *SMARTctl) mineDeviceSelfTestLog() {
 				fmt.Sprintf("%d", lastTest.Get("status.value").Int()),
 				lastTest.Get("status.string").String(),
 			)
-
 		}
 	}
 }
