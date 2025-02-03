@@ -14,7 +14,13 @@
 package main
 
 import (
+	"fmt"
+	"os"
 	"testing"
+
+	"github.com/prometheus/client_golang/prometheus"
+	dto "github.com/prometheus/client_model/go"
+	// "github.com/golang/protobuf/proto"
 )
 
 func TestBuildDeviceLabel(t *testing.T) {
@@ -41,4 +47,132 @@ func TestBuildDeviceLabel(t *testing.T) {
 			t.Errorf("deviceName=%v deviceType=%v expected=%v result=%v", test.deviceName, test.deviceType, test.expectedLabel, result)
 		}
 	}
+}
+
+func readTestFile(path string) []byte {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		panic(fmt.Sprintf("Error reading test file: %v", err))
+	}
+	return data
+}
+
+func TestMineDeviceSelfTestLog(t *testing.T) {
+	tests := []struct {
+		name     string
+		jsonFile string
+		want     map[string]struct {
+			count      float64
+			errorTotal float64
+			logType    string
+		}
+	}{
+		{
+			name:     "Exos X16 self-test log parsing",
+			jsonFile: "testdata/sat-Segate_Exos_X16-ST10000NM001G-2MW103.json",
+			want: map[string]struct {
+				count      float64
+				errorTotal float64
+				logType    string
+			}{
+				"standard": {
+					count:      21,
+					errorTotal: 0,
+					logType:    "standard",
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Read and parse test JSON
+			jsonRaw := readTestFile(tt.jsonFile)
+			jsonData := parseJSON(string(jsonRaw))
+
+			// Create collector and mine data
+			ch := make(chan prometheus.Metric, 20) // Increased buffer size
+			smart := NewSMARTctl(nil, jsonData, ch)
+			smart.mineDeviceSelfTestLog()
+			close(ch)
+
+			// Verify metrics
+			metricsFound := make(map[string]bool)
+			for m := range ch {
+				metric := new(dto.Metric)
+				m.Write(metric)
+
+				var deviceName, logType string
+				for _, label := range metric.GetLabel() {
+					switch *label.Name {
+					case "device":
+						deviceName = *label.Value
+					case "self_test_log_type":
+						logType = *label.Value
+					}
+				}
+
+				// Verify device name matches JSON contents
+				if deviceName != "sdc" {
+					t.Errorf("Unexpected device name: got %s want sdc", deviceName)
+				}
+
+				// Check log type and values
+				expected, ok := tt.want[logType]
+				if !ok {
+					t.Errorf("Unexpected log type: %s", logType)
+					continue
+				}
+
+				metricType := getMetricType(metric)
+				if metricType == nil {
+					t.Errorf("Unknown metric type")
+				}
+				switch *metricType {
+				case dto.MetricType_GAUGE:
+					value := metric.GetGauge().GetValue()
+					if logType == "standard" {
+						switch m.Desc() {
+						case metricDeviceSelfTestLogCount:
+							if value != expected.count {
+								t.Errorf("count mismatch: got %v want %v", value, expected.count)
+							}
+						case metricDeviceSelfTestLogErrorCount:
+							if value != expected.errorTotal {
+								t.Errorf("error_count_total mismatch: got %v want %v", value, expected.errorTotal)
+							}
+						default:
+							t.Errorf("Metric unkown")
+						}
+
+					}
+					metricsFound[logType] = true
+				}
+			}
+
+			// Verify we found all expected log types
+			for logType := range tt.want {
+				if !metricsFound[logType] {
+					t.Errorf("Missing metrics for log type: %s", logType)
+				}
+			}
+		})
+	}
+}
+
+// Helper to determine metric type
+func getMetricType(m *dto.Metric) *dto.MetricType {
+	if m.Counter != nil {
+		return dto.MetricType_COUNTER.Enum()
+	}
+	if m.Gauge != nil {
+		return dto.MetricType_GAUGE.Enum()
+	}
+	if m.Histogram != nil {
+		return dto.MetricType_HISTOGRAM.Enum()
+	}
+	if m.Summary != nil {
+		return dto.MetricType_SUMMARY.Enum()
+	}
+	return nil
 }
