@@ -366,7 +366,7 @@ var (
 	)
 
 	metricDeviceLastSelfTestInfo = prometheus.NewDesc(
-		"smartctl_device_last_self_test",
+		"smartctl_device_last_self_test_info",
 		"Device last SMART self test info",
 		[]string{
 			"device",
