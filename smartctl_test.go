@@ -120,7 +120,18 @@ func (m MetricFamilies) GetMetricWithLabelMap(name string, labels map[string]str
 		}
 	}
 
-	return nil, fmt.Errorf("metric %q with labels %v not found", name, labels)
+	// If we get here, no matching metric was found. Build error message with available metrics.
+	var availableLabels []string
+	for _, metric := range family.Metric {
+		labelPairs := make([]string, 0, len(metric.Label))
+		for _, lp := range metric.Label {
+			labelPairs = append(labelPairs, fmt.Sprintf("%s=%s", lp.GetName(), lp.GetValue()))
+		}
+		availableLabels = append(availableLabels, fmt.Sprintf("{%s}", strings.Join(labelPairs, ", ")))
+	}
+
+	return nil, fmt.Errorf("metric %q with labels %v not found. Available metrics had labels: %s",
+		name, labels, strings.Join(availableLabels, "; "))
 }
 
 func TestBuildDeviceLabel(t *testing.T) {
