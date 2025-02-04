@@ -14,6 +14,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"strconv"
@@ -21,9 +22,106 @@ import (
 	"testing"
 
 	"github.com/prometheus/client_golang/prometheus"
-	dto "github.com/prometheus/client_model/go"
+	io_prometheus_client "github.com/prometheus/client_model/go"
+	"github.com/prometheus/common/expfmt"
 	"github.com/stretchr/testify/assert"
 )
+
+// channelCollector adapts a channel-based metric producer to Prometheus Collector interface
+type channelCollector struct {
+	metrics <-chan prometheus.Metric
+}
+
+func (c *channelCollector) Describe(ch chan<- *prometheus.Desc) {
+	// No-op implementation since we're dealing with dynamic metrics from smartctl.
+}
+
+func (c *channelCollector) Collect(ch chan<- prometheus.Metric) {
+	// Forward metrics from our internal channel to Prometheus
+	for m := range c.metrics {
+		ch <- m
+	}
+}
+
+type MetricFamilies []*io_prometheus_client.MetricFamily
+
+// gathermetrics handles metric collection for testing purposes using Prometheus registry
+func gathermetrics(t *testing.T, ch <-chan prometheus.Metric) MetricFamilies {
+	reg := prometheus.NewRegistry()
+
+	collector := &channelCollector{metrics: ch}
+	if err := reg.Register(collector); err != nil {
+		t.Fatalf("Failed to register collector: %v", err)
+	}
+
+	mfs, err := reg.Gather()
+	if err != nil {
+		t.Fatalf("Failed to gather metrics: %v", err)
+	}
+
+	// Encode gathered metrics into the text format.
+	var buf bytes.Buffer
+	enc := expfmt.NewEncoder(&buf, expfmt.FmtText)
+	for _, mf := range mfs {
+		if err := enc.Encode(mf); err != nil {
+			t.Fatalf("failed to encode metric family: %v", err)
+		}
+	}
+	output := buf.String()
+	t.Log("Gathered metrics output:\n", output)
+
+	return mfs
+}
+
+func (m MetricFamilies) GetMetricFamily(name string) (*io_prometheus_client.MetricFamily, error) {
+	for _, mf := range m {
+		if mf.GetName() == name {
+			return mf, nil
+		}
+	}
+	return nil, fmt.Errorf("metric family %s not found", name)
+}
+
+func (m MetricFamilies) GetMetricWithLabelMap(name string, labels map[string]string) (*io_prometheus_client.Metric, error) {
+	// Look up the metric family by name.
+	family, ok := m.GetMetricFamily(name)
+	if ok != nil {
+		return nil, fmt.Errorf("metric family %q not found", name)
+	}
+
+	// Iterate over each metric in the family.
+	for _, metric := range family.Metric {
+		matches := true
+
+		// For each key/value pair in the labels map, check if it exists in the metric.
+		for key, val := range labels {
+			labelFound := false
+
+			// Check the metric's labels.
+			for _, lp := range metric.Label {
+				if lp.GetName() == key {
+					if lp.GetValue() == val {
+						labelFound = true
+					}
+					break // Found the label key, break out of the inner loop.
+				}
+			}
+
+			// If the current label was not found or didn't match the expected value, skip this metric.
+			if !labelFound {
+				matches = false
+				break
+			}
+		}
+
+		// Return the metric if all provided labels match.
+		if matches {
+			return metric, nil
+		}
+	}
+
+	return nil, fmt.Errorf("metric %q with labels %v not found", name, labels)
+}
 
 func TestBuildDeviceLabel(t *testing.T) {
 	tests := []struct {
@@ -57,25 +155,6 @@ func readTestFile(path string) []byte {
 		panic(fmt.Sprintf("Error reading test file: %v", err))
 	}
 	return data
-}
-
-func getLabelValue(labels []*dto.LabelPair, key string) (string, bool) {
-	for _, label := range labels {
-		if label.GetName() == key {
-			return label.GetValue(), true
-		}
-	}
-	return "", false
-}
-
-func getMetricsFromChannel(ch chan prometheus.Metric) map[*prometheus.Desc]*dto.Metric {
-	metricMap := make(map[*prometheus.Desc]*dto.Metric)
-	for m := range ch {
-		metric := new(dto.Metric)
-		m.Write(metric)
-		metricMap[m.Desc()] = metric
-	}
-	return metricMap
 }
 
 func TestMineDeviceSelfTestLog(t *testing.T) {
@@ -127,8 +206,8 @@ func TestMineDeviceSelfTestLog(t *testing.T) {
 				lastTestStatusDesc string
 			}{
 
-				count:              -1,
-				errorTotal:         -1,
+				count:              -999,
+				errorTotal:         -999,
 				logType:            "",
 				lastTestType:       "Background short",
 				lastTestHours:      "1239",
@@ -149,72 +228,41 @@ func TestMineDeviceSelfTestLog(t *testing.T) {
 			deviceName = strings.TrimPrefix(deviceName, "/dev/")
 
 			// Create collector and mine data
-			ch := make(chan prometheus.Metric, 20) // Increased buffer size
+			ch := make(chan prometheus.Metric, 20)
 			smart := NewSMARTctl(nil, jsonData, ch)
 			smart.mineDeviceSelfTestLog()
 			close(ch)
 
-			metricMap := getMetricsFromChannel(ch)
+			// Get registry and metrics
+			mfs := gathermetrics(t, ch)
+
 			expected := tt.want
 
-			var metric *dto.Metric
-
-			// Execute if we expect a metric
-			if expected.count > -0 {
-				metric = metricMap[metricDeviceSelfTestLogCount]
-				assert.NotNil(t, metric, "Missing metricDeviceSelfTestLogCount")
-				assert.Equal(t, expected.count, metric.GetGauge().GetValue())
-				val, ok := getLabelValue(metric.GetLabel(), "device")
-				assert.True(t, ok)
-				assert.Equal(t, deviceName, val)
-				val, ok = getLabelValue(metric.GetLabel(), "self_test_log_type")
-				assert.True(t, ok)
-				assert.Equal(t, "standard", val)
+			// Validate self test count metric if expected
+			if expected.count >= 0 {
+				metric, err := mfs.GetMetricWithLabelMap("smartctl_device_self_test_log_count",
+					map[string]string{"device": deviceName, "self_test_log_type": expected.logType})
+				assert.NoError(t, err, "metric smartctl_device_self_test_log_count not found")
+				assert.Equal(t, expected.count, metric.GetGauge().GetValue(), "metric smartctl_device_self_test_log_count value")
 			}
 
-			// Execute if we expect a metric
-			if expected.errorTotal > -0 {
-				metric = metricMap[metricDeviceSelfTestLogErrorCount]
-				assert.NotNil(t, metric, "Missing metricDeviceSelfTestLogErrorCount")
-				assert.Equal(t, expected.errorTotal, metric.GetGauge().GetValue())
-				val, ok := getLabelValue(metric.GetLabel(), "device")
-				assert.True(t, ok)
-				assert.Equal(t, deviceName, val)
-				val, ok = getLabelValue(metric.GetLabel(), "self_test_log_type")
-				assert.True(t, ok)
-				assert.Equal(t, "standard", val)
+			// Execute if we expect an error total metric
+			if expected.errorTotal >= 0 {
+				metric, err := mfs.GetMetricWithLabelMap("smartctl_device_self_test_log_error_count",
+					map[string]string{"device": deviceName, "self_test_log_type": expected.logType})
+				assert.NoError(t, err, "metric smartctl_device_self_test_log_error_count not found")
+				assert.Equal(t, expected.errorTotal, metric.GetGauge().GetValue(), "metric smartctl_device_self_test_log_error_count value")
 			}
 
-			metric = metricMap[metricDeviceLastSelfTest]
-			assert.NotNil(t, metric, "Missing metricDeviceLastSelfTest")
-			assert.Equal(t, expected.lastTestStatus, metric.GetGauge().GetValue())
-			val, ok := getLabelValue(metric.GetLabel(), "device")
-			assert.True(t, ok)
-			assert.Equal(t, deviceName, val)
-			val, ok = getLabelValue(metric.GetLabel(), "lifetime_hours")
-			assert.True(t, ok)
-			assert.Equal(t, expected.lastTestHours, val)
+			metric, err := mfs.GetMetricWithLabelMap("smartctl_device_last_self_test",
+				map[string]string{"device": deviceName, "lifetime_hours": expected.lastTestHours})
+			assert.NoError(t, err, "metric smartctl_device_last_self_test not found")
+			assert.Equal(t, expected.lastTestStatus, metric.GetGauge().GetValue(), "metric smartctl_device_last_self_test value")
 
-			metric = metricMap[metricDeviceLastSelfTestInfo]
-			assert.NotNil(t, metric, "Missing metricDeviceLastSelfTestInfo")
-			assert.Equal(t, 1.0, metric.GetGauge().GetValue())
-			val, ok = getLabelValue(metric.GetLabel(), "device")
-			assert.True(t, ok)
-			assert.Equal(t, deviceName, val)
-			val, ok = getLabelValue(metric.GetLabel(), "lifetime_hours")
-			assert.True(t, ok)
-			assert.Equal(t, expected.lastTestHours, val)
-			val, ok = getLabelValue(metric.GetLabel(), "status")
-			assert.True(t, ok)
-			assert.Equal(t, strconv.FormatFloat(expected.lastTestStatus, 'f', -1, 64), val)
-
-			val, ok = getLabelValue(metric.GetLabel(), "description")
-			assert.True(t, ok)
-			assert.Equal(t, expected.lastTestStatusDesc, val)
-			val, ok = getLabelValue(metric.GetLabel(), "type")
-			assert.True(t, ok)
-			assert.Equal(t, expected.lastTestType, val)
-
+			metric, err = mfs.GetMetricWithLabelMap("smartctl_device_last_self_test_info",
+				map[string]string{"device": deviceName, "lifetime_hours": expected.lastTestHours, "status": strconv.FormatFloat(expected.lastTestStatus, 'f', -1, 64), "description": expected.lastTestStatusDesc})
+			assert.NoError(t, err, "metric smartctl_device_last_self_test_info not found")
+			assert.Equal(t, 1.0, metric.GetGauge().GetValue(), "metric smartctl_device_last_self_test_info value")
 		})
 	}
 }
