@@ -8,3 +8,4 @@ debug/
 Manifest
 smartctl_exporter
 *.exe
+.aider*
