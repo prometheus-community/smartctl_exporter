@@ -72,7 +72,7 @@ func NewSMARTctl(logger *slog.Logger, json gjson.Result, ch chan<- prometheus.Me
 	var device_name string
 	var device_interface string
 	if strings.Contains(strings.ToLower(json.Get("device.info_name").String()), "cciss") {
-		// Correct the "device name" to be what is exected in buildDeviceLabel
+		// Correct the "device name" to be what is expected in buildDeviceLabel
 		// For a CCISS device typically device.name is just /dev/sda
 		// The info_name is reported as "/dev/sda [cciss_disk_NN] [SCSI]"
 		tmp := json.Get("device.info_name").String()
