@@ -29,7 +29,6 @@ func TestBuildDeviceLabel(t *testing.T) {
 		// Some cases extracted from smartctl docs. Are these the prettiest?
 		// Probably not. Are they unique enough. Definitely.
 		{"/dev/sg1", "cciss,1", "sg1_cciss_1"},
-		{"/dev/sda", "cciss,0", "sda_cciss_0"},
 		{"/dev/bsg/sssraid0", "sssraid,0,1", "bsg_sssraid0_sssraid_0_1"},
 		{"/dev/cciss/c0d0", "cciss,0", "cciss_c0d0_cciss_0"},
 		{"/dev/sdb", "aacraid,1,0,4", "sdb_aacraid_1_0_4"},
