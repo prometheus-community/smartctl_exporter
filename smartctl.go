@@ -68,7 +68,7 @@ func NewSMARTctl(logger *slog.Logger, json gjson.Result, ch chan<- prometheus.Me
 	}
 
 	// Handle CCISS devices.
-	// CCISS does not alway get stored in devices.type, it is more frequent in devices.info_name
+	// CCISS does not always get stored in devices.type, it is more frequent in devices.info_name
 	var device_name string
 	var device_interface string
 	if strings.Contains(strings.ToLower(json.Get("device.info_name").String()), "cciss") {
