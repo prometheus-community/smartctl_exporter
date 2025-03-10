@@ -18,6 +18,7 @@ import (
 	"log/slog"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"sync"
 	"time"
@@ -48,9 +49,9 @@ func parseJSON(data string) gjson.Result {
 }
 
 // Reading fake smartctl json
-func readFakeSMARTctl(logger *slog.Logger, device Device) gjson.Result {
+func readFakeSMARTctl(logger *slog.Logger, device Device, fakeDataPath string) gjson.Result {
 	s := strings.Split(device.Name, "/")
-	filename := fmt.Sprintf("debug/%s.json", s[len(s)-1])
+	filename := filepath.Join(fakeDataPath, fmt.Sprintf("%s.json", s[len(s)-1]))
 	logger.Debug("Read fake S.M.A.R.T. data from json", "filename", filename)
 	jsonFile, err := os.ReadFile(filename)
 	if err != nil {
@@ -103,7 +104,7 @@ func readSMARTctlDevices(logger *slog.Logger) gjson.Result {
 // Select json source and parse
 func readData(logger *slog.Logger, device Device) gjson.Result {
 	if *smartctlFakeData {
-		return readFakeSMARTctl(logger, device)
+		return readFakeSMARTctl(logger, device, *smartctlFakeDataPath)
 	}
 
 	cacheValue, cacheOk := jsonCache.Load(device)
