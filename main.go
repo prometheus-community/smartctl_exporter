@@ -119,8 +119,12 @@ var (
 		"Device type to use during automatic scan. Special by-id value forces predictable device names. (repeatable)",
 	).Strings()
 	smartctlFakeData = kingpin.Flag("smartctl.fake-data",
-		"The device to monitor (repeatable)",
+		"Use fake device data for debugging & development",
 	).Default("false").Hidden().Bool()
+	smartctlFakeDataPath = kingpin.Flag(
+		"smartctl.fake-data-path",
+		"Directory to use for fake devices based on smartctl --json output",
+	).Default("debug").Hidden().String()
 )
 
 // scanDevices uses smartctl to gather the list of available devices.
