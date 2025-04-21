@@ -117,60 +117,49 @@ Follow these steps to gather smartctl data for troubleshooting purposes. If you
 have unique drives/data/edge cases and would like to "donate" the data, open a
 PR with the redacted JSON files.
 
-1. Run `scripts/collect-smartctl-json.sh` to export all drives to a
+1. Run `collect-smartctl-json.sh` to export all drives to a
    `smartctl-data` directory (created in the current directory).
-2. Run `scripts/redact_fake_json.py` to redact sensitive data.
+2. Run `redact_fake_json.py` to redact sensitive data.
 3. Provide the JSON file for the drive in question.
 
 ```bash
-cd scripts
 ./collect-smartctl-json.sh
 ./redact-fake-json.py smartctl-data/*.json
 ```
 
-## Run smartctl_exporter using JSON data
-The `smartctl_exporter` can be run using local JSON data. The device names are
-pulled from actual devices in the machine while the data is redirected to the
-`debug` directory. Save the JSON data in the `debug` directory using the actual
-device names using a 1:1 ratio. If you have 3 devices, `sda`, `sdb` and `sdc`,
-the `smartctl_exporter` will expect 3 files: `debug/sda.json`, `debug/sdb.json`
-and `debug/sdc.json`.
-
-Once the "fake devices" (JSON files) are in place, run the exporter passing the
-hidden `--smartctl.fake-data` switch on the command line. The port is specified
-to prevent conflicts with an existing `smartctl_exporter` on the default port.
-
-```bash
-smartctl_exporter --web.listen-address 127.0.0.1:19633 --smartctl.fake-data
-```
-
 # FAQ
-## How do I run `smartctl_exporter` against a JSON file?
+## Run smartctl_exporter using JSON data
+The `smartctl_exporter` can be run using local JSON data.
 
-If you're helping someone else, request the output of the `smartctl` command
-above. Feed this into the `smartctl_exporter` using the
-hidden `--smartctl.fake-data` flag. If a `smartctl_exporter` is already running,
-use a different port; in this case, it's `19633`. Run `collect_fake_json.sh`
-first to collect the JSON files for **your** devices. Copy the requested JSON
-file into one of the fake files. After starting the exporter, you can query it
-to see the data generated.
+* The device names are pulled from actual devices in the machine.
+* It will read from a directory specified by `--smartctl.fake-data`, relative to the working directory that `smartctl_exporter` is run from. The path can be changed with `--smartctl.fake-data-path=SOMEPATH`.
+* Once the "fake devices" (JSON files) are in place, run the exporter passing the hidden `--smartctl.fake-data-path=$DATAPATH` switch on the command line. The port is specified to prevent conflicts with an existing `smartctl_exporter` on the default port.
+* Example: If you have 3 devices, `sda`, `sdb` and `sdc`, the `smartctl_exporter --smartctl.fake-data --smartctl.fake-data-path=debug` is run from `/home/username/smartctl_exporter/`, it will try to read 3 files: `debug/sda.json`, `debug/sdb.json` and `debug/sdc.json`, all relative to `/home/username/smartctl_exporter/`
 
 ```bash
 # Dump the JSON files for your devices into debug/
-./collect_fake_json.sh
+./collect-smartctl-json.sh
 
-# copy the test JSON into one of the files in debug/
-cp extracted-from-above-sda.json debug/sda.json
+# copy the dumped JSON into one of the files in debug/
+cp smartctl-data/${DEVICENAME}.json debug/sdzz.json
+# or using the some existing test data:
+cp testdata/nvme-null-CT250P2SSD8-nvme0.json debug/sdzz.json
 
 # Make sure you have the latest version
-go build
+make build
+
 # Use a different port in case smartctl_exporter is already running
-sudo ./smartctl_exporter --web.listen-address=127.0.0.1:19633 --log.level=debug --smartctl.fake-data
+# Specifically load the data from debug/sdzz.json, but the device name INSIDE
+# the file will be used thereafter.
+sudo ./smartctl_exporter --web.listen-address=127.0.0.1:19633 \
+  --smartctl.device=sdzz \
+  --log.level=debug \
+  --smartctl.fake-data --smartctl.fake-data-path=debug
 
 # Use curl with grep
-curl --silent 127.0.0.1:19633/metrics | grep -i nvme
+curl --silent 127.0.0.1:19633/metrics | grep -w -e $DEVICENAME -e nvme0
 # Or xh with ripgrep
-xh --body :19633/metrics | rg nvme
+xh --body :19633/metrics | rg -w -e $DEVICENAME -e nvme0
 ```
 
 ## Why is root required? Can't I add a user to the "disk" group?
