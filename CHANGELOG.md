@@ -1,3 +1,10 @@
+## 0.14.0 / 2025-04-22
+
+* [BUGFIX] `smart_status` exported if object is present #260
+* [ENHANCEMENT] Added version collector metric #273
+* [FEATURE] Allow to define power mode skip policy #242
+* [FEATURE] Use worker pool for smartctl #204
+
 ## 0.13.0 / 2024-12-20
 
 * [CHANGE] `slog` used for logging instead go logger #246
