@@ -64,6 +64,7 @@ func (i *SMARTctlManagerCollector) Describe(ch chan<- *prometheus.Desc) {
 func (i *SMARTctlManagerCollector) Collect(ch chan<- prometheus.Metric) {
 	info := NewSMARTctlInfo(ch)
 	i.mutex.Lock()
+	refreshAllDevices(i.logger, i.Devices)
 	for _, device := range i.Devices {
 		json := readData(i.logger, device)
 		if json.Exists() {

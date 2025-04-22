@@ -61,7 +61,8 @@ func readFakeSMARTctl(logger *slog.Logger, device Device) gjson.Result {
 }
 
 // Get json from smartctl and parse it
-func readSMARTctl(logger *slog.Logger, device Device) (gjson.Result, bool) {
+func readSMARTctl(logger *slog.Logger, device Device, wg *sync.WaitGroup) {
+	defer wg.Done()
 	start := time.Now()
 	var smartctlArgs = []string{"--json", "--info", "--health", "--attributes", "--tolerance=verypermissive", "--nocheck=" + *smartctlPowerModeCheck, "--format=brief", "--log=error", "--device=" + device.Type, device.Name}
 
@@ -76,7 +77,9 @@ func readSMARTctl(logger *slog.Logger, device Device) (gjson.Result, bool) {
 	rcOk := resultCodeIsOk(logger, device, json.Get("smartctl.exit_status").Int())
 	jsonOk := jsonIsOk(logger, json)
 	logger.Debug("Collected S.M.A.R.T. json data", "device", device, "duration", time.Since(start))
-	return json, rcOk && jsonOk
+	if rcOk && jsonOk {
+		jsonCache.Store(device, JSONCache{JSON: json, LastCollect: time.Now()})
+	}
 }
 
 func readSMARTctlDevices(logger *slog.Logger) gjson.Result {
@@ -100,23 +103,31 @@ func readSMARTctlDevices(logger *slog.Logger) gjson.Result {
 	return parseJSON(string(out))
 }
 
-// Select json source and parse
+// Refresh all devices' json
+func refreshAllDevices(logger *slog.Logger, devices []Device) {
+	if *smartctlFakeData {
+		return
+	}
+
+	var wg sync.WaitGroup
+	for _, device := range devices {
+		cacheValue, cacheOk := jsonCache.Load(device)
+		if !cacheOk || time.Now().After(cacheValue.(JSONCache).LastCollect.Add(*smartctlInterval)) {
+			wg.Add(1)
+			go readSMARTctl(logger, device, &wg)
+		}
+	}
+	wg.Wait()
+}
+
 func readData(logger *slog.Logger, device Device) gjson.Result {
 	if *smartctlFakeData {
 		return readFakeSMARTctl(logger, device)
 	}
 
-	cacheValue, cacheOk := jsonCache.Load(device)
-	if !cacheOk || time.Now().After(cacheValue.(JSONCache).LastCollect.Add(*smartctlInterval)) {
-		json, ok := readSMARTctl(logger, device)
-		if ok {
-			jsonCache.Store(device, JSONCache{JSON: json, LastCollect: time.Now()})
-			j, found := jsonCache.Load(device)
-			if !found {
-				logger.Warn("device not found", "device", device)
-			}
-			return j.(JSONCache).JSON
-		}
+	cacheValue, found := jsonCache.Load(device)
+	if !found {
+		logger.Warn("device not found", "device", device)
 		return gjson.Result{}
 	}
 	return cacheValue.(JSONCache).JSON
