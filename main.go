@@ -120,6 +120,9 @@ var (
 		"smartctl.scan-device-type",
 		"Device type to use during automatic scan. Special by-id value forces predictable device names. (repeatable)",
 	).Strings()
+	smartctlExcludeENXIO = kingpin.Flag("smartctl.exclude-enxio",
+		"Whether or not to exclude devices where open() returns with ENXIO",
+	).Default("false").Bool()
 	smartctlFakeData = kingpin.Flag("smartctl.fake-data",
 		"The device to monitor (repeatable)",
 	).Default("false").Hidden().Bool()
@@ -138,6 +141,13 @@ func scanDevices(logger *slog.Logger) []Device {
 	for _, d := range scanDevices {
 		deviceName := d.Get("name").String()
 		deviceType := d.Get("type").String()
+		deviceOpenError := d.Get("open_error").String()
+
+		if *smartctlExcludeENXIO && deviceOpenError == "No such device or address" {
+			// Ignore devices that do not exist (anymore) or were not properly cleaned up
+			// This effectively means open(device) returned ENXIO
+			continue
+		}
 
 		// SATA devices are reported as SCSI during scan - fallback to auto scraping
 		if deviceType == "scsi" {
