@@ -1,19 +1,34 @@
 [Unit]
-Description=smartctl exporter service
-After=network-online.target
+Description=Prometheus exporter for S.M.A.R.T. metrics
+Requires=network-online.target
+After=network-online.target basic.target
+Wants=network-online.target
+StartLimitIntervalSec=30
+StartLimitBurst=3
 
 [Service]
-Type=simple
-PIDFile=/run/smartctl_exporter.pid
-ExecStart=/usr/bin/smartctl_exporter
 User=root
 Group=root
-SyslogIdentifier=smartctl_exporter
+EnvironmentFile=-/etc/conf.d/smartctl_exporter
+ExecStart=/usr/bin/smartctl_exporter $OPTIONS
 Restart=on-failure
-RemainAfterExit=no
-RestartSec=100ms
-StandardOutput=journal
-StandardError=journal
+RestartSec=30
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ProtectHostname=true
+ProtectControlGroups=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectKernelLogs=true
+LockPersonality=true
+RestrictRealtime=true
+RestrictNamespaces=true
+RestrictSUIDSGID=true
+MemoryDenyWriteExecute=true
+CapabilityBoundingSet=CAP_SYS_ADMIN CAP_SYS_RAWIO CAP_MKNOD
+AmbientCapabilities=
 
 [Install]
 WantedBy=multi-user.target
