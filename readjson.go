@@ -69,14 +69,14 @@ func readSMARTctl(logger *slog.Logger, device Device, wg *sync.WaitGroup) {
 	logger.Debug("Calling smartctl with args", "args", strings.Join(smartctlArgs, " "))
 	out, err := exec.Command(*smartctlPath, smartctlArgs...).Output()
 	if err != nil {
-		logger.Warn("S.M.A.R.T. output reading", "err", err, "device", device)
+		logger.Warn("S.M.A.R.T. output reading", "device", device.Label, "type", device.Type, "err", err)
 	}
 	// Accommodate a smartmontools pre-7.3 bug
 	cleaned_out := strings.TrimPrefix(string(out), "  Pending defect count:")
 	json := parseJSON(cleaned_out)
 	rcOk := resultCodeIsOk(logger, device, json.Get("smartctl.exit_status").Int())
 	jsonOk := jsonIsOk(logger, json)
-	logger.Debug("Collected S.M.A.R.T. json data", "device", device, "duration", time.Since(start))
+	logger.Debug("Collected S.M.A.R.T. json data", "device", device.Label, "type", device.Type, "duration", time.Since(start))
 	if rcOk && jsonOk {
 		jsonCache.Store(device, JSONCache{JSON: json, LastCollect: time.Now()})
 	}
@@ -127,7 +127,7 @@ func readData(logger *slog.Logger, device Device) gjson.Result {
 
 	cacheValue, found := jsonCache.Load(device)
 	if !found {
-		logger.Warn("device not found", "device", device)
+		logger.Warn("Device not found", "device", device.Label, "type", device.Type)
 		return gjson.Result{}
 	}
 	return cacheValue.(JSONCache).JSON
@@ -139,30 +139,30 @@ func resultCodeIsOk(logger *slog.Logger, device Device, SMARTCtlResult int64) bo
 	if SMARTCtlResult > 0 {
 		b := SMARTCtlResult
 		if (b & 1) != 0 {
-			logger.Error("Command line did not parse", "device", device)
+			logger.Error("Command line did not parse", "device", device.Label, "type", device.Type)
 			result = false
 		}
 		if (b & (1 << 1)) != 0 {
-			logger.Error("Device open failed, device did not return an IDENTIFY DEVICE structure, or device is in a low-power mode", "device", device)
+			logger.Error("Device open failed, device did not return an IDENTIFY DEVICE structure, or device is in a low-power mode", "device", device.Label, "type", device.Type)
 			result = false
 		}
 		if (b & (1 << 2)) != 0 {
-			logger.Warn("Some SMART or other ATA command to the disk failed, or there was a checksum error in a SMART data structure", "device", device)
+			logger.Warn("Some SMART or other ATA command to the disk failed, or there was a checksum error in a SMART data structure", "device", device.Label, "type", device.Type)
 		}
 		if (b & (1 << 3)) != 0 {
-			logger.Warn("SMART status check returned 'DISK FAILING'", "device", device)
+			logger.Warn("SMART status check returned 'DISK FAILING'", "device", device.Label, "type", device.Type)
 		}
 		if (b & (1 << 4)) != 0 {
-			logger.Warn("We found prefail Attributes <= threshold", "device", device)
+			logger.Warn("We found prefail Attributes <= threshold", "device", device.Label, "type", device.Type)
 		}
 		if (b & (1 << 5)) != 0 {
-			logger.Warn("SMART status check returned 'DISK OK' but we found that some (usage or prefail) Attributes have been <= threshold at some time in the past", "device", device)
+			logger.Warn("SMART status check returned 'DISK OK' but we found that some (usage or prefail) Attributes have been <= threshold at some time in the past", "device", device.Label, "type", device.Type)
 		}
 		if (b & (1 << 6)) != 0 {
-			logger.Warn("The device error log contains records of errors", "device", device)
+			logger.Warn("The device error log contains records of errors", "device", device.Label, "type", device.Type)
 		}
 		if (b & (1 << 7)) != 0 {
-			logger.Warn("The device self-test log contains records of errors. [ATA only] Failed self-tests outdated by a newer successful extended self-test are ignored", "device", device)
+			logger.Warn("The device self-test log contains records of errors. [ATA only] Failed self-tests outdated by a newer successful extended self-test are ignored", "device", device.Label, "type", device.Type)
 		}
 	}
 	return result
@@ -171,7 +171,6 @@ func resultCodeIsOk(logger *slog.Logger, device Device, SMARTCtlResult int64) bo
 // Check json
 func jsonIsOk(logger *slog.Logger, json gjson.Result) bool {
 	messages := json.Get("smartctl.messages")
-	// logger.Debug(messages.String())
 	if messages.Exists() {
 		for _, message := range messages.Array() {
 			if message.Get("severity").String() == "error" {
