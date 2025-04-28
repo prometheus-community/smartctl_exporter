@@ -109,6 +109,7 @@ func (smart *SMARTctl) Collect() {
 		smart.mineNvmeCriticalWarning()
 		smart.mineNvmeMediaErrors()
 		smart.mineNvmeNumErrLogEntries()
+		smart.mineNvmeVolatileMemoryBackupFailed()
 		smart.mineNvmeBytesRead()
 		smart.mineNvmeBytesWritten()
 	}
@@ -382,6 +383,21 @@ func (smart *SMARTctl) mineNvmeNumErrLogEntries() {
 	)
 }
 
+func (smart *SMARTctl) mineNvmeVolatileMemoryBackupFailed() {
+	nvmeStatus := smart.json.Get("smart_status.nvme")
+	if nvmeStatus.Exists() {
+		volatileMemoryBackupFailed := nvmeStatus.Get("volatile_memory_backup_failed")
+		if volatileMemoryBackupFailed.Exists() {
+			smart.ch <- prometheus.MustNewConstMetric(
+				metricDeviceVolatileMemoryBackupFailed,
+				prometheus.CounterValue,
+				volatileMemoryBackupFailed.Float(),
+				smart.device.device,
+			)
+		}
+	}
+}
+
 // https://nvmexpress.org/wp-content/uploads/NVM-Express-NVM-Command-Set-Specification-1.0d-2023.12.28-Ratified.pdf
 // 4.1.4.2 SMART / Health Information (02h)
 // The SMART / Health Information log page is as defined in the NVM Express Base Specification. For the
@@ -472,7 +488,7 @@ func (smart *SMARTctl) mineSmartStatus() {
 	if smartStatus.Exists() {
 		smart.ch <- prometheus.MustNewConstMetric(
 			metricDeviceSmartStatus,
-			prometheus.GaugeValue,
+			prometheus.CounterValue,
 			smartStatus.Get("passed").Float(),
 			smart.device.device,
 		)
