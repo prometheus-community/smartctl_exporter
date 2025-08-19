@@ -290,6 +290,14 @@ var (
 		},
 		nil,
 	)
+	metricSCSIUsedEnduranceIndicator = prometheus.NewDesc(
+		"smartctl_scsi_percentage_used_endurance_indicator",
+		"Device SCSI percentage used endurance indicator",
+		[]string{
+			"device",
+		},
+		nil,
+	)
 	metricReadErrorsCorrectedByRereadsRewrites = prometheus.NewDesc(
 		"smartctl_read_errors_corrected_by_rereads_rewrites",
 		"Read Errors Corrected by ReReads/ReWrites",
@@ -349,6 +357,38 @@ var (
 	metricWriteTotalUncorrectedErrors = prometheus.NewDesc(
 		"smartctl_write_total_uncorrected_errors",
 		"Write Total Uncorrected Errors",
+		[]string{
+			"device",
+		},
+		nil,
+	)
+	metricVerifyErrorsCorrectedByRereadsRewrites = prometheus.NewDesc(
+		"smartctl_verify_errors_corrected_by_rereads_rewrites",
+		"Verify Errors Corrected by ReReads/ReWrites",
+		[]string{
+			"device",
+		},
+		nil,
+	)
+	metricVerifyErrorsCorrectedByEccFast = prometheus.NewDesc(
+		"smartctl_verify_errors_corrected_by_eccfast",
+		"Verify Errors Corrected by ECC Fast",
+		[]string{
+			"device",
+		},
+		nil,
+	)
+	metricVerifyErrorsCorrectedByEccDelayed = prometheus.NewDesc(
+		"smartctl_verify_errors_corrected_by_eccdelayed",
+		"Verify Errors Corrected by ECC Delayed",
+		[]string{
+			"device",
+		},
+		nil,
+	)
+	metricVerifyTotalUncorrectedErrors = prometheus.NewDesc(
+		"smartctl_verify_total_uncorrected_errors",
+		"Verify Total Uncorrected Errors",
 		[]string{
 			"device",
 		},
