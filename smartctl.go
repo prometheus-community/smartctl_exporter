@@ -87,6 +87,7 @@ func (smart *SMARTctl) Collect() {
 	smart.logger.Debug("Collecting metrics from", "device", smart.device.device, "family", smart.device.family, "model", smart.device.model)
 	smart.mineExitStatus()
 	smart.mineDevice()
+	smart.minePowerMode()
 	smart.mineCapacity()
 	smart.mineBlockSize()
 	smart.mineInterfaceSpeed()
@@ -152,6 +153,18 @@ func (smart *SMARTctl) mineDevice() {
 		smart.json.Get("scsi_revision").String(),
 		smart.json.Get("scsi_version").String(),
 	)
+}
+
+func (smart *SMARTctl) minePowerMode() {
+	powerMode := smart.json.Get("power_mode")
+	if powerMode.Exists() {
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricDevicePowerMode,
+			prometheus.GaugeValue,
+			powerMode.Get("ata_value").Float(),
+			smart.device.device,
+		)
+	}
 }
 
 func (smart *SMARTctl) mineCapacity() {
