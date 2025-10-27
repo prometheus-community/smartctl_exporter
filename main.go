@@ -81,6 +81,7 @@ func (i *SMARTctlManagerCollector) Describe(ch chan<- *prometheus.Desc) {
 	ch <- metricDeviceSmartStatus
 	ch <- metricDeviceExitStatus
 	ch <- metricDeviceState
+	ch <- metricDevicePowerMode
 	ch <- metricDeviceStatistics
 	ch <- metricDeviceErrorLogCount
 	ch <- metricDeviceSelfTestLogCount
