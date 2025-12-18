@@ -69,7 +69,7 @@ func (i *SMARTctlManagerCollector) Collect(ch chan<- prometheus.Metric) {
 		json := readData(i.logger, device)
 		if json.Exists() {
 			info.SetJSON(json)
-			smart := NewSMARTctl(i.logger, json, ch)
+			smart := NewSMARTctl(i.logger, json, ch, device)
 			smart.Collect()
 		}
 	}
