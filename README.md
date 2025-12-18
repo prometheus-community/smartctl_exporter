@@ -40,6 +40,8 @@ Flags:
       --smartctl.device-include=""
                                Regexp of devices to include in automatic scanning. (mutually exclusive to
                                device-exclude)
+      --smartctl.powermode-check=""
+                               Whether or not to check powermode before fetching data. (default: standby)
       --web.telemetry-path="/metrics"  
                                Path under which to expose metrics
       --web.systemd-socket     Use systemd socket activation listeners instead of port listeners (Linux only).
