@@ -18,6 +18,8 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"runtime"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -95,38 +97,76 @@ func (i *SMARTctlManagerCollector) RescanForDevices() {
 }
 
 var (
+	configFile *string
+
+	smartctlPath            *string
+	smartctlInterval        *time.Duration
+	smartctlRescanInterval  *time.Duration
+	smartctlScan            *bool
+	smartctlDevices         *[]string
+	smartctlDeviceExclude   *string
+	smartctlDeviceInclude   *string
+	smartctlScanDeviceTypes *[]string
+	smartctlFakeData        *bool
+	smartctlPowerModeCheck  *string
+)
+
+func defaultSmartctlPath() string {
+	if runtime.GOOS == "windows" {
+		return "smartctl.exe"
+	}
+	return "/usr/sbin/smartctl"
+}
+
+func initFlags(cfg Config, configPath string) (*string, *web.FlagConfig) {
+	configFile = kingpin.Flag("config.file", "Path to configuration file.").Default(configPath).String()
+
 	smartctlPath = kingpin.Flag("smartctl.path",
 		"The path to the smartctl binary",
-	).Default("/usr/sbin/smartctl").String()
+	).Default(stringValueOrDefault(cfg.SmartctlPath, defaultSmartctlPath())).String()
 	smartctlInterval = kingpin.Flag("smartctl.interval",
 		"The interval between smartctl polls",
-	).Default("60s").Duration()
+	).Default(stringValueOrDefault(cfg.SmartctlInterval, "60s")).Duration()
 	smartctlRescanInterval = kingpin.Flag("smartctl.rescan",
 		"The interval between rescanning for new/disappeared devices. If the interval is smaller than 1s no rescanning takes place. If any devices are configured with smartctl.device also no rescanning takes place.",
-	).Default("10m").Duration()
-	smartctlScan    = kingpin.Flag("smartctl.scan", "Enable scanning. This is a default if no devices are specified").Default("false").Bool()
-	smartctlDevices = kingpin.Flag("smartctl.device",
+	).Default(stringValueOrDefault(cfg.SmartctlRescan, "10m")).Duration()
+	smartctlScan = kingpin.Flag("smartctl.scan", "Enable scanning. This is a default if no devices are specified").Default(strconv.FormatBool(cfg.SmartctlScan != nil && *cfg.SmartctlScan)).Bool()
+	devicesFlag := kingpin.Flag("smartctl.device",
 		"The device to monitor. Device type can be specified after a semicolon, eg. '/dev/bus/0;megaraid,1' (repeatable)",
-	).Strings()
+	)
+	if len(cfg.SmartctlDevices) > 0 {
+		devicesFlag.Default(cfg.SmartctlDevices...)
+	}
+	smartctlDevices = devicesFlag.Strings()
 	smartctlDeviceExclude = kingpin.Flag(
 		"smartctl.device-exclude",
 		"Regexp of devices to exclude from automatic scanning. (mutually exclusive to device-include)",
-	).Default("").String()
+	).Default(stringValueOrDefault(cfg.SmartctlDeviceExclude, "")).String()
 	smartctlDeviceInclude = kingpin.Flag(
 		"smartctl.device-include",
 		"Regexp of devices to exclude from automatic scanning. (mutually exclusive to device-exclude)",
-	).Default("").String()
-	smartctlScanDeviceTypes = kingpin.Flag(
+	).Default(stringValueOrDefault(cfg.SmartctlDeviceInclude, "")).String()
+	scanTypesFlag := kingpin.Flag(
 		"smartctl.scan-device-type",
 		"Device type to use during automatic scan. Special by-id value forces predictable device names. (repeatable)",
-	).Strings()
+	)
+	if len(cfg.SmartctlScanDeviceTypes) > 0 {
+		scanTypesFlag.Default(cfg.SmartctlScanDeviceTypes...)
+	}
+	smartctlScanDeviceTypes = scanTypesFlag.Strings()
 	smartctlFakeData = kingpin.Flag("smartctl.fake-data",
 		"The device to monitor (repeatable)",
 	).Default("false").Hidden().Bool()
 	smartctlPowerModeCheck = kingpin.Flag("smartctl.powermode-check",
 		"Whether or not to check powermode before fetching data",
-	).Default("standby").String()
-)
+	).Default(stringValueOrDefault(cfg.SmartctlPowerModeCheck, "standby")).String()
+
+	metricsPath := kingpin.Flag(
+		"web.telemetry-path", "Path under which to expose metrics",
+	).Default(stringValueOrDefault(cfg.WebTelemetryPath, "/metrics")).String()
+	toolkitFlags := webflag.AddFlags(kingpin.CommandLine, stringValueOrDefault(cfg.WebListenAddress, ":9633"))
+	return metricsPath, toolkitFlags
+}
 
 // scanDevices uses smartctl to gather the list of available devices.
 func scanDevices(logger *slog.Logger) []Device {
@@ -187,10 +227,14 @@ func validatePowerMode(mode string) error {
 }
 
 func main() {
-	metricsPath := kingpin.Flag(
-		"web.telemetry-path", "Path under which to expose metrics",
-	).Default("/metrics").String()
-	toolkitFlags := webflag.AddFlags(kingpin.CommandLine, ":9633")
+	configPath := findConfigFile(os.Args[1:])
+	cfg, err := loadConfigFile(configPath)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+
+	metricsPath, toolkitFlags := initFlags(cfg, configPath)
 
 	promslogConfig := &promslog.Config{}
 	flag.AddFlags(kingpin.CommandLine, promslogConfig)

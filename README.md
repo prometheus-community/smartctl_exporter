@@ -26,8 +26,9 @@ usage: smartctl_exporter [<flags>]
 
 Flags:
   -h, --help                   Show context-sensitive help (also try --help-long and --help-man).
+      --config.file=""         Path to configuration file.
       --smartctl.path="/usr/sbin/smartctl"  
-                               The path to the smartctl binary
+                               The path to the smartctl binary (defaults to smartctl.exe on Windows)
       --smartctl.interval=60s  The interval between smartctl polls
       --smartctl.rescan=10m    The interval between rescanning for new/disappeared devices. If the interval is smaller than 1s no
                                rescanning takes place. If any devices are configured with smartctl.device also no rescanning takes
@@ -60,6 +61,30 @@ This exporter supports TLS and basic authentication.
 To use TLS and/or basic authentication, you need to pass a configuration file
 using the `--web.config.file` parameter. The format of the file is described
 [in the exporter-toolkit repository](https://github.com/prometheus/exporter-toolkit/blob/master/docs/web-configuration.md).
+
+## Configuration file
+
+You can provide a YAML configuration file with `--config.file`. Any values defined in the file become the
+default values for flags, and explicit CLI flags still take precedence. A minimal Windows-friendly example:
+
+```yaml
+web.listen-address: ":9633"
+smartctl.path: "smartctl.exe"
+```
+
+The supported keys are:
+
+- `web.listen-address`
+- `web.telemetry-path`
+- `smartctl.path`
+- `smartctl.interval`
+- `smartctl.rescan`
+- `smartctl.scan`
+- `smartctl.device`
+- `smartctl.device-exclude`
+- `smartctl.device-include`
+- `smartctl.scan-device-type`
+- `smartctl.powermode-check`
 
 ## Example of running in Docker
 
@@ -202,6 +227,20 @@ From the smartmontools FAQ: [My NVMe drive is not in the smartctl/smartd databas
 > specific commands (see ticket #870).
 
 smartmontools also has a [wiki page for NVMe](https://www.smartmontools.org/wiki/NVMe_Support) devices.
+
+## Windows 10/11 notes
+
+This exporter works on Windows as long as `smartctl.exe` from smartmontools is available in `PATH`
+(or you set `--smartctl.path` to the full path). On Windows the default `--smartctl.path` is `smartctl.exe`
+instead of `/usr/sbin/smartctl`. Device names returned by `smartctl --scan` often look like
+`\\.\PhysicalDrive0`; the exporter now normalizes these into stable labels such as `PhysicalDrive0`. If you
+run the exporter next to `windows_exporter` (default `:9182`), use the smartctl_exporter default `:9633` or
+set `--web.listen-address=:9633` (or another port) to avoid a conflict.
+
+An MSI-based installer (with service registration) is documented in `installer/windows/README.md`. It
+installs to `C:\Program Files\smartctl_exporter`, configures the Windows service, and can accept MSI
+properties such as `LISTEN_ADDRESS` for port selection. Install smartmontools separately and ensure
+`smartctl.exe` is in `PATH` (or set `smartctl.path`).
 
 ## How do I report upstream to smartmontools?
 Check their FAQ: [How to create a bug report](https://www.smartmontools.org/wiki/FAQ#Howtocreateabugreport).
