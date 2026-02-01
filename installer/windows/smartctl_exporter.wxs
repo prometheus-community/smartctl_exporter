@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+  <Package Name="smartctl_exporter"
+           Manufacturer="Prometheus Community"
+           Version="$(var.ProductVersion)"
+           UpgradeCode="B1C89A83-6EAB-4E1A-91F5-3216C4F735B9"
+           InstallerVersion="500"
+           Compressed="yes">
+    <MajorUpgrade DowngradeErrorMessage="A newer version of smartctl_exporter is already installed." />
+    <MediaTemplate />
+
+    <Property Id="LISTEN_ADDRESS" Value=":9633" />
+
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="smartctl_exporter" />
+    </StandardDirectory>
+
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      <Component Id="SmartctlExporterExe" Guid="*">
+        <File Id="SmartctlExporterExe" Source="$(var.ExeSource)" KeyPath="yes" />
+        <ServiceInstall Id="SmartctlExporterService"
+                        Name="smartctl_exporter"
+                        DisplayName="smartctl_exporter"
+                        Description="Prometheus exporter for S.M.A.R.T. devices"
+                        Start="auto"
+                        Type="ownProcess"
+                        ErrorControl="normal"
+                        Arguments="--config.file=&quot;[INSTALLFOLDER]smartctl_exporter.yml&quot; --web.listen-address=[LISTEN_ADDRESS]" />
+        <ServiceControl Id="StartService"
+                        Name="smartctl_exporter"
+                        Start="install"
+                        Stop="both"
+                        Remove="uninstall"
+                        Wait="yes" />
+      </Component>
+      <Component Id="SmartctlExporterConfig" Guid="*">
+        <File Id="SmartctlExporterConfig" Source="$(var.ConfigSource)" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+    <Feature Id="MainFeature" Title="smartctl_exporter" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+    </Feature>
+  </Package>
+</Wix>
