@@ -43,15 +43,36 @@ type SMARTctl struct {
 }
 
 func buildDeviceLabel(inputName string, inputType string) string {
-	// Strip /dev prefix and replace / with _ (/dev/bus/0 becomes bus_0, /dev/disk/by-id/abcd becomes abcd)
-	devReg := regexp.MustCompile(`^/dev/(?:disk/by-id/|disk/by-path/|)`)
-	deviceName := strings.ReplaceAll(devReg.ReplaceAllString(inputName, ""), "/", "_")
+	deviceName := sanitizeDeviceName(inputName)
 
 	if strings.Contains(inputType, ",") {
 		return deviceName + "_" + strings.ReplaceAll(inputType, ",", "_")
 	}
 
 	return deviceName
+}
+
+func sanitizeDeviceName(inputName string) string {
+	name := strings.TrimSpace(inputName)
+	if name == "" {
+		return name
+	}
+
+	for _, prefix := range []string{`\\.\`, `//./`, `\\?\`, `//?/`} {
+		if strings.HasPrefix(name, prefix) {
+			name = strings.TrimPrefix(name, prefix)
+			break
+		}
+	}
+
+	// Strip /dev prefix and replace / with _ (/dev/bus/0 becomes bus_0, /dev/disk/by-id/abcd becomes abcd)
+	devReg := regexp.MustCompile(`^/dev/(?:disk/by-id/|disk/by-path/|)`)
+	name = devReg.ReplaceAllString(name, "")
+	name = strings.ReplaceAll(name, "\\", "_")
+	name = strings.ReplaceAll(name, "/", "_")
+	name = strings.ReplaceAll(name, ":", "_")
+
+	return name
 }
 
 // NewSMARTctl is smartctl constructor

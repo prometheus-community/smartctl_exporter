@@ -33,6 +33,10 @@ func TestBuildDeviceLabel(t *testing.T) {
 		{"/dev/cciss/c0d0", "cciss,0", "cciss_c0d0_cciss_0"},
 		{"/dev/sdb", "aacraid,1,0,4", "sdb_aacraid_1_0_4"},
 		{"/dev/twl0", "3ware,1", "twl0_3ware_1"},
+		{`\\.\PhysicalDrive0`, "auto", "PhysicalDrive0"},
+		{`//./PhysicalDrive1`, "auto", "PhysicalDrive1"},
+		{`\\?\PhysicalDrive2`, "auto", "PhysicalDrive2"},
+		{`C:`, "auto", "C_"},
 	}
 
 	for _, test := range tests {
