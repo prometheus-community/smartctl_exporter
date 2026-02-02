@@ -25,9 +25,9 @@ $msiPath = Join-Path $buildDir "smartctl_exporter.msi"
 
 Write-Host "Building MSI..."
 wix build "$PSScriptRoot/smartctl_exporter.wxs" `
-    -dProductVersion=$Version `
-    -dExeSource=$exePath `
-    -dConfigSource=$configPath `
+    -d ProductVersion=$Version `
+    -d ExeSource=$exePath `
+    -d ConfigSource=$configPath `
     -o $msiPath
 
 Write-Host "Done. Artifacts:"

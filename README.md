@@ -242,5 +242,8 @@ installs to `C:\Program Files\smartctl_exporter`, configures the Windows service
 properties such as `LISTEN_ADDRESS` for port selection. Install smartmontools separately and ensure
 `smartctl.exe` is in `PATH` (or set `smartctl.path`).
 
+For a step-by-step build and deployment guide (including GPO/msiexec), see
+`BUILD_WINDOWS_MSI.md`.
+
 ## How do I report upstream to smartmontools?
 Check their FAQ: [How to create a bug report](https://www.smartmontools.org/wiki/FAQ#Howtocreateabugreport).
