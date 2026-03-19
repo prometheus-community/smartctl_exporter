@@ -1,4 +1,10 @@
 #! /bin/bash
+#
+# Modified 2026-03-19: Added MegaRAID RAID controller support
+# Changes:
+#   - Removed /dev/bus device filtering to allow RAID controller devices
+#   - Added device type extraction from smartctl scan to pass correct -d flag
+#   - Added support for scsi_model_name in addition to model_name for SCSI devices
 
 script_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 

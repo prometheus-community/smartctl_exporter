@@ -1,3 +1,8 @@
+# Modified 2026-03-19: Changed to multi-stage build for self-contained container builds
+# Changes:
+#   - Added Go build stage to compile binary within Docker (no pre-built artifacts needed)
+#   - Optimized layer caching by copying go.mod/go.sum before source code
+
 # Build stage
 FROM docker.io/golang:1.26-alpine3.23 AS builder
 

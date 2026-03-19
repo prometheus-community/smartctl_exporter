@@ -10,6 +10,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+//
+// Modified 2026-03-19: Added MegaRAID RAID controller support
+// Changes:
+//   - Changed protocol detection to use device.protocol field instead of device.interface_
+//   - This allows SCSI metrics collection for devices behind RAID controllers (e.g., megaraid,N)
 
 package main
 
