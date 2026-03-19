@@ -1,0 +1,97 @@
+{
+	"device": {
+		"info_name": "/dev/bus/0 [megaraid_disk_03]",
+		"name": "/dev/bus/0",
+		"protocol": "SCSI",
+		"type": "megaraid,3"
+	},
+	"device_type": {
+		"name": "disk",
+		"scsi_value": 0
+	},
+	"form_factor": {
+		"name": "3.5 inches",
+		"scsi_value": 2
+	},
+	"json_format_version": [
+		1,
+		0
+	],
+	"local_time": {
+		"asctime": "Fri Feb 13 23:31:30 2009 UTC",
+		"time_t": 1234567890
+	},
+	"logical_block_size": 512,
+	"model_name": "TOSHIBA MG08SCA16TEY",
+	"physical_block_size": 4096,
+	"product": "MG08SCA16TEY",
+	"revision": "EJ08",
+	"rotation_rate": 7200,
+	"scsi_error_counter_log": {
+		"read": {
+			"correction_algorithm_invocations": 14,
+			"errors_corrected_by_eccdelayed": 14,
+			"errors_corrected_by_eccfast": 0,
+			"errors_corrected_by_rereads_rewrites": 14,
+			"gigabytes_processed": "2803566.902",
+			"total_errors_corrected": 14,
+			"total_uncorrected_errors": 0
+		},
+		"verify": {
+			"correction_algorithm_invocations": 2,
+			"errors_corrected_by_eccdelayed": 2,
+			"errors_corrected_by_eccfast": 0,
+			"errors_corrected_by_rereads_rewrites": 2,
+			"gigabytes_processed": "607903.207",
+			"total_errors_corrected": 2,
+			"total_uncorrected_errors": 0
+		},
+		"write": {
+			"correction_algorithm_invocations": 52,
+			"errors_corrected_by_eccdelayed": 23,
+			"errors_corrected_by_eccfast": 0,
+			"errors_corrected_by_rereads_rewrites": 23,
+			"gigabytes_processed": "80355.979",
+			"total_errors_corrected": 23,
+			"total_uncorrected_errors": 0
+		}
+	},
+	"scsi_grown_defect_list": 0,
+	"scsi_version": "SPC-4",
+	"serial_number": "REDACTED",
+	"smart_status": {
+		"passed": true
+	},
+	"smartctl": {
+		"argv": [
+			"smartctl",
+			"--json",
+			"--info",
+			"--health",
+			"--attributes",
+			"--tolerance=verypermissive",
+			"--nocheck=standby",
+			"--format=brief",
+			"--log=error",
+			"--device=megaraid,3",
+			"/dev/bus/0"
+		],
+		"build_info": "REDACTED",
+		"exit_status": 0,
+		"platform_info": "REDACTED",
+		"svn_revision": "5022",
+		"version": [
+			7,
+			1
+		]
+	},
+	"temperature": {
+		"current": 29,
+		"drive_trip": 65
+	},
+	"user_capacity": {
+		"blocks": 31251759104,
+		"bytes": 16000900661248
+	},
+	"vendor": "TOSHIBA"
+}
