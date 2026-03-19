@@ -11,8 +11,9 @@ data_dir="${script_dir}/smartctl-data"
 smartctl_args="--json --info --health --attributes --tolerance=verypermissive \
 --nocheck=standby --format=brief --log=error"
 
-# Ignore this devices
-smartctl_ignore_dev_regex="^(/dev/bus)"
+# Ignore these devices (empty by default to include all devices including /dev/bus for RAID controllers)
+# Example: smartctl_ignore_dev_regex="^(/dev/sg)"
+smartctl_ignore_dev_regex=""
 
 # Determine the json query tool to use
 if command -v jq >/dev/null; then
@@ -43,26 +44,46 @@ fi
 
 if [[ $# -ne 0 ]]; then
 	devices="${1}"
+	mapfile -t devices <<< "${devices[@]}"
 else
-	devices="$(smartctl --scan --json | "${json_tool}" "${json_args}" \
-".devices[].name | select(test(\"${smartctl_ignore_dev_regex}\") | not)")"
-  mapfile -t devices <<< "${devices[@]}"
+	# Get both device name and type from smartctl scan
+	scan_output="$(smartctl --scan --json)"
+	devices=()
+	while IFS= read -r device_json; do
+		dev_name=$(echo "${device_json}" | "${json_tool}" "${json_args}" '.name')
+		dev_type=$(echo "${device_json}" | "${json_tool}" "${json_args}" '.type')
+		dev_label="${dev_name}"
+		# Filter out ignored devices
+		if [[ -n "${smartctl_ignore_dev_regex}" ]] && [[ "${dev_label}" =~ ${smartctl_ignore_dev_regex} ]]; then
+			continue
+		fi
+		devices+=("${dev_name};${dev_type}")
+	done < <(echo "${scan_output}" | "${json_tool}" "${json_args}" -c '.devices[]')
 fi
 
-for device in "${devices[@]}"
+for device_spec in "${devices[@]}"
   do
-	echo -n "Collecting data for '${device}'..."
+	# Split device spec into name and type (format: /dev/sdX;type or just /dev/sdX)
+	IFS=';' read -r device device_type <<< "${device_spec}"
+	[[ -z "${device_type}" ]] && device_type="auto"
+
+	echo -n "Collecting data for '${device}' with type '${device_type}'..."
 	# shellcheck disable=SC2086
-	data="$($SUDO smartctl ${smartctl_args} ${device})"
+	data="$($SUDO smartctl ${smartctl_args} --device=${device_type} ${device})"
 	# Accommodate a smartmontools pre-7.3 bug
 	data=${data#"  Pending defect count:"}
 	type="$(echo "${data}" | "${json_tool}" "${json_args}" '.device.type')"
 	family="$(echo "${data}" | "${json_tool}" "${json_args}" \
 'select(.model_family != null) | .model_family | sub(" |/" ; "_" ; "g")
  | sub("\"|\\(|\\)" ; "" ; "g")')"
+	# SCSI devices use scsi_model_name instead of model_name
 	model="$(echo "${data}" | "${json_tool}" "${json_args}" \
-'.model_name | sub(" |/" ; "_" ; "g") | sub("\"|\\(|\\)" ; "" ; "g")')"
+'(.model_name // .scsi_model_name // "unknown") | sub(" |/" ; "_" ; "g") | sub("\"|\\(|\\)" ; "" ; "g")')"
 	device_name="$(basename "${device}")"
+	# For megaraid devices, basename returns "0", so use a more descriptive name
+	if [[ "${device_type}" =~ ^(megaraid|sat\+megaraid) ]]; then
+		device_name="${device_name}_${device_type//,/_}"
+	fi
 	echo -e "\tSaving to ${type}-${family:=null}-${model}-${device_name}.json"
 	echo "${data}" > \
 "${data_dir}/${type}-${family:=null}-${model}-${device_name}.json"
