@@ -1,0 +1,125 @@
+{
+	"device": {
+		"info_name": "/dev/bus/0 [megaraid_disk_02]",
+		"name": "/dev/bus/0",
+		"protocol": "SCSI",
+		"type": "megaraid,2"
+	},
+	"device_type": {
+		"name": "disk",
+		"scsi_terminology": "Peripheral Device Type [PDT]",
+		"scsi_value": 0
+	},
+	"form_factor": {
+		"name": "2.5 inches",
+		"scsi_value": 3
+	},
+	"json_format_version": [
+		1,
+		0
+	],
+	"local_time": {
+		"asctime": "Fri Feb 13 23:31:30 2009 UTC",
+		"time_t": 1234567890
+	},
+	"logical_block_size": 512,
+	"logical_unit_id": "0x1234567890abcdef",
+	"physical_block_size": 4096,
+	"power_on_time": {
+		"hours": 12438,
+		"minutes": 15
+	},
+	"rotation_rate": 10000,
+	"scsi_error_counter_log": {
+		"read": {
+			"correction_algorithm_invocations": 828,
+			"errors_corrected_by_eccdelayed": 483,
+			"errors_corrected_by_eccfast": 0,
+			"errors_corrected_by_rereads_rewrites": 483,
+			"gigabytes_processed": "1524373.897",
+			"total_errors_corrected": 483,
+			"total_uncorrected_errors": 0
+		},
+		"verify": {
+			"correction_algorithm_invocations": 30,
+			"errors_corrected_by_eccdelayed": 30,
+			"errors_corrected_by_eccfast": 0,
+			"errors_corrected_by_rereads_rewrites": 30,
+			"gigabytes_processed": "177654.107",
+			"total_errors_corrected": 30,
+			"total_uncorrected_errors": 0
+		},
+		"write": {
+			"correction_algorithm_invocations": 5,
+			"errors_corrected_by_eccdelayed": 5,
+			"errors_corrected_by_eccfast": 0,
+			"errors_corrected_by_rereads_rewrites": 5,
+			"gigabytes_processed": "56975.734",
+			"total_errors_corrected": 5,
+			"total_uncorrected_errors": 0
+		}
+	},
+	"scsi_grown_defect_list": 0,
+	"scsi_model_name": "TOSHIBA AL15SEB24EQY",
+	"scsi_product": "AL15SEB24EQY",
+	"scsi_protection_interval_bytes_per_lb": 8,
+	"scsi_protection_type": 2,
+	"scsi_revision": "EF06",
+	"scsi_start_stop_cycle_counter": {
+		"accumulated_load_unload_cycles": 23008,
+		"accumulated_start_stop_cycles": 82,
+		"specified_cycle_count_over_device_lifetime": 50000,
+		"specified_load_unload_count_over_device_lifetime": 600000,
+		"week_of_manufacture": "17",
+		"year_of_manufacture": "2024"
+	},
+	"scsi_transport_protocol": {
+		"name": "SAS (SPL-4)",
+		"value": 6
+	},
+	"scsi_vendor": "TOSHIBA",
+	"scsi_version": "SPC-4",
+	"serial_number": "REDACTED",
+	"smart_status": {
+		"passed": true
+	},
+	"smart_support": {
+		"available": true,
+		"enabled": true
+	},
+	"smartctl": {
+		"argv": [
+			"smartctl",
+			"--json",
+			"--info",
+			"--health",
+			"--attributes",
+			"--tolerance=verypermissive",
+			"--nocheck=standby",
+			"--format=brief",
+			"--log=error",
+			"--device=megaraid,2",
+			"/dev/bus/0"
+		],
+		"build_info": "REDACTED",
+		"exit_status": 0,
+		"platform_info": "REDACTED",
+		"pre_release": false,
+		"svn_revision": "5530",
+		"version": [
+			7,
+			4
+		]
+	},
+	"temperature": {
+		"current": 31,
+		"drive_trip": 65
+	},
+	"temperature_warning": {
+		"enabled": false
+	},
+	"user_capacity": {
+		"blocks": 4688430768,
+		"bytes": 2400476553216
+	}
+}
