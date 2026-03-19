@@ -102,7 +102,7 @@ func (smart *SMARTctl) Collect() {
 	smart.mineDeviceERC()
 	smart.mineSmartStatus()
 
-	if smart.device.interface_ == "nvme" {
+	if strings.EqualFold(smart.device.protocol, "nvme") {
 		smart.mineNvmePercentageUsed()
 		smart.mineNvmeAvailableSpare()
 		smart.mineNvmeAvailableSpareThreshold()
@@ -113,7 +113,7 @@ func (smart *SMARTctl) Collect() {
 		smart.mineNvmeBytesWritten()
 	}
 	// SCSI, SAS
-	if smart.device.interface_ == "scsi" {
+	if strings.EqualFold(smart.device.protocol, "scsi") {
 		smart.mineSCSIGrownDefectList()
 		smart.mineSCSIErrorCounterLog()
 		smart.mineSCSIBytesRead()

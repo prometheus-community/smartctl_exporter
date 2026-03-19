@@ -138,9 +138,13 @@ func scanDevices(logger *slog.Logger) []Device {
 	for _, d := range scanDevices {
 		deviceName := d.Get("name").String()
 		deviceType := d.Get("type").String()
+		deviceProtocol := d.Get("protocol").String()
 
-		// SATA devices are reported as SCSI during scan - fallback to auto scraping
-		if deviceType == "scsi" {
+		// SATA devices behind controllers are reported with protocol=ATA but type=sat+megaraid,N
+		// Pure SCSI devices have both type=scsi and protocol=SCSI
+		// We should not convert megaraid or other controller types to auto
+		// For regular scsi devices, use auto to let smartctl detect if they're actually SATA
+		if deviceType == "scsi" && deviceProtocol == "SCSI" {
 			deviceType = "auto"
 		}
 
