@@ -1,3 +1,11 @@
+## 0.15.0-megaraid / 2026-03-19
+### Forked from https://github.com/prometheus-community/smart_exporter commit d0e5f6af72851f5b3b862d241642192265824157
+* [ENHANCEMENT] Added support for MegaRAID devices.
+* [ENHANCEMENT] Added hostname and serial number to all metric labels.
+* [ENHANCEMENT] Dockerfile now builds the go binary instead of relying on pre-built binaries.
+* [BUGFIX] Fixed `collect-smartctl-json.sh` script to support MegaRAID devices.
+* [ENHANCEMENT] Added megaraid devices to `testdata` for future reference.
+
 ## 0.14.0 / 2025-04-22
 
 * [BUGFIX] `smart_status` exported if object is present #260
