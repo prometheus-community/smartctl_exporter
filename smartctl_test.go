@@ -14,7 +14,14 @@
 package main
 
 import (
+	"io"
+	"log/slog"
+	"os"
+	"strings"
 	"testing"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/tidwall/gjson"
 )
 
 func TestBuildDeviceLabel(t *testing.T) {
@@ -41,4 +48,70 @@ func TestBuildDeviceLabel(t *testing.T) {
 			t.Errorf("deviceName=%v deviceType=%v expected=%v result=%v", test.deviceName, test.deviceType, test.expectedLabel, result)
 		}
 	}
+}
+
+func TestStandbyJSONSkipsMissingMetrics(t *testing.T) {
+	names := collectMetricNames(t, "testdata/standby-sdc.json")
+	expected := map[string]struct{}{
+		"smartctl_device_power_mode":           {},
+		"smartctl_device_smartctl_exit_status": {},
+	}
+
+	if len(names) != len(expected) {
+		t.Fatalf("expected %d metrics, got %d: %v", len(expected), len(names), names)
+	}
+	for name := range expected {
+		if _, ok := names[name]; !ok {
+			t.Fatalf("missing metric %q", name)
+		}
+	}
+	for name := range names {
+		if _, ok := expected[name]; !ok {
+			t.Fatalf("unexpected metric %q", name)
+		}
+	}
+}
+
+func collectMetricNames(t *testing.T, jsonPath string) map[string]struct{} {
+	t.Helper()
+
+	data, err := os.ReadFile(jsonPath)
+	if err != nil {
+		t.Fatalf("read json: %v", err)
+	}
+	json := gjson.ParseBytes(data)
+
+	ch := make(chan prometheus.Metric)
+	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
+	smart := NewSMARTctl(logger, json, ch)
+
+	go func() {
+		smart.Collect()
+		close(ch)
+	}()
+
+	names := make(map[string]struct{})
+	for metric := range ch {
+		name := metricName(metric)
+		if name == "" {
+			t.Fatalf("missing metric name for %v", metric)
+		}
+		names[name] = struct{}{}
+	}
+	return names
+}
+
+func metricName(metric prometheus.Metric) string {
+	desc := metric.Desc().String()
+	const prefix = `fqName: "`
+	start := strings.Index(desc, prefix)
+	if start == -1 {
+		return ""
+	}
+	start += len(prefix)
+	end := strings.Index(desc[start:], `"`)
+	if end == -1 {
+		return ""
+	}
+	return desc[start : start+end]
 }
