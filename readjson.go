@@ -74,7 +74,8 @@ func readSMARTctl(logger *slog.Logger, device Device, wg *sync.WaitGroup) {
 	// Accommodate a smartmontools pre-7.3 bug
 	cleaned_out := strings.TrimPrefix(string(out), "  Pending defect count:")
 	json := parseJSON(cleaned_out)
-	rcOk := resultCodeIsOk(logger, device, json.Get("smartctl.exit_status").Int())
+	exitStatus := json.Get("smartctl.exit_status").Int()
+	rcOk := resultCodeIsOk(logger, device, exitStatus, json)
 	jsonOk := jsonIsOk(logger, json)
 	logger.Debug("Collected S.M.A.R.T. json data", "device", device, "duration", time.Since(start))
 	if rcOk && jsonOk {
@@ -134,7 +135,7 @@ func readData(logger *slog.Logger, device Device) gjson.Result {
 }
 
 // Parse smartctl return code
-func resultCodeIsOk(logger *slog.Logger, device Device, SMARTCtlResult int64) bool {
+func resultCodeIsOk(logger *slog.Logger, device Device, SMARTCtlResult int64, json gjson.Result) bool {
 	result := true
 	if SMARTCtlResult > 0 {
 		b := SMARTCtlResult
@@ -143,8 +144,12 @@ func resultCodeIsOk(logger *slog.Logger, device Device, SMARTCtlResult int64) bo
 			result = false
 		}
 		if (b & (1 << 1)) != 0 {
-			logger.Error("Device open failed, device did not return an IDENTIFY DEVICE structure, or device is in a low-power mode", "device", device)
-			result = false
+			if json.Get("power_mode").Exists() {
+				logger.Info("Device in low-power mode", "device", device)
+			} else {
+				logger.Error("Device open failed, device did not return an IDENTIFY DEVICE structure, or device is in a low-power mode", "device", device)
+				result = false
+			}
 		}
 		if (b & (1 << 2)) != 0 {
 			logger.Warn("Some SMART or other ATA command to the disk failed, or there was a checksum error in a SMART data structure", "device", device)
