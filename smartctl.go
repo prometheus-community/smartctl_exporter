@@ -101,6 +101,7 @@ func (smart *SMARTctl) Collect() {
 	smart.mineDeviceSelfTestLog()
 	smart.mineDeviceERC()
 	smart.mineSmartStatus()
+	smart.mineFarmLog()
 
 	if smart.device.interface_ == "nvme" {
 		smart.mineNvmePercentageUsed()
