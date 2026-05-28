@@ -354,4 +354,150 @@ var (
 		},
 		nil,
 	)
+
+	// Seagate FARM log metrics
+	metricFarmWorkloadReadCommands = prometheus.NewDesc(
+		"smartctl_device_farm_workload_read_commands_total",
+		"Seagate FARM total read commands",
+		[]string{"device"},
+		nil,
+	)
+	metricFarmWorkloadWriteCommands = prometheus.NewDesc(
+		"smartctl_device_farm_workload_write_commands_total",
+		"Seagate FARM total write commands",
+		[]string{"device"},
+		nil,
+	)
+	metricFarmWorkloadLogicalSectorsRead = prometheus.NewDesc(
+		"smartctl_device_farm_workload_logical_sectors_read_total",
+		"Seagate FARM logical sectors read",
+		[]string{"device"},
+		nil,
+	)
+	metricFarmWorkloadLogicalSectorsWritten = prometheus.NewDesc(
+		"smartctl_device_farm_workload_logical_sectors_written_total",
+		"Seagate FARM logical sectors written",
+		[]string{"device"},
+		nil,
+	)
+	metricFarmErrorUnrecoverableRead = prometheus.NewDesc(
+		"smartctl_device_farm_error_unrecoverable_read_total",
+		"Seagate FARM unrecoverable read errors",
+		[]string{"device"},
+		nil,
+	)
+	metricFarmErrorUnrecoverableWrite = prometheus.NewDesc(
+		"smartctl_device_farm_error_unrecoverable_write_total",
+		"Seagate FARM unrecoverable write errors",
+		[]string{"device"},
+		nil,
+	)
+	metricFarmErrorReallocatedSectors = prometheus.NewDesc(
+		"smartctl_device_farm_error_reallocated_sectors",
+		"Seagate FARM reallocated sectors",
+		[]string{"device"},
+		nil,
+	)
+	metricFarmErrorReallocatedCandidates = prometheus.NewDesc(
+		"smartctl_device_farm_error_reallocated_candidate_sectors",
+		"Seagate FARM reallocated candidate sectors",
+		[]string{"device"},
+		nil,
+	)
+	metricFarmErrorCRCErrors = prometheus.NewDesc(
+		"smartctl_device_farm_error_crc_errors_total",
+		"Seagate FARM total CRC errors",
+		[]string{"device"},
+		nil,
+	)
+	metricFarmErrorCommandTimeouts = prometheus.NewDesc(
+		"smartctl_device_farm_error_command_timeouts_total",
+		"Seagate FARM command timeout count",
+		[]string{"device"},
+		nil,
+	)
+	metricFarmEnvironmentTemperature = prometheus.NewDesc(
+		"smartctl_device_farm_environment_temperature_celsius",
+		"Seagate FARM environment temperature",
+		[]string{"device", "temperature_type"},
+		nil,
+	)
+	metricFarmEnvironmentHumidity = prometheus.NewDesc(
+		"smartctl_device_farm_environment_humidity_percent",
+		"Seagate FARM environment humidity percentage",
+		[]string{"device"},
+		nil,
+	)
+	metricFarmEnvironment12V = prometheus.NewDesc(
+		"smartctl_device_farm_environment_12v_millivolts",
+		"Seagate FARM 12V rail millivolts",
+		[]string{"device", "voltage_type"},
+		nil,
+	)
+	metricFarmEnvironment5V = prometheus.NewDesc(
+		"smartctl_device_farm_environment_5v_millivolts",
+		"Seagate FARM 5V rail millivolts",
+		[]string{"device", "voltage_type"},
+		nil,
+	)
+	metricFarmEnvironmentMotorPower = prometheus.NewDesc(
+		"smartctl_device_farm_environment_motor_power",
+		"Seagate FARM current motor power",
+		[]string{"device"},
+		nil,
+	)
+	metricFarmReliabilityErrorRate = prometheus.NewDesc(
+		"smartctl_device_farm_reliability_error_rate_raw",
+		"Seagate FARM error rate raw value",
+		[]string{"device"},
+		nil,
+	)
+	metricFarmReliabilitySeekErrorRate = prometheus.NewDesc(
+		"smartctl_device_farm_reliability_seek_error_rate_raw",
+		"Seagate FARM seek error rate raw value",
+		[]string{"device"},
+		nil,
+	)
+	metricFarmReliabilityHighPriorityUnloads = prometheus.NewDesc(
+		"smartctl_device_farm_reliability_high_priority_unload_events",
+		"Seagate FARM high priority unload events",
+		[]string{"device"},
+		nil,
+	)
+	metricFarmReliabilityHeliumPressureTrip = prometheus.NewDesc(
+		"smartctl_device_farm_reliability_helium_pressure_trip",
+		"Seagate FARM helium pressure trip count",
+		[]string{"device"},
+		nil,
+	)
+	metricFarmErrorUnrecoverableByHead = prometheus.NewDesc(
+		"smartctl_device_farm_error_unrecoverable_by_head",
+		"Seagate FARM per-head unrecoverable errors",
+		[]string{"device", "head", "error_type"},
+		nil,
+	)
+	metricFarmReliabilityReallocatedByHead = prometheus.NewDesc(
+		"smartctl_device_farm_reliability_reallocated_sectors_by_head",
+		"Seagate FARM per-head reallocated sectors",
+		[]string{"device", "head"},
+		nil,
+	)
+	metricFarmReliabilityCandidatesByHead = prometheus.NewDesc(
+		"smartctl_device_farm_reliability_reallocation_candidates_by_head",
+		"Seagate FARM per-head reallocation candidate sectors",
+		[]string{"device", "head"},
+		nil,
+	)
+	metricFarmReliabilitySkipWriteByHead = prometheus.NewDesc(
+		"smartctl_device_farm_reliability_skip_write_detect_by_head",
+		"Seagate FARM per-head skip write detect count",
+		[]string{"device", "head", "detect_type"},
+		nil,
+	)
+	metricFarmReliabilityMRHeadResistanceByHead = prometheus.NewDesc(
+		"smartctl_device_farm_reliability_mr_head_resistance_by_head",
+		"Seagate FARM per-head MR head resistance",
+		[]string{"device", "head"},
+		nil,
+	)
 )

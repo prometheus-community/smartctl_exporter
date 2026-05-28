@@ -1,0 +1,410 @@
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      5
+    ],
+    "pre_release": false,
+    "svn_revision": "5714",
+    "platform_info": "x86_64-linux-5.14.0-611.9.1.el9_7.x86_64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "--json",
+      "--log=farm",
+      "/dev/sda"
+    ],
+    "drive_database_version": {
+      "string": "7.5/5706"
+    },
+    "exit_status": 0
+  },
+  "local_time": {
+    "time_t": 1779999109,
+    "asctime": "Thu May 28 17:11:49 2026 ADT"
+  },
+  "device": {
+    "name": "/dev/sda",
+    "info_name": "/dev/sda [SAT]",
+    "type": "sat",
+    "protocol": "ATA"
+  },
+  "serial_number": "ZJV0PMA6",
+  "model_name": "ST12000NM000J-2TV103",
+  "model_family": "Seagate Exos X18",
+  "seagate_farm_log": {
+    "page_0_log_header": {
+      "farm_log_version": [
+        2,
+        1
+      ],
+      "pages_supported": 6,
+      "log_size": 98304,
+      "page_size": 16384,
+      "heads_supported": 24,
+      "number_of_copies": 0,
+      "reason_for_frame_capture": 0
+    },
+    "page_1_drive_information": {
+      "serial_number": "ZJV0PMA6",
+      "world_wide_name": "0x5000c500b17b059f",
+      "device_interface": "SATA",
+      "device_capacity_in_sectors": 23437770752,
+      "physical_sector_size": 4096,
+      "logical_sector_size": 512,
+      "device_buffer_size": 268435456,
+      "number_of_heads": 16,
+      "form_factor": "3.5 inches",
+      "rotation_rate": 7200,
+      "firmware_rev": "SN02    ",
+      "poh": 31583,
+      "spoh": 452565969807,
+      "head_flight_hours": 452565954977,
+      "head_load_events": 23003,
+      "power_cycle_count": 114,
+      "reset_count": 663,
+      "spin_up_time": 11,
+      "time_to_ready": 0,
+      "time_held": 0,
+      "drive_recording_type": "UNKNOWN",
+      "max_number_for_reasign": 0,
+      "date_of_assembly": "",
+      "depopulation_head_mask": 0
+    },
+    "page_2_workload_statistics": {
+      "total_read_commands": 947966635,
+      "total_write_commands": 159262778,
+      "total_random_reads": 31745091,
+      "total_random_writes": 134590856,
+      "total_other_commands": 31931579,
+      "logical_sectors_written": 108391477992,
+      "logical_sectors_read": 465962064793,
+      "dither": 0,
+      "dither_random": 0,
+      "dither_sequential": 0,
+      "read_commands_by_radius_0_3": 0,
+      "read_commands_by_radius_3_25": 0,
+      "read_commands_by_radius_25_75": 0,
+      "read_commands_by_radius_75_100": 0,
+      "write_commands_by_radius_0_3": 0,
+      "write_commands_by_radius_3_25": 0,
+      "write_commands_by_radius_25_75": 0,
+      "write_commands_by_radius_75_100": 0
+    },
+    "page_3_error_statistics": {
+      "number_of_unrecoverable_read_errors": 0,
+      "number_of_unrecoverable_write_errors": 0,
+      "number_of_reallocated_sectors": 0,
+      "number_of_read_recovery_attempts": 0,
+      "number_of_mechanical_start_failures": 0,
+      "number_of_reallocated_candidate_sectors": 0,
+      "total_asr_events": 124,
+      "total_crc_errors": 36507,
+      "attr_spin_retry_count": 0,
+      "normal_spin_retry_count": 100,
+      "worst_spin_rretry_count": 100,
+      "number_of_ioedc_errors": 0,
+      "command_time_out_count_total": 76,
+      "command_time_out_over_5_seconds_count": 0,
+      "command_time_out_over_7_seconds_count": 0,
+      "total_flash_led": 0,
+      "index_flash_led": 0,
+      "uncorrectables": 0,
+      "cumulative_unrecoverable_read_erc": 0,
+      "total_flash_led_errors": 0,
+      "flash_led_event_0": {
+        "timestamp_of_event": 0,
+        "event_information": 0,
+        "power_cycle_event": 0
+      },
+      "flash_led_event_7": {
+        "timestamp_of_event": 0,
+        "event_information": 0,
+        "power_cycle_event": 0
+      },
+      "flash_led_event_6": {
+        "timestamp_of_event": 0,
+        "event_information": 0,
+        "power_cycle_event": 0
+      },
+      "flash_led_event_5": {
+        "timestamp_of_event": 0,
+        "event_information": 0,
+        "power_cycle_event": 0
+      },
+      "flash_led_event_4": {
+        "timestamp_of_event": 0,
+        "event_information": 0,
+        "power_cycle_event": 0
+      },
+      "flash_led_event_3": {
+        "timestamp_of_event": 0,
+        "event_information": 0,
+        "power_cycle_event": 0
+      },
+      "flash_led_event_2": {
+        "timestamp_of_event": 0,
+        "event_information": 0,
+        "power_cycle_event": 0
+      },
+      "flash_led_event_1": {
+        "timestamp_of_event": 0,
+        "event_information": 0,
+        "power_cycle_event": 0
+      },
+      "cum_lifetime_unrecoverable_by_head_0": {
+        "cum_lifetime_unrecoverable_read_repeating": 0,
+        "cum_lifetime_unrecoverable_read_unique": 0
+      },
+      "cum_lifetime_unrecoverable_by_head_1": {
+        "cum_lifetime_unrecoverable_read_repeating": 0,
+        "cum_lifetime_unrecoverable_read_unique": 0
+      },
+      "cum_lifetime_unrecoverable_by_head_2": {
+        "cum_lifetime_unrecoverable_read_repeating": 0,
+        "cum_lifetime_unrecoverable_read_unique": 0
+      },
+      "cum_lifetime_unrecoverable_by_head_3": {
+        "cum_lifetime_unrecoverable_read_repeating": 0,
+        "cum_lifetime_unrecoverable_read_unique": 0
+      },
+      "cum_lifetime_unrecoverable_by_head_4": {
+        "cum_lifetime_unrecoverable_read_repeating": 0,
+        "cum_lifetime_unrecoverable_read_unique": 0
+      },
+      "cum_lifetime_unrecoverable_by_head_5": {
+        "cum_lifetime_unrecoverable_read_repeating": 0,
+        "cum_lifetime_unrecoverable_read_unique": 0
+      },
+      "cum_lifetime_unrecoverable_by_head_6": {
+        "cum_lifetime_unrecoverable_read_repeating": 0,
+        "cum_lifetime_unrecoverable_read_unique": 0
+      },
+      "cum_lifetime_unrecoverable_by_head_7": {
+        "cum_lifetime_unrecoverable_read_repeating": 0,
+        "cum_lifetime_unrecoverable_read_unique": 0
+      },
+      "cum_lifetime_unrecoverable_by_head_8": {
+        "cum_lifetime_unrecoverable_read_repeating": 0,
+        "cum_lifetime_unrecoverable_read_unique": 0
+      },
+      "cum_lifetime_unrecoverable_by_head_9": {
+        "cum_lifetime_unrecoverable_read_repeating": 0,
+        "cum_lifetime_unrecoverable_read_unique": 0
+      },
+      "cum_lifetime_unrecoverable_by_head_10": {
+        "cum_lifetime_unrecoverable_read_repeating": 0,
+        "cum_lifetime_unrecoverable_read_unique": 0
+      },
+      "cum_lifetime_unrecoverable_by_head_11": {
+        "cum_lifetime_unrecoverable_read_repeating": 0,
+        "cum_lifetime_unrecoverable_read_unique": 0
+      },
+      "cum_lifetime_unrecoverable_by_head_12": {
+        "cum_lifetime_unrecoverable_read_repeating": 0,
+        "cum_lifetime_unrecoverable_read_unique": 0
+      },
+      "cum_lifetime_unrecoverable_by_head_13": {
+        "cum_lifetime_unrecoverable_read_repeating": 0,
+        "cum_lifetime_unrecoverable_read_unique": 0
+      },
+      "cum_lifetime_unrecoverable_by_head_14": {
+        "cum_lifetime_unrecoverable_read_repeating": 0,
+        "cum_lifetime_unrecoverable_read_unique": 0
+      },
+      "cum_lifetime_unrecoverable_by_head_15": {
+        "cum_lifetime_unrecoverable_read_repeating": 0,
+        "cum_lifetime_unrecoverable_read_unique": 0
+      }
+    },
+    "page_4_environment_statistics": {
+      "curent_temp": 25,
+      "highest_temp": 39,
+      "lowest_temp": 0,
+      "average_temp": 25,
+      "average_long_temp": 26,
+      "highest_short_temp": 38,
+      "lowest_short_temp": 15,
+      "highest_long_temp": 33,
+      "lowest_long_temp": 20,
+      "over_temp_time": 0,
+      "under_temp_time": 210,
+      "max_temp": 60,
+      "min_temp": 5,
+      "humidity": 120,
+      "current_motor_power": 3615,
+      "current_12v_in_mv": 0,
+      "minimum_12v_in_mv": 0,
+      "maximum_12v_in_mv": 0,
+      "current_5v_in_mv": 0,
+      "minimum_5v_in_mv": 0,
+      "maximum_5v_in_mv": 0,
+      "average_12v_power": 0,
+      "minimum_12v_power": 0,
+      "maximum_12v_power": 0,
+      "average_5v_power": 0,
+      "minimum_5v_power": 0,
+      "maximum_5v_power": 0
+    },
+    "page_5_reliability_statistics": {
+      "attr_error_rate_raw": 96007328,
+      "error_rate_normalized": 80,
+      "error_rate_worst": 64,
+      "attr_seek_error_rate_raw": 407955248,
+      "seek_error_rate_normalized": 86,
+      "seek_error_rate_worst": 60,
+      "high_priority_unload_events": 224,
+      "helium_presure_trip": 0,
+      "lbas_corrected_by_parity_sector": 0,
+      "dvga_skip_write_detect_by_head_0": 0,
+      "dvga_skip_write_detect_by_head_1": 0,
+      "dvga_skip_write_detect_by_head_2": 0,
+      "dvga_skip_write_detect_by_head_3": 0,
+      "dvga_skip_write_detect_by_head_4": 0,
+      "dvga_skip_write_detect_by_head_5": 0,
+      "dvga_skip_write_detect_by_head_6": 0,
+      "dvga_skip_write_detect_by_head_7": 0,
+      "dvga_skip_write_detect_by_head_8": 0,
+      "dvga_skip_write_detect_by_head_9": 0,
+      "dvga_skip_write_detect_by_head_10": 0,
+      "dvga_skip_write_detect_by_head_11": 0,
+      "dvga_skip_write_detect_by_head_12": 0,
+      "dvga_skip_write_detect_by_head_13": 0,
+      "dvga_skip_write_detect_by_head_14": 0,
+      "dvga_skip_write_detect_by_head_15": 0,
+      "rvga_skip_write_detect_by_head_0": 0,
+      "rvga_skip_write_detect_by_head_1": 0,
+      "rvga_skip_write_detect_by_head_2": 0,
+      "rvga_skip_write_detect_by_head_3": 0,
+      "rvga_skip_write_detect_by_head_4": 0,
+      "rvga_skip_write_detect_by_head_5": 0,
+      "rvga_skip_write_detect_by_head_6": 0,
+      "rvga_skip_write_detect_by_head_7": 0,
+      "rvga_skip_write_detect_by_head_8": 0,
+      "rvga_skip_write_detect_by_head_9": 0,
+      "rvga_skip_write_detect_by_head_10": 0,
+      "rvga_skip_write_detect_by_head_11": 0,
+      "rvga_skip_write_detect_by_head_12": 0,
+      "rvga_skip_write_detect_by_head_13": 0,
+      "rvga_skip_write_detect_by_head_14": 0,
+      "rvga_skip_write_detect_by_head_15": 0,
+      "fvga_skip_write_detect_by_head_0": 0,
+      "fvga_skip_write_detect_by_head_1": 0,
+      "fvga_skip_write_detect_by_head_2": 0,
+      "fvga_skip_write_detect_by_head_3": 0,
+      "fvga_skip_write_detect_by_head_4": 0,
+      "fvga_skip_write_detect_by_head_5": 0,
+      "fvga_skip_write_detect_by_head_6": 0,
+      "fvga_skip_write_detect_by_head_7": 0,
+      "fvga_skip_write_detect_by_head_8": 0,
+      "fvga_skip_write_detect_by_head_9": 0,
+      "fvga_skip_write_detect_by_head_10": 0,
+      "fvga_skip_write_detect_by_head_11": 0,
+      "fvga_skip_write_detect_by_head_12": 0,
+      "fvga_skip_write_detect_by_head_13": 0,
+      "fvga_skip_write_detect_by_head_14": 0,
+      "fvga_skip_write_detect_by_head_15": 0,
+      "skip_write_detect_threshold_exceeded_by_head_0": 0,
+      "skip_write_detect_threshold_exceeded_by_head_1": 0,
+      "skip_write_detect_threshold_exceeded_by_head_2": 0,
+      "skip_write_detect_threshold_exceeded_by_head_3": 0,
+      "skip_write_detect_threshold_exceeded_by_head_4": 0,
+      "skip_write_detect_threshold_exceeded_by_head_5": 0,
+      "skip_write_detect_threshold_exceeded_by_head_6": 0,
+      "skip_write_detect_threshold_exceeded_by_head_7": 0,
+      "skip_write_detect_threshold_exceeded_by_head_8": 0,
+      "skip_write_detect_threshold_exceeded_by_head_9": 0,
+      "skip_write_detect_threshold_exceeded_by_head_10": 0,
+      "skip_write_detect_threshold_exceeded_by_head_11": 0,
+      "skip_write_detect_threshold_exceeded_by_head_12": 0,
+      "skip_write_detect_threshold_exceeded_by_head_13": 0,
+      "skip_write_detect_threshold_exceeded_by_head_14": 0,
+      "skip_write_detect_threshold_exceeded_by_head_15": 0,
+      "write_workload_power_on_time_by_head_0": 0,
+      "write_workload_power_on_time_by_head_1": 0,
+      "write_workload_power_on_time_by_head_2": 0,
+      "write_workload_power_on_time_by_head_3": 0,
+      "write_workload_power_on_time_by_head_4": 0,
+      "write_workload_power_on_time_by_head_5": 0,
+      "write_workload_power_on_time_by_head_6": 0,
+      "write_workload_power_on_time_by_head_7": 0,
+      "write_workload_power_on_time_by_head_8": 0,
+      "write_workload_power_on_time_by_head_9": 0,
+      "write_workload_power_on_time_by_head_10": 0,
+      "write_workload_power_on_time_by_head_11": 0,
+      "write_workload_power_on_time_by_head_12": 0,
+      "write_workload_power_on_time_by_head_13": 0,
+      "write_workload_power_on_time_by_head_14": 0,
+      "write_workload_power_on_time_by_head_15": 0,
+      "mr_head_resistance_from_head_0": 452,
+      "mr_head_resistance_from_head_1": 373,
+      "mr_head_resistance_from_head_2": 443,
+      "mr_head_resistance_from_head_3": 375,
+      "mr_head_resistance_from_head_4": 356,
+      "mr_head_resistance_from_head_5": 348,
+      "mr_head_resistance_from_head_6": 415,
+      "mr_head_resistance_from_head_7": 417,
+      "mr_head_resistance_from_head_8": 407,
+      "mr_head_resistance_from_head_9": 606,
+      "mr_head_resistance_from_head_10": 370,
+      "mr_head_resistance_from_head_11": 444,
+      "mr_head_resistance_from_head_12": 475,
+      "mr_head_resistance_from_head_13": 404,
+      "mr_head_resistance_from_head_14": 550,
+      "mr_head_resistance_from_head_15": 439,
+      "second_mr_head_resistance_by_head_0": 0,
+      "second_mr_head_resistance_by_head_1": 0,
+      "second_mr_head_resistance_by_head_2": 0,
+      "second_mr_head_resistance_by_head_3": 0,
+      "second_mr_head_resistance_by_head_4": 0,
+      "second_mr_head_resistance_by_head_5": 0,
+      "second_mr_head_resistance_by_head_6": 0,
+      "second_mr_head_resistance_by_head_7": 0,
+      "second_mr_head_resistance_by_head_8": 0,
+      "second_mr_head_resistance_by_head_9": 0,
+      "second_mr_head_resistance_by_head_10": 0,
+      "second_mr_head_resistance_by_head_11": 0,
+      "second_mr_head_resistance_by_head_12": 0,
+      "second_mr_head_resistance_by_head_13": 0,
+      "second_mr_head_resistance_by_head_14": 0,
+      "second_mr_head_resistance_by_head_15": 0,
+      "number_of_reallocated_sectors_by_head_0": 0,
+      "number_of_reallocated_sectors_by_head_1": 0,
+      "number_of_reallocated_sectors_by_head_2": 0,
+      "number_of_reallocated_sectors_by_head_3": 0,
+      "number_of_reallocated_sectors_by_head_4": 0,
+      "number_of_reallocated_sectors_by_head_5": 0,
+      "number_of_reallocated_sectors_by_head_6": 0,
+      "number_of_reallocated_sectors_by_head_7": 0,
+      "number_of_reallocated_sectors_by_head_8": 0,
+      "number_of_reallocated_sectors_by_head_9": 0,
+      "number_of_reallocated_sectors_by_head_10": 0,
+      "number_of_reallocated_sectors_by_head_11": 0,
+      "number_of_reallocated_sectors_by_head_12": 0,
+      "number_of_reallocated_sectors_by_head_13": 0,
+      "number_of_reallocated_sectors_by_head_14": 0,
+      "number_of_reallocated_sectors_by_head_15": 0,
+      "number_of_reallocation_candidate_sectors_by_head_0": 0,
+      "number_of_reallocation_candidate_sectors_by_head_1": 0,
+      "number_of_reallocation_candidate_sectors_by_head_2": 0,
+      "number_of_reallocation_candidate_sectors_by_head_3": 0,
+      "number_of_reallocation_candidate_sectors_by_head_4": 0,
+      "number_of_reallocation_candidate_sectors_by_head_5": 0,
+      "number_of_reallocation_candidate_sectors_by_head_6": 0,
+      "number_of_reallocation_candidate_sectors_by_head_7": 0,
+      "number_of_reallocation_candidate_sectors_by_head_8": 0,
+      "number_of_reallocation_candidate_sectors_by_head_9": 0,
+      "number_of_reallocation_candidate_sectors_by_head_10": 0,
+      "number_of_reallocation_candidate_sectors_by_head_11": 0,
+      "number_of_reallocation_candidate_sectors_by_head_12": 0,
+      "number_of_reallocation_candidate_sectors_by_head_13": 0,
+      "number_of_reallocation_candidate_sectors_by_head_14": 0,
+      "number_of_reallocation_candidate_sectors_by_head_15": 0
+    },
+    "supported": true
+  }
+}
