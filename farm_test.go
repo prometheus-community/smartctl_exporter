@@ -30,7 +30,7 @@ func TestMineFarmLog(t *testing.T) {
 	json := gjson.Parse(string(jsonFile))
 	ch := make(chan prometheus.Metric, 1000)
 
-	smart := NewSMARTctl(slog.Default(), json, ch)
+	smart := NewSMARTctl(slog.Default(), json, ch, Device{})
 	smart.mineFarmLog()
 	close(ch)
 
@@ -83,7 +83,7 @@ func TestMineFarmLogAbsentKey(t *testing.T) {
 	json := gjson.Parse(`{"device": {"name": "/dev/sda", "type": "sat", "protocol": "ATA"}, "model_name": "WDC WD10EZEX"}`)
 	ch := make(chan prometheus.Metric, 100)
 
-	smart := NewSMARTctl(slog.Default(), json, ch)
+	smart := NewSMARTctl(slog.Default(), json, ch, Device{})
 	smart.mineFarmLog()
 	close(ch)
 

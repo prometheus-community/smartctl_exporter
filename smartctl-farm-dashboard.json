@@ -324,7 +324,7 @@
           "name": "instance",
           "query": "label_values(smartctl_device_farm_environment_temperature_celsius, instance)",
           "refresh": 2,
-          "regex": "/^(?!localhost).*/",
+          "regex": "",
           "type": "query"
         },
         {
