@@ -1,0 +1,314 @@
+{
+  "dashboard": {
+    "id": null,
+    "panels": [
+      {
+        "datasource": "Prometheus",
+        "fieldConfig": {
+          "defaults": {
+            "unit": "celsius"
+          }
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 0
+        },
+        "targets": [
+          {
+            "expr": "smartctl_device_farm_environment_temperature_celsius{device=~\"$device\", temperature_type=\"current\"}",
+            "legendFormat": "{{device}}"
+          }
+        ],
+        "title": "FARM Temperature (Current)",
+        "type": "timeseries"
+      },
+      {
+        "datasource": "Prometheus",
+        "fieldConfig": {
+          "defaults": {
+            "unit": "celsius"
+          }
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 0
+        },
+        "targets": [
+          {
+            "expr": "smartctl_device_farm_environment_temperature_celsius{device=~\"$device\"}",
+            "legendFormat": "{{device}} - {{temperature_type}}"
+          }
+        ],
+        "title": "FARM Temperature (All Types)",
+        "type": "timeseries"
+      },
+      {
+        "datasource": "Prometheus",
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ops"
+          }
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 8
+        },
+        "targets": [
+          {
+            "expr": "rate(smartctl_device_farm_workload_read_commands_total{device=~\"$device\"}[5m])",
+            "legendFormat": "{{device}} reads/s"
+          }
+        ],
+        "title": "FARM Workload - Read Commands",
+        "type": "timeseries"
+      },
+      {
+        "datasource": "Prometheus",
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ops"
+          }
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 8
+        },
+        "targets": [
+          {
+            "expr": "rate(smartctl_device_farm_workload_write_commands_total{device=~\"$device\"}[5m])",
+            "legendFormat": "{{device}} writes/s"
+          }
+        ],
+        "title": "FARM Workload - Write Commands",
+        "type": "timeseries"
+      },
+      {
+        "datasource": "Prometheus",
+        "gridPos": {
+          "h": 6,
+          "w": 8,
+          "x": 0,
+          "y": 16
+        },
+        "targets": [
+          {
+            "expr": "smartctl_device_farm_error_reallocated_sectors{device=~\"$device\"}",
+            "legendFormat": "{{device}}"
+          }
+        ],
+        "title": "FARM Reallocated Sectors",
+        "type": "stat"
+      },
+      {
+        "datasource": "Prometheus",
+        "gridPos": {
+          "h": 6,
+          "w": 8,
+          "x": 8,
+          "y": 16
+        },
+        "targets": [
+          {
+            "expr": "smartctl_device_farm_error_crc_errors_total{device=~\"$device\"}",
+            "legendFormat": "{{device}}"
+          }
+        ],
+        "title": "FARM CRC Errors",
+        "type": "stat"
+      },
+      {
+        "datasource": "Prometheus",
+        "gridPos": {
+          "h": 6,
+          "w": 8,
+          "x": 16,
+          "y": 16
+        },
+        "targets": [
+          {
+            "expr": "smartctl_device_farm_error_command_timeouts_total{device=~\"$device\"}",
+            "legendFormat": "{{device}}"
+          }
+        ],
+        "title": "FARM Command Timeouts",
+        "type": "stat"
+      },
+      {
+        "datasource": "Prometheus",
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 22
+        },
+        "targets": [
+          {
+            "expr": "smartctl_device_farm_error_unrecoverable_read_total{device=~\"$device\"}",
+            "legendFormat": "{{device}}"
+          }
+        ],
+        "title": "FARM Unrecoverable Read Errors",
+        "type": "timeseries"
+      },
+      {
+        "datasource": "Prometheus",
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 22
+        },
+        "targets": [
+          {
+            "expr": "smartctl_device_farm_error_unrecoverable_write_total{device=~\"$device\"}",
+            "legendFormat": "{{device}}"
+          }
+        ],
+        "title": "FARM Unrecoverable Write Errors",
+        "type": "timeseries"
+      },
+      {
+        "datasource": "Prometheus",
+        "fieldConfig": {
+          "defaults": {
+            "unit": "mvolt"
+          }
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 30
+        },
+        "targets": [
+          {
+            "expr": "smartctl_device_farm_environment_12v_millivolts{device=~\"$device\"}",
+            "legendFormat": "{{device}} - {{voltage_type}}"
+          }
+        ],
+        "title": "FARM 12V Rail (mV)",
+        "type": "timeseries"
+      },
+      {
+        "datasource": "Prometheus",
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 30
+        },
+        "targets": [
+          {
+            "expr": "smartctl_device_farm_reliability_mr_head_resistance_by_head{device=~\"$device\"}",
+            "legendFormat": "{{device}} head {{head}}"
+          }
+        ],
+        "title": "FARM MR Head Resistance by Head",
+        "type": "timeseries"
+      },
+      {
+        "datasource": "Prometheus",
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 38
+        },
+        "targets": [
+          {
+            "expr": "smartctl_device_farm_reliability_reallocated_sectors_by_head{device=~\"$device\"}",
+            "legendFormat": "{{device}} head {{head}}"
+          }
+        ],
+        "title": "FARM Reallocated Sectors by Head",
+        "type": "timeseries"
+      },
+      {
+        "datasource": "Prometheus",
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 38
+        },
+        "targets": [
+          {
+            "expr": "smartctl_device_farm_reliability_error_rate_raw{device=~\"$device\"}",
+            "legendFormat": "{{device}} error_rate"
+          },
+          {
+            "expr": "smartctl_device_farm_reliability_seek_error_rate_raw{device=~\"$device\"}",
+            "legendFormat": "{{device}} seek_error_rate"
+          }
+        ],
+        "title": "FARM Reliability - Error Rate / Seek Error Rate",
+        "type": "timeseries"
+      },
+      {
+        "datasource": "Prometheus",
+        "gridPos": {
+          "h": 6,
+          "w": 12,
+          "x": 0,
+          "y": 46
+        },
+        "targets": [
+          {
+            "expr": "smartctl_device_farm_reliability_high_priority_unload_events{device=~\"$device\"}",
+            "legendFormat": "{{device}}"
+          }
+        ],
+        "title": "FARM High Priority Unload Events",
+        "type": "stat"
+      },
+      {
+        "datasource": "Prometheus",
+        "gridPos": {
+          "h": 6,
+          "w": 12,
+          "x": 12,
+          "y": 46
+        },
+        "targets": [
+          {
+            "expr": "smartctl_device_farm_environment_motor_power{device=~\"$device\"}",
+            "legendFormat": "{{device}}"
+          }
+        ],
+        "title": "FARM Motor Power",
+        "type": "timeseries"
+      }
+    ],
+    "refresh": "1m",
+    "schemaVersion": 38,
+    "templating": {
+      "list": [
+        {
+          "current": {
+            "text": "All",
+            "value": "$__all"
+          },
+          "datasource": "Prometheus",
+          "includeAll": true,
+          "multi": true,
+          "name": "device",
+          "query": "label_values(smartctl_device_farm_environment_temperature_celsius, device)",
+          "refresh": 2,
+          "type": "query"
+        }
+      ]
+    },
+    "timezone": "browser",
+    "title": "Seagate FARM & SMART Metrics",
+    "uid": "smartctl-farm",
+    "version": 1
+  }
+}
