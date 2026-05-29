@@ -183,10 +183,10 @@
           }
         },
         "gridPos": {
-          "h": 8,
-          "w": 12,
           "x": 0,
-          "y": 30
+          "y": 30,
+          "w": 12,
+          "h": 8
         },
         "targets": [
           {
@@ -199,11 +199,33 @@
       },
       {
         "datasource": "Prometheus",
+        "fieldConfig": {
+          "defaults": {
+            "unit": "mvolt"
+          }
+        },
+        "gridPos": {
+          "x": 12,
+          "y": 30,
+          "w": 12,
+          "h": 8
+        },
+        "targets": [
+          {
+            "expr": "smartctl_device_farm_environment_5v_millivolts{instance=~\"$instance\", voltage_type=\"current\"}",
+            "legendFormat": "{{instance}} / {{device}}"
+          }
+        ],
+        "title": "FARM 5V Rail Over Time",
+        "type": "timeseries"
+      },
+      {
+        "datasource": "Prometheus",
         "gridPos": {
           "h": 8,
           "w": 12,
-          "x": 12,
-          "y": 30
+          "x": 0,
+          "y": 38
         },
         "targets": [
           {
@@ -219,7 +241,7 @@
         "gridPos": {
           "h": 8,
           "w": 12,
-          "x": 0,
+          "x": 12,
           "y": 38
         },
         "targets": [
@@ -236,8 +258,8 @@
         "gridPos": {
           "h": 8,
           "w": 12,
-          "x": 12,
-          "y": 38
+          "x": 0,
+          "y": 46
         },
         "targets": [
           {
@@ -255,9 +277,9 @@
       {
         "datasource": "Prometheus",
         "gridPos": {
-          "h": 6,
+          "h": 8,
           "w": 12,
-          "x": 0,
+          "x": 12,
           "y": 46
         },
         "targets": [
@@ -272,10 +294,10 @@
       {
         "datasource": "Prometheus",
         "gridPos": {
-          "h": 6,
+          "h": 8,
           "w": 12,
-          "x": 12,
-          "y": 46
+          "x": 0,
+          "y": 54
         },
         "targets": [
           {
@@ -284,28 +306,6 @@
           }
         ],
         "title": "FARM Motor Power",
-        "type": "timeseries"
-      },
-      {
-        "datasource": "Prometheus",
-        "fieldConfig": {
-          "defaults": {
-            "unit": "mvolt"
-          }
-        },
-        "gridPos": {
-          "h": 8,
-          "w": 24,
-          "x": 0,
-          "y": 52
-        },
-        "targets": [
-          {
-            "expr": "smartctl_device_farm_environment_5v_millivolts{instance=~\"$instance\", voltage_type=\"current\"}",
-            "legendFormat": "{{instance}} / {{device}}"
-          }
-        ],
-        "title": "FARM 5V Rail Over Time",
         "type": "timeseries"
       }
     ],
@@ -358,6 +358,6 @@
     "timezone": "browser",
     "title": "Seagate FARM & SMART Metrics",
     "uid": "smartctl-farm",
-    "version": 5
+    "version": 6
   }
 }
