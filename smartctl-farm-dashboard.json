@@ -39,7 +39,7 @@
         },
         "targets": [
           {
-            "expr": "smartctl_device_farm_environment_temperature_celsius{instance=~\"$instance\", device=~\"$device\"}",
+            "expr": "smartctl_device_farm_environment_temperature_celsius{instance=~\"$instance\", device=~\"$device\", temperature_type=~\"$temperature_type\"}",
             "legendFormat": "{{instance}} / {{device}} - {{temperature_type}}"
           }
         ],
@@ -324,6 +324,7 @@
           "name": "instance",
           "query": "label_values(smartctl_device_farm_environment_temperature_celsius, instance)",
           "refresh": 2,
+          "regex": "/^(?!localhost).*/",
           "type": "query"
         },
         {
@@ -338,12 +339,25 @@
           "query": "label_values(smartctl_device_farm_environment_temperature_celsius, device)",
           "refresh": 2,
           "type": "query"
+        },
+        {
+          "current": {
+            "text": "All",
+            "value": "$__all"
+          },
+          "datasource": "Prometheus",
+          "includeAll": true,
+          "multi": true,
+          "name": "temperature_type",
+          "query": "label_values(smartctl_device_farm_environment_temperature_celsius, temperature_type)",
+          "refresh": 2,
+          "type": "query"
         }
       ]
     },
     "timezone": "browser",
     "title": "Seagate FARM & SMART Metrics",
     "uid": "smartctl-farm",
-    "version": 3
+    "version": 5
   }
 }
