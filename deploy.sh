@@ -41,9 +41,9 @@ if [[ $# -eq 0 ]]; then
     exit 1
 fi
 
-echo "==> Building smartctl_exporter..."
+echo "==> Building smartctl_exporter (static)..."
 cd "$SCRIPT_DIR"
-GOOS=linux GOARCH=amd64 go build -o smartctl_exporter .
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o smartctl_exporter .
 
 for TARGET in "$@"; do
     echo ""
