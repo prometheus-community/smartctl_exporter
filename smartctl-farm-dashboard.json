@@ -190,7 +190,7 @@
         },
         "targets": [
           {
-            "expr": "smartctl_device_farm_environment_12v_millivolts{instance=~\"$instance\", device=~\"$device\"}",
+            "expr": "smartctl_device_farm_environment_12v_millivolts{instance=~\"$instance\", device=~\"$device\", voltage_type=~\"$voltage_type\"}",
             "legendFormat": "{{instance}} / {{device}} - {{voltage_type}}"
           }
         ],
@@ -212,8 +212,8 @@
         },
         "targets": [
           {
-            "expr": "smartctl_device_farm_environment_5v_millivolts{instance=~\"$instance\", voltage_type=\"current\"}",
-            "legendFormat": "{{instance}} / {{device}}"
+            "expr": "smartctl_device_farm_environment_5v_millivolts{instance=~\"$instance\", device=~\"$device\", voltage_type=~\"$voltage_type\"}",
+            "legendFormat": "{{instance}} / {{device}} - {{voltage_type}}"
           }
         ],
         "title": "FARM 5V Rail Over Time",
@@ -352,12 +352,27 @@
           "query": "label_values(smartctl_device_farm_environment_temperature_celsius, temperature_type)",
           "refresh": 2,
           "type": "query"
+        },
+        {
+          "name": "voltage_type",
+          "type": "query",
+          "datasource": "Prometheus",
+          "query": "label_values(smartctl_device_farm_environment_12v_millivolts, voltage_type)",
+          "refresh": 1,
+          "includeAll": true,
+          "multi": true,
+          "allValue": ".*",
+          "current": {
+            "text": "All",
+            "value": "$__all"
+          },
+          "sort": 1
         }
       ]
     },
     "timezone": "browser",
     "title": "Seagate FARM & SMART Metrics",
     "uid": "smartctl-farm",
-    "version": 6
+    "version": 7
   }
 }
