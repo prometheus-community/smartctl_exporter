@@ -67,16 +67,38 @@ func NewSMARTctl(logger *slog.Logger, json gjson.Result, ch chan<- prometheus.Me
 		model_name = "unknown"
 	}
 
+	// Handle CCISS devices.
+	// CCISS does not always get stored in devices.type, it is more frequent in devices.info_name
+	var device_name string
+	var device_interface string
+	if strings.Contains(strings.ToLower(json.Get("device.info_name").String()), "cciss") {
+		// Correct the "device name" to be what is expected in buildDeviceLabel
+		// For a CCISS device typically device.name is just /dev/sda
+		// The info_name is reported as "/dev/sda [cciss_disk_NN] [SCSI]"
+		tmp := json.Get("device.info_name").String()
+		tmp = strings.Trim(strings.Split(tmp, "")[1], "[]")
+		tmp = strings.Replace(tmp, "_disk_", ",", 1)
+		device_name = buildDeviceLabel(json.Get("device.name").String(), tmp)
+
+		// Correct the device "interface"
+		// On some machines it reports the interface as CCISS and others it reports it as SAT/SCSI
+		// Here it will show the device as SAT or SCSI
+		device_interface = strings.ToLower(strings.Trim(strings.Split(json.Get("device.info_name").String(), " ")[2], "[]"))
+	} else {
+		device_name = buildDeviceLabel(json.Get("device.name").String(), json.Get("device.type").String())
+		device_interface = strings.TrimSpace(json.Get("device.type").String())
+	}
+
 	return SMARTctl{
 		ch:     ch,
 		json:   json,
 		logger: logger,
 		device: SMARTDevice{
-			device:     buildDeviceLabel(json.Get("device.name").String(), json.Get("device.type").String()),
+			device:     device_name,
 			serial:     strings.TrimSpace(json.Get("serial_number").String()),
 			family:     strings.TrimSpace(GetStringIfExists(json, "model_family", "unknown")),
 			model:      strings.TrimSpace(model_name),
-			interface_: strings.TrimSpace(json.Get("device.type").String()),
+			interface_: device_interface,
 			protocol:   strings.TrimSpace(json.Get("device.protocol").String()),
 		},
 	}
