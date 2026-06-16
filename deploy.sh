@@ -148,18 +148,50 @@ scrape_configs:
 EOF
 else
     echo "    Using inline prometheus.yml style..."
-    # Remove existing smartctl job block if present, then append new one
-    ssh "${SSH_USER}@${PROM_HOST}" "
-        # Remove old smartctl block (job_name line + following lines until next job or EOF)
-        sed -i '/job_name:.*smartctl/,/^  - job_name\\|^\$/{/^  - job_name.*smartctl/d;/^  - job_name/!d}' /etc/prometheus/prometheus.yml 2>/dev/null || true
-        # Append new smartctl job
-        cat >> /etc/prometheus/prometheus.yml <<INNER
-  - job_name: 'smartctl'
-    scrape_interval: 60s
-    static_configs:
-      - targets: [${TARGETS_INLINE}]
-INNER
-    "
+    # Use Python for YAML-aware insertion: removes any existing smartctl job,
+    # then inserts the new one before the 'alerting:' block (or appends to
+    # scrape_configs if no alerting block exists). This avoids the bug where
+    # blindly appending to EOF places the job inside the alerting block.
+    ssh "${SSH_USER}@${PROM_HOST}" "python3 - /etc/prometheus/prometheus.yml ${TARGETS_INLINE}" <<'PYEOF'
+import sys, re
+
+cfg = sys.argv[1]
+targets = sys.argv[2:]
+
+with open(cfg) as f:
+    content = f.read()
+
+# Remove any existing smartctl job block (idempotent).
+content = re.sub(
+    r"(?m)^  - job_name: ['\"]smartctl['\"].*\n(?:    [^\n]*\n)*",
+    '',
+    content
+)
+
+# Build the new job block.
+target_list = ', '.join(targets)
+job = (
+    "  - job_name: 'smartctl'\n"
+    "    scrape_interval: 60s\n"
+    "    static_configs:\n"
+    f"      - targets: [{target_list}]\n"
+)
+
+# Insert before 'alerting:' if present, otherwise append to end.
+if re.search(r'^alerting:', content, re.MULTILINE):
+    content = re.sub(
+        r'^(alerting:)',
+        lambda m: job + m.group(1),
+        content,
+        count=1,
+        flags=re.MULTILINE
+    )
+else:
+    content = content.rstrip('\n') + '\n' + job
+
+with open(cfg, 'w') as f:
+    f.write(content)
+PYEOF
 fi
 
 echo "==> Restarting Prometheus on ${PROM_HOST}..."
