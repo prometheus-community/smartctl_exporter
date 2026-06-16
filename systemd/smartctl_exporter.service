@@ -5,7 +5,7 @@ After=network-online.target
 [Service]
 Type=simple
 PIDFile=/run/smartctl_exporter.pid
-ExecStart=/usr/bin/smartctl_exporter --smartctl.farm-log
+ExecStart=/usr/bin/smartctl_exporter --smartctl.farm-log --smartctl.vdev-label
 User=root
 Group=root
 SyslogIdentifier=smartctl_exporter
