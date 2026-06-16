@@ -73,6 +73,12 @@ for TARGET in "$@"; do
         ssh "${SSH_USER}@${TARGET}" "sed -i 's|--smartctl.farm-log|--smartctl.farm-log --smartctl.path=${SMARTCTL_PATH}|' /etc/systemd/system/smartctl_exporter.service"
     fi
 
+    # Check if the target has ID_VDEV udev data (ZFS vdev labels / enclosure slots)
+    if ssh "${SSH_USER}@${TARGET}" "udevadm info --export --query=property /dev/\$(lsblk -dn -o NAME | head -1) 2>/dev/null | grep -q ID_VDEV"; then
+        echo "    ID_VDEV detected, ensuring --smartctl.vdev-label is set..."
+        ssh "${SSH_USER}@${TARGET}" "grep -q 'vdev-label' /etc/systemd/system/smartctl_exporter.service || sed -i 's|--smartctl.farm-log|--smartctl.farm-log --smartctl.vdev-label|' /etc/systemd/system/smartctl_exporter.service"
+    fi
+
     echo "==> Enabling and starting smartctl_exporter..."
     ssh "${SSH_USER}@${TARGET}" "systemctl daemon-reload && systemctl enable --now smartctl_exporter && systemctl restart smartctl_exporter"
 
