@@ -41,9 +41,9 @@ if [[ $# -eq 0 ]]; then
     exit 1
 fi
 
-echo "==> Building smartctl_exporter..."
+echo "==> Building smartctl_exporter (static)..."
 cd "$SCRIPT_DIR"
-GOOS=linux GOARCH=amd64 go build -o smartctl_exporter .
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o smartctl_exporter .
 
 for TARGET in "$@"; do
     echo ""
@@ -57,11 +57,27 @@ for TARGET in "$@"; do
     echo "==> Checking smartctl version..."
     ssh "${SSH_USER}@${TARGET}" "smartctl --version | head -1"
 
+    echo "==> Stopping existing service (if running)..."
+    ssh "${SSH_USER}@${TARGET}" "systemctl stop smartctl_exporter 2>/dev/null || true"
+
     echo "==> Copying binary..."
     scp smartctl_exporter "${SSH_USER}@${TARGET}:/usr/bin/smartctl_exporter"
 
     echo "==> Installing systemd service..."
     scp systemd/smartctl_exporter.service "${SSH_USER}@${TARGET}:/etc/systemd/system/smartctl_exporter.service"
+
+    # If smartctl is not at the default path, add --smartctl.path to the service file
+    SMARTCTL_PATH=$(ssh "${SSH_USER}@${TARGET}" "which smartctl 2>/dev/null || echo /usr/sbin/smartctl")
+    if [[ "$SMARTCTL_PATH" != "/usr/sbin/smartctl" ]]; then
+        echo "    smartctl found at ${SMARTCTL_PATH}, updating service file..."
+        ssh "${SSH_USER}@${TARGET}" "sed -i 's|--smartctl.farm-log|--smartctl.farm-log --smartctl.path=${SMARTCTL_PATH}|' /etc/systemd/system/smartctl_exporter.service"
+    fi
+
+    # Check if the target has ID_VDEV udev data (ZFS vdev labels / enclosure slots)
+    if ssh "${SSH_USER}@${TARGET}" "udevadm info --export --query=property /dev/\$(lsblk -dn -o NAME | head -1) 2>/dev/null | grep -q ID_VDEV"; then
+        echo "    ID_VDEV detected, ensuring --smartctl.vdev-label is set..."
+        ssh "${SSH_USER}@${TARGET}" "grep -q 'vdev-label' /etc/systemd/system/smartctl_exporter.service || sed -i 's|--smartctl.farm-log|--smartctl.farm-log --smartctl.vdev-label|' /etc/systemd/system/smartctl_exporter.service"
+    fi
 
     echo "==> Enabling and starting smartctl_exporter..."
     ssh "${SSH_USER}@${TARGET}" "systemctl daemon-reload && systemctl enable --now smartctl_exporter && systemctl restart smartctl_exporter"
@@ -71,10 +87,22 @@ for TARGET in "$@"; do
     if ssh "${SSH_USER}@${TARGET}" "systemctl is-active grafana-server >/dev/null 2>&1"; then
         echo "==> Grafana detected on ${TARGET}, importing dashboard..."
         sleep 5
-        curl -sf -u "${GRAFANA_USER}:${GRAFANA_PASS}" \
+        # Import dashboard with instance regex cleared (we use IPs, not localhost)
+        python3 -c "
+import sys, json
+with open('${SCRIPT_DIR}/smartctl-farm-dashboard.json') as f:
+    d = json.load(f)
+for var in d.get('dashboard', d).get('templating', {}).get('list', []):
+    if var.get('name') == 'instance':
+        var['regex'] = ''
+d.setdefault('overwrite', True)
+if 'dashboard' in d:
+    d['dashboard']['id'] = None
+print(json.dumps(d))
+" | curl -sf -u "${GRAFANA_USER}:${GRAFANA_PASS}" \
             -X POST -H "Content-Type: application/json" \
             "http://${GRAFANA_TARGET}:3000/api/dashboards/db" \
-            -d @"${SCRIPT_DIR}/smartctl-farm-dashboard.json" \
+            -d @- \
             && echo "    Dashboard imported." \
             || echo "    WARNING: Dashboard import failed."
     else
@@ -98,20 +126,73 @@ if ! ssh "${SSH_USER}@${PROM_HOST}" "systemctl list-unit-files prometheus.servic
 fi
 
 # Build targets list from all deployed hosts
-TARGETS=""
+TARGETS_YAML=""
+TARGETS_INLINE=""
 for TARGET in "$@"; do
-    if [[ -n "$TARGETS" ]]; then
-        TARGETS="${TARGETS}, "
+    if [[ -n "$TARGETS_INLINE" ]]; then
+        TARGETS_INLINE="${TARGETS_INLINE}, "
     fi
-    TARGETS="${TARGETS}'${TARGET}:9633'"
+    TARGETS_INLINE="${TARGETS_INLINE}'${TARGET}:9633'"
+    TARGETS_YAML="${TARGETS_YAML}
+      - targets: ['${TARGET}:9633']"
 done
 
-ssh "${SSH_USER}@${PROM_HOST}" "mkdir -p /etc/prometheus/scrape_configs && cat > /etc/prometheus/scrape_configs/smartctl_exporter.yml" <<EOF
+# Determine Prometheus config style: scrape_config_files or inline prometheus.yml
+if ssh "${SSH_USER}@${PROM_HOST}" "grep -q 'scrape_config_files' /etc/prometheus/prometheus.yml 2>/dev/null"; then
+    echo "    Using scrape_config_files style..."
+    ssh "${SSH_USER}@${PROM_HOST}" "mkdir -p /etc/prometheus/scrape_configs && cat > /etc/prometheus/scrape_configs/smartctl_exporter.yml" <<EOF
 scrape_configs:
   - job_name: 'smartctl'
     static_configs:
-      - targets: [${TARGETS}]
+      - targets: [${TARGETS_INLINE}]
 EOF
+else
+    echo "    Using inline prometheus.yml style..."
+    # Use Python for YAML-aware insertion: removes any existing smartctl job,
+    # then inserts the new one before the 'alerting:' block (or appends to
+    # scrape_configs if no alerting block exists). This avoids the bug where
+    # blindly appending to EOF places the job inside the alerting block.
+    ssh "${SSH_USER}@${PROM_HOST}" "python3 - /etc/prometheus/prometheus.yml ${TARGETS_INLINE}" <<'PYEOF'
+import sys, re
+
+cfg = sys.argv[1]
+targets = sys.argv[2:]
+
+with open(cfg) as f:
+    content = f.read()
+
+# Remove any existing smartctl job block (idempotent).
+content = re.sub(
+    r"(?m)^  - job_name: ['\"]smartctl['\"].*\n(?:    [^\n]*\n)*",
+    '',
+    content
+)
+
+# Build the new job block.
+target_list = ', '.join(targets)
+job = (
+    "  - job_name: 'smartctl'\n"
+    "    scrape_interval: 60s\n"
+    "    static_configs:\n"
+    f"      - targets: [{target_list}]\n"
+)
+
+# Insert before 'alerting:' if present, otherwise append to end.
+if re.search(r'^alerting:', content, re.MULTILINE):
+    content = re.sub(
+        r'^(alerting:)',
+        lambda m: job + m.group(1),
+        content,
+        count=1,
+        flags=re.MULTILINE
+    )
+else:
+    content = content.rstrip('\n') + '\n' + job
+
+with open(cfg, 'w') as f:
+    f.write(content)
+PYEOF
+fi
 
 echo "==> Restarting Prometheus on ${PROM_HOST}..."
 ssh "${SSH_USER}@${PROM_HOST}" "systemctl restart prometheus 2>/dev/null || true"

@@ -4,6 +4,66 @@
     "panels": [
       {
         "datasource": "Prometheus",
+        "gridPos": {
+          "h": 7,
+          "w": 24,
+          "x": 0,
+          "y": 0
+        },
+        "targets": [
+          {
+            "expr": "smartctl_device{instance=~\"$instance\", device=~\"$device\"}",
+            "format": "table",
+            "instant": true,
+            "legendFormat": ""
+          }
+        ],
+        "title": "Device Inventory (Slot / Device)",
+        "type": "table",
+        "transformations": [
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {
+                "Time": true,
+                "Value": true,
+                "__name__": true,
+                "job": true,
+                "ata_version": true,
+                "sata_version": true,
+                "form_factor": true,
+                "scsi_vendor": true,
+                "scsi_product": true,
+                "scsi_revision": true,
+                "scsi_version": true,
+                "ata_additional_product_id": true
+              },
+              "indexByName": {
+                "device": 0,
+                "instance": 1,
+                "model_family": 2,
+                "model_name": 3,
+                "serial_number": 4,
+                "firmware_version": 5,
+                "interface": 6,
+                "protocol": 7
+              },
+              "renameByName": {
+                "device": "Slot / Device",
+                "instance": "Instance",
+                "model_name": "Model",
+                "serial_number": "Serial",
+                "model_family": "Family",
+                "firmware_version": "Firmware",
+                "interface": "Interface",
+                "protocol": "Protocol"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "datasource": "Prometheus",
         "fieldConfig": {
           "defaults": {
             "unit": "celsius"
@@ -13,7 +73,7 @@
           "h": 8,
           "w": 12,
           "x": 0,
-          "y": 0
+          "y": 7
         },
         "targets": [
           {
@@ -35,7 +95,7 @@
           "h": 8,
           "w": 12,
           "x": 12,
-          "y": 0
+          "y": 7
         },
         "targets": [
           {
@@ -57,7 +117,7 @@
           "h": 8,
           "w": 12,
           "x": 0,
-          "y": 8
+          "y": 15
         },
         "targets": [
           {
@@ -79,7 +139,7 @@
           "h": 8,
           "w": 12,
           "x": 12,
-          "y": 8
+          "y": 15
         },
         "targets": [
           {
@@ -96,7 +156,7 @@
           "h": 6,
           "w": 8,
           "x": 0,
-          "y": 16
+          "y": 23
         },
         "targets": [
           {
@@ -113,7 +173,7 @@
           "h": 6,
           "w": 8,
           "x": 8,
-          "y": 16
+          "y": 23
         },
         "targets": [
           {
@@ -130,7 +190,7 @@
           "h": 6,
           "w": 8,
           "x": 16,
-          "y": 16
+          "y": 23
         },
         "targets": [
           {
@@ -147,7 +207,7 @@
           "h": 8,
           "w": 12,
           "x": 0,
-          "y": 22
+          "y": 29
         },
         "targets": [
           {
@@ -164,7 +224,7 @@
           "h": 8,
           "w": 12,
           "x": 12,
-          "y": 22
+          "y": 29
         },
         "targets": [
           {
@@ -184,7 +244,7 @@
         },
         "gridPos": {
           "x": 0,
-          "y": 30,
+          "y": 37,
           "w": 12,
           "h": 8
         },
@@ -206,7 +266,7 @@
         },
         "gridPos": {
           "x": 12,
-          "y": 30,
+          "y": 37,
           "w": 12,
           "h": 8
         },
@@ -225,7 +285,7 @@
           "h": 8,
           "w": 12,
           "x": 0,
-          "y": 38
+          "y": 45
         },
         "targets": [
           {
@@ -242,7 +302,7 @@
           "h": 8,
           "w": 12,
           "x": 12,
-          "y": 38
+          "y": 45
         },
         "targets": [
           {
@@ -259,7 +319,7 @@
           "h": 8,
           "w": 12,
           "x": 0,
-          "y": 46
+          "y": 53
         },
         "targets": [
           {
@@ -280,7 +340,7 @@
           "h": 8,
           "w": 12,
           "x": 12,
-          "y": 46
+          "y": 53
         },
         "targets": [
           {
@@ -297,7 +357,7 @@
           "h": 8,
           "w": 12,
           "x": 0,
-          "y": 54
+          "y": 61
         },
         "targets": [
           {
@@ -324,7 +384,7 @@
           "name": "instance",
           "query": "label_values(smartctl_device_farm_environment_temperature_celsius, instance)",
           "refresh": 2,
-          "regex": "/^(?!localhost).*/",
+          "regex": "",
           "type": "query"
         },
         {
