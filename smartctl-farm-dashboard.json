@@ -245,16 +245,16 @@
         "gridPos": {
           "x": 0,
           "y": 37,
-          "w": 12,
+          "w": 8,
           "h": 8
         },
         "targets": [
           {
-            "expr": "smartctl_device_farm_environment_12v_millivolts{instance=~\"$instance\", device=~\"$device\", voltage_type=~\"$voltage_type\"}",
-            "legendFormat": "{{instance}} / {{device}} - {{voltage_type}}"
+            "expr": "smartctl_device_farm_environment_12v_millivolts{instance=~\"$instance\", device=~\"$device\", voltage_type=\"current\"}",
+            "legendFormat": "{{instance}} / {{device}}"
           }
         ],
-        "title": "FARM 12V Rail (mV)",
+        "title": "FARM 12V Rail - Current (mV)",
         "type": "timeseries"
       },
       {
@@ -265,18 +265,106 @@
           }
         },
         "gridPos": {
-          "x": 12,
+          "x": 8,
           "y": 37,
-          "w": 12,
+          "w": 8,
           "h": 8
         },
         "targets": [
           {
-            "expr": "smartctl_device_farm_environment_5v_millivolts{instance=~\"$instance\", device=~\"$device\", voltage_type=~\"$voltage_type\"}",
-            "legendFormat": "{{instance}} / {{device}} - {{voltage_type}}"
+            "expr": "smartctl_device_farm_environment_12v_millivolts{instance=~\"$instance\", device=~\"$device\", voltage_type=\"minimum\"}",
+            "legendFormat": "{{instance}} / {{device}}"
           }
         ],
-        "title": "FARM 5V Rail Over Time",
+        "title": "FARM 12V Rail - Min (mV)",
+        "type": "timeseries"
+      },
+      {
+        "datasource": "Prometheus",
+        "fieldConfig": {
+          "defaults": {
+            "unit": "mvolt"
+          }
+        },
+        "gridPos": {
+          "x": 16,
+          "y": 37,
+          "w": 8,
+          "h": 8
+        },
+        "targets": [
+          {
+            "expr": "smartctl_device_farm_environment_12v_millivolts{instance=~\"$instance\", device=~\"$device\", voltage_type=\"maximum\"}",
+            "legendFormat": "{{instance}} / {{device}}"
+          }
+        ],
+        "title": "FARM 12V Rail - Max (mV)",
+        "type": "timeseries"
+      },
+      {
+        "datasource": "Prometheus",
+        "fieldConfig": {
+          "defaults": {
+            "unit": "mvolt"
+          }
+        },
+        "gridPos": {
+          "x": 0,
+          "y": 45,
+          "w": 8,
+          "h": 8
+        },
+        "targets": [
+          {
+            "expr": "smartctl_device_farm_environment_5v_millivolts{instance=~\"$instance\", device=~\"$device\", voltage_type=\"current\"}",
+            "legendFormat": "{{instance}} / {{device}}"
+          }
+        ],
+        "title": "FARM 5V Rail - Current (mV)",
+        "type": "timeseries"
+      },
+      {
+        "datasource": "Prometheus",
+        "fieldConfig": {
+          "defaults": {
+            "unit": "mvolt"
+          }
+        },
+        "gridPos": {
+          "x": 8,
+          "y": 45,
+          "w": 8,
+          "h": 8
+        },
+        "targets": [
+          {
+            "expr": "smartctl_device_farm_environment_5v_millivolts{instance=~\"$instance\", device=~\"$device\", voltage_type=\"minimum\"}",
+            "legendFormat": "{{instance}} / {{device}}"
+          }
+        ],
+        "title": "FARM 5V Rail - Min (mV)",
+        "type": "timeseries"
+      },
+      {
+        "datasource": "Prometheus",
+        "fieldConfig": {
+          "defaults": {
+            "unit": "mvolt"
+          }
+        },
+        "gridPos": {
+          "x": 16,
+          "y": 45,
+          "w": 8,
+          "h": 8
+        },
+        "targets": [
+          {
+            "expr": "smartctl_device_farm_environment_5v_millivolts{instance=~\"$instance\", device=~\"$device\", voltage_type=\"maximum\"}",
+            "legendFormat": "{{instance}} / {{device}}"
+          }
+        ],
+        "title": "FARM 5V Rail - Max (mV)",
         "type": "timeseries"
       },
       {
@@ -285,7 +373,7 @@
           "h": 8,
           "w": 12,
           "x": 0,
-          "y": 45
+          "y": 53
         },
         "targets": [
           {
@@ -302,7 +390,7 @@
           "h": 8,
           "w": 12,
           "x": 12,
-          "y": 45
+          "y": 53
         },
         "targets": [
           {
@@ -319,7 +407,7 @@
           "h": 8,
           "w": 12,
           "x": 0,
-          "y": 53
+          "y": 61
         },
         "targets": [
           {
@@ -340,7 +428,7 @@
           "h": 8,
           "w": 12,
           "x": 12,
-          "y": 53
+          "y": 61
         },
         "targets": [
           {
@@ -357,7 +445,7 @@
           "h": 8,
           "w": 12,
           "x": 0,
-          "y": 61
+          "y": 69
         },
         "targets": [
           {
