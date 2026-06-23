@@ -18,6 +18,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"os/exec"
 	"strings"
 	"sync"
 	"time"
@@ -36,9 +37,10 @@ import (
 
 // Device
 type Device struct {
-	Name  string
-	Type  string
-	Label string
+	Name     string
+	Type     string
+	Label    string
+	VdevLabel string
 }
 
 func (d Device) String() string {
@@ -69,7 +71,7 @@ func (i *SMARTctlManagerCollector) Collect(ch chan<- prometheus.Metric) {
 		json := readData(i.logger, device)
 		if json.Exists() {
 			info.SetJSON(json)
-			smart := NewSMARTctl(i.logger, json, ch)
+			smart := NewSMARTctl(i.logger, json, ch, device)
 			smart.Collect()
 		}
 	}
@@ -126,7 +128,27 @@ var (
 	smartctlPowerModeCheck = kingpin.Flag("smartctl.powermode-check",
 		"Whether or not to check powermode before fetching data",
 	).Default("standby").String()
+	smartctlFarmLog = kingpin.Flag("smartctl.farm-log",
+		"Collect Seagate FARM log metrics (requires smartmontools 7.4+)",
+	).Default("false").Bool()
+	smartctlVdevLabel = kingpin.Flag("smartctl.vdev-label",
+		"Use udev ID_VDEV (slot number) as device label instead of sdX",
+	).Default("false").Bool()
 )
+
+// lookupVdevLabel queries udev for the ID_VDEV property of a device.
+func lookupVdevLabel(logger *slog.Logger, deviceName string) string {
+	out, err := exec.Command("udevadm", "info", "--query=property", deviceName).Output()
+	if err != nil {
+		return ""
+	}
+	for _, line := range strings.Split(string(out), "\n") {
+		if strings.HasPrefix(line, "ID_VDEV=") {
+			return strings.TrimPrefix(line, "ID_VDEV=")
+		}
+	}
+	return ""
+}
 
 // scanDevices uses smartctl to gather the list of available devices.
 func scanDevices(logger *slog.Logger) []Device {
@@ -148,11 +170,22 @@ func scanDevices(logger *slog.Logger) []Device {
 		if filter.ignored(deviceLabel) {
 			logger.Info("Ignoring device", "name", deviceLabel)
 		} else {
-			logger.Info("Found device", "name", deviceLabel)
+			vdevLabel := ""
+			if *smartctlVdevLabel {
+				vdevLabel = lookupVdevLabel(logger, deviceName)
+				if vdevLabel != "" {
+					logger.Info("Found device", "name", deviceLabel, "vdev", vdevLabel)
+				} else {
+					logger.Info("Found device", "name", deviceLabel, "vdev", "(none)")
+				}
+			} else {
+				logger.Info("Found device", "name", deviceLabel)
+			}
 			device := Device{
-				Name:  deviceName,
-				Type:  deviceType,
-				Label: deviceLabel,
+				Name:      deviceName,
+				Type:      deviceType,
+				Label:     deviceLabel,
+				VdevLabel: vdevLabel,
 			}
 			scanDeviceResult = append(scanDeviceResult, device)
 		}
