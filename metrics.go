@@ -194,6 +194,14 @@ var (
 		},
 		nil,
 	)
+	metricDeviceVolatileMemoryBackupFailed = prometheus.NewDesc(
+		"smartctl_device_volatile_memory_backup_failed",
+		"Indicates that Volatile Memory Backup (NVMe PLP) is failed",
+		[]string{
+			"device",
+		},
+		nil,
+	)
 	metricDeviceBytesRead = prometheus.NewDesc(
 		"smartctl_device_bytes_read",
 		"",
