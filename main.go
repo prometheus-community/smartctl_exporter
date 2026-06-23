@@ -14,7 +14,6 @@
 package main
 
 import (
-	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
@@ -102,30 +101,31 @@ var (
 		"The interval between smartctl polls",
 	).Default("60s").Duration()
 	smartctlRescanInterval = kingpin.Flag("smartctl.rescan",
-		"The interval between rescanning for new/disappeared devices. If the interval is smaller than 1s no rescanning takes place. If any devices are configured with smartctl.device also no rescanning takes place.",
+		"The interval between rescanning for new/disappeared devices. If the interval is smaller than 1s no rescanning takes place. If any devices are configured with smartctl.device also no rescanning takes place",
 	).Default("10m").Duration()
-	smartctlScan    = kingpin.Flag("smartctl.scan", "Enable scanning. This is a default if no devices are specified").Default("false").Bool()
+	smartctlScan = kingpin.Flag("smartctl.scan", "Enable scanning. This is a default if no devices are specified",
+	).Default("false").Bool()
 	smartctlDevices = kingpin.Flag("smartctl.device",
 		"The device to monitor. Device type can be specified after a semicolon, eg. '/dev/bus/0;megaraid,1' (repeatable)",
 	).Strings()
 	smartctlDeviceExclude = kingpin.Flag(
 		"smartctl.device-exclude",
-		"Regexp of devices to exclude from automatic scanning. (mutually exclusive to device-include)",
+		"Regexp of devices to exclude from automatic scanning (mutually exclusive to device-include)",
 	).Default("").String()
 	smartctlDeviceInclude = kingpin.Flag(
 		"smartctl.device-include",
-		"Regexp of devices to exclude from automatic scanning. (mutually exclusive to device-exclude)",
+		"Regexp of devices to exclude from automatic scanning (mutually exclusive to device-exclude)",
 	).Default("").String()
 	smartctlScanDeviceTypes = kingpin.Flag(
 		"smartctl.scan-device-type",
-		"Device type to use during automatic scan. Special by-id value forces predictable device names. (repeatable)",
+		"Device type to use during automatic scan. Special by-id value forces predictable device names (repeatable)",
 	).Strings()
 	smartctlFakeData = kingpin.Flag("smartctl.fake-data",
 		"The device to monitor (repeatable)",
 	).Default("false").Hidden().Bool()
 	smartctlPowerModeCheck = kingpin.Flag("smartctl.powermode-check",
-		"Whether or not to check powermode before fetching data",
-	).Default("standby").String()
+		"Whether or not to check powermode before fetching data. Must be one of: 'never', 'sleep', 'standby', 'idle'. Default is 'standby'",
+	).Default("standby").Enum("never", "sleep", "standby", "idle")
 )
 
 // scanDevices uses smartctl to gather the list of available devices.
@@ -177,15 +177,6 @@ func buildDevicesFromFlag(devices []Device) []Device {
 	return devices
 }
 
-func validatePowerMode(mode string) error {
-	switch strings.ToLower(mode) {
-	case "never", "sleep", "standby", "idle":
-		return nil
-	default:
-		return fmt.Errorf("invalid power mode: %s. Must be one of: never, sleep, standby, idle", mode)
-	}
-}
-
 func main() {
 	metricsPath := kingpin.Flag(
 		"web.telemetry-path", "Path under which to expose metrics",
@@ -198,11 +189,6 @@ func main() {
 	kingpin.HelpFlag.Short('h')
 	kingpin.Parse()
 	logger := promslog.New(promslogConfig)
-
-	if err := validatePowerMode(*smartctlPowerModeCheck); err != nil {
-		logger.Error(err.Error())
-		os.Exit(1)
-	}
 	logger.Info("Starting smartctl_exporter", "version", version.Info())
 	logger.Info("Build context", "build_context", version.BuildContext())
 	var devices []Device
@@ -258,7 +244,7 @@ func main() {
 		}
 		landingPage, err := web.NewLandingPage(landingConfig)
 		if err != nil {
-			logger.Error("error creating landing page", "err", err)
+			logger.Error("Error creating landing page", "err", err)
 			os.Exit(1)
 		}
 		http.Handle("/", landingPage)
@@ -266,7 +252,7 @@ func main() {
 
 	srv := &http.Server{}
 	if err := web.ListenAndServe(srv, toolkitFlags, logger); err != nil {
-		logger.Error("error running HTTP server", "err", err)
+		logger.Error("Error running HTTP server", "err", err)
 		os.Exit(1)
 	}
 }
