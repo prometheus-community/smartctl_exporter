@@ -57,7 +57,9 @@ type SMARTctlManagerCollector struct {
 
 // Describe sends the super-set of all possible descriptors of metrics
 func (i *SMARTctlManagerCollector) Describe(ch chan<- *prometheus.Desc) {
-	prometheus.DescribeByCollect(i, ch)
+	for _, desc := range allMetricDescs {
+		ch <- desc
+	}
 }
 
 // Collect is called by the Prometheus registry when collecting metrics.
