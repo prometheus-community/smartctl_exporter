@@ -61,15 +61,47 @@
               }
             }
           }
-        ]
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        }
       },
       {
         "datasource": "Prometheus",
         "id": 2,
         "fieldConfig": {
           "defaults": {
-            "unit": "celsius"
-          }
+            "unit": "celsius",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
         },
         "gridPos": {
           "h": 8,
@@ -91,8 +123,22 @@
         "id": 3,
         "fieldConfig": {
           "defaults": {
-            "unit": "celsius"
-          }
+            "unit": "celsius",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
         },
         "gridPos": {
           "h": 8,
@@ -114,8 +160,22 @@
         "id": 4,
         "fieldConfig": {
           "defaults": {
-            "unit": "ops"
-          }
+            "unit": "ops",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
         },
         "gridPos": {
           "h": 8,
@@ -137,8 +197,22 @@
         "id": 5,
         "fieldConfig": {
           "defaults": {
-            "unit": "ops"
-          }
+            "unit": "ops",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
         },
         "gridPos": {
           "h": 8,
@@ -279,7 +353,25 @@
           }
         ],
         "title": "FARM Unrecoverable Read Errors",
-        "type": "timeseries"
+        "type": "timeseries",
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        }
       },
       {
         "datasource": "Prometheus",
@@ -297,15 +389,47 @@
           }
         ],
         "title": "FARM Unrecoverable Write Errors",
-        "type": "timeseries"
+        "type": "timeseries",
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        }
       },
       {
         "datasource": "Prometheus",
         "id": 11,
         "fieldConfig": {
           "defaults": {
-            "unit": "mvolt"
-          }
+            "unit": "mvolt",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
         },
         "gridPos": {
           "x": 0,
@@ -327,8 +451,22 @@
         "id": 12,
         "fieldConfig": {
           "defaults": {
-            "unit": "mvolt"
-          }
+            "unit": "mvolt",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
         },
         "gridPos": {
           "x": 8,
@@ -350,8 +488,22 @@
         "id": 13,
         "fieldConfig": {
           "defaults": {
-            "unit": "mvolt"
-          }
+            "unit": "mvolt",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
         },
         "gridPos": {
           "x": 16,
@@ -373,8 +525,22 @@
         "id": 14,
         "fieldConfig": {
           "defaults": {
-            "unit": "mvolt"
-          }
+            "unit": "mvolt",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
         },
         "gridPos": {
           "x": 0,
@@ -396,8 +562,22 @@
         "id": 15,
         "fieldConfig": {
           "defaults": {
-            "unit": "mvolt"
-          }
+            "unit": "mvolt",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
         },
         "gridPos": {
           "x": 8,
@@ -419,8 +599,22 @@
         "id": 16,
         "fieldConfig": {
           "defaults": {
-            "unit": "mvolt"
-          }
+            "unit": "mvolt",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
         },
         "gridPos": {
           "x": 16,
@@ -453,7 +647,25 @@
           }
         ],
         "title": "FARM MR Head Resistance by Head",
-        "type": "timeseries"
+        "type": "timeseries",
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        }
       },
       {
         "datasource": "Prometheus",
@@ -471,7 +683,25 @@
           }
         ],
         "title": "FARM Reallocated Sectors by Head",
-        "type": "timeseries"
+        "type": "timeseries",
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        }
       },
       {
         "datasource": "Prometheus",
@@ -493,7 +723,25 @@
           }
         ],
         "title": "FARM Reliability - Error Rate / Seek Error Rate",
-        "type": "timeseries"
+        "type": "timeseries",
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        }
       },
       {
         "datasource": "Prometheus",
@@ -547,7 +795,25 @@
           }
         ],
         "title": "FARM Motor Power",
-        "type": "timeseries"
+        "type": "timeseries",
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        }
       }
     ],
     "refresh": "1m",
