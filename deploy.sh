@@ -82,6 +82,17 @@ for TARGET in "$@"; do
     echo "==> Enabling and starting smartctl_exporter..."
     ssh "${SSH_USER}@${TARGET}" "systemctl daemon-reload && systemctl enable --now smartctl_exporter && systemctl restart smartctl_exporter"
 
+    echo "==> Opening port 9633/tcp..."
+    ssh "${SSH_USER}@${TARGET}" "
+        if command -v firewall-cmd >/dev/null 2>&1; then
+            firewall-cmd --permanent --add-port=9633/tcp && firewall-cmd --reload
+        elif command -v ufw >/dev/null 2>&1; then
+            ufw allow 9633/tcp
+        else
+            echo '    No firewall manager found, skipping.'
+        fi
+    "
+
     # Check if Grafana is running on this node and import dashboard
     GRAFANA_TARGET="${GRAFANA_HOST:-$TARGET}"
     if ssh "${SSH_USER}@${TARGET}" "systemctl is-active grafana-server >/dev/null 2>&1"; then

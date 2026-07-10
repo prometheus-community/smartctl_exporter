@@ -171,7 +171,25 @@
           }
         ],
         "title": "FARM Reallocated Sectors",
-        "type": "stat"
+        "type": "stat",
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        }
       },
       {
         "datasource": "Prometheus",
@@ -189,7 +207,25 @@
           }
         ],
         "title": "FARM CRC Errors",
-        "type": "stat"
+        "type": "stat",
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        }
       },
       {
         "datasource": "Prometheus",
@@ -207,7 +243,25 @@
           }
         ],
         "title": "FARM Command Timeouts",
-        "type": "stat"
+        "type": "stat",
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        }
       },
       {
         "datasource": "Prometheus",
@@ -457,7 +511,25 @@
           }
         ],
         "title": "FARM High Priority Unload Events",
-        "type": "stat"
+        "type": "stat",
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        }
       },
       {
         "datasource": "Prometheus",
