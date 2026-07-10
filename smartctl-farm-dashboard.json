@@ -3,7 +3,7 @@
     "id": null,
     "panels": [
       {
-        "datasource": "Prometheus",
+        "datasource": null,
         "id": 1,
         "gridPos": {
           "h": 7,
@@ -82,7 +82,7 @@
         }
       },
       {
-        "datasource": "Prometheus",
+        "datasource": null,
         "id": 2,
         "fieldConfig": {
           "defaults": {
@@ -119,7 +119,7 @@
         "type": "timeseries"
       },
       {
-        "datasource": "Prometheus",
+        "datasource": null,
         "id": 3,
         "fieldConfig": {
           "defaults": {
@@ -156,7 +156,7 @@
         "type": "timeseries"
       },
       {
-        "datasource": "Prometheus",
+        "datasource": null,
         "id": 4,
         "fieldConfig": {
           "defaults": {
@@ -193,7 +193,7 @@
         "type": "timeseries"
       },
       {
-        "datasource": "Prometheus",
+        "datasource": null,
         "id": 5,
         "fieldConfig": {
           "defaults": {
@@ -230,7 +230,7 @@
         "type": "timeseries"
       },
       {
-        "datasource": "Prometheus",
+        "datasource": null,
         "id": 6,
         "gridPos": {
           "h": 6,
@@ -266,7 +266,7 @@
         }
       },
       {
-        "datasource": "Prometheus",
+        "datasource": null,
         "id": 7,
         "gridPos": {
           "h": 6,
@@ -302,7 +302,7 @@
         }
       },
       {
-        "datasource": "Prometheus",
+        "datasource": null,
         "id": 8,
         "gridPos": {
           "h": 6,
@@ -338,7 +338,7 @@
         }
       },
       {
-        "datasource": "Prometheus",
+        "datasource": null,
         "id": 9,
         "gridPos": {
           "h": 8,
@@ -374,7 +374,7 @@
         }
       },
       {
-        "datasource": "Prometheus",
+        "datasource": null,
         "id": 10,
         "gridPos": {
           "h": 8,
@@ -410,7 +410,7 @@
         }
       },
       {
-        "datasource": "Prometheus",
+        "datasource": null,
         "id": 11,
         "fieldConfig": {
           "defaults": {
@@ -447,7 +447,7 @@
         "type": "timeseries"
       },
       {
-        "datasource": "Prometheus",
+        "datasource": null,
         "id": 12,
         "fieldConfig": {
           "defaults": {
@@ -484,7 +484,7 @@
         "type": "timeseries"
       },
       {
-        "datasource": "Prometheus",
+        "datasource": null,
         "id": 13,
         "fieldConfig": {
           "defaults": {
@@ -521,7 +521,7 @@
         "type": "timeseries"
       },
       {
-        "datasource": "Prometheus",
+        "datasource": null,
         "id": 14,
         "fieldConfig": {
           "defaults": {
@@ -558,7 +558,7 @@
         "type": "timeseries"
       },
       {
-        "datasource": "Prometheus",
+        "datasource": null,
         "id": 15,
         "fieldConfig": {
           "defaults": {
@@ -595,7 +595,7 @@
         "type": "timeseries"
       },
       {
-        "datasource": "Prometheus",
+        "datasource": null,
         "id": 16,
         "fieldConfig": {
           "defaults": {
@@ -632,7 +632,7 @@
         "type": "timeseries"
       },
       {
-        "datasource": "Prometheus",
+        "datasource": null,
         "id": 17,
         "gridPos": {
           "h": 8,
@@ -668,7 +668,7 @@
         }
       },
       {
-        "datasource": "Prometheus",
+        "datasource": null,
         "id": 18,
         "gridPos": {
           "h": 8,
@@ -704,7 +704,7 @@
         }
       },
       {
-        "datasource": "Prometheus",
+        "datasource": null,
         "id": 19,
         "gridPos": {
           "h": 8,
@@ -744,7 +744,7 @@
         }
       },
       {
-        "datasource": "Prometheus",
+        "datasource": null,
         "id": 20,
         "gridPos": {
           "h": 8,
@@ -780,7 +780,7 @@
         }
       },
       {
-        "datasource": "Prometheus",
+        "datasource": null,
         "id": 21,
         "gridPos": {
           "h": 8,
@@ -825,7 +825,6 @@
             "text": "All",
             "value": "$__all"
           },
-          "datasource": "Prometheus",
           "includeAll": true,
           "multi": true,
           "name": "instance",
@@ -839,7 +838,6 @@
             "text": "All",
             "value": "$__all"
           },
-          "datasource": "Prometheus",
           "includeAll": true,
           "multi": true,
           "name": "device",
@@ -852,7 +850,6 @@
             "text": "All",
             "value": "$__all"
           },
-          "datasource": "Prometheus",
           "includeAll": true,
           "multi": true,
           "name": "temperature_type",
@@ -863,7 +860,6 @@
         {
           "name": "voltage_type",
           "type": "query",
-          "datasource": "Prometheus",
           "query": "label_values(smartctl_device_farm_environment_12v_millivolts, voltage_type)",
           "refresh": 1,
           "includeAll": true,
