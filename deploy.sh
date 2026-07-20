@@ -52,7 +52,7 @@ for TARGET in "$@"; do
             dnf install -y smartmontools 2>/dev/null || apt-get install -y smartmontools 2>/dev/null
         fi
         # Check version and update if below 7.4
-        SMARTCTL_VER=$(smartctl --version | head -1 | grep -oP '\d+\.\d+')
+        SMARTCTL_VER=$(smartctl --version | head -1 | grep -oP '\d+\.\d+' | head -1)
         MAJOR=$(echo "$SMARTCTL_VER" | cut -d. -f1)
         MINOR=$(echo "$SMARTCTL_VER" | cut -d. -f2)
         if [[ "$MAJOR" -lt 7 ]] || { [[ "$MAJOR" -eq 7 ]] && [[ "$MINOR" -lt 4 ]]; }; then
@@ -62,7 +62,7 @@ for TARGET in "$@"; do
             elif command -v apt-get >/dev/null 2>&1; then
                 apt-get update && apt-get install -y --only-upgrade smartmontools
             fi
-            SMARTCTL_VER=$(smartctl --version | head -1 | grep -oP '\d+\.\d+')
+            SMARTCTL_VER=$(smartctl --version | head -1 | grep -oP '\d+\.\d+' | head -1)
             MAJOR=$(echo "$SMARTCTL_VER" | cut -d. -f1)
             MINOR=$(echo "$SMARTCTL_VER" | cut -d. -f2)
             if [[ "$MAJOR" -lt 7 ]] || { [[ "$MAJOR" -eq 7 ]] && [[ "$MINOR" -lt 4 ]]; }; then
@@ -203,7 +203,7 @@ else:
 
 with open(cfg, 'w') as f:
     f.write(content)
-PYEOFq
+PYEOF
 fi
 
 echo "==> Restarting Prometheus on ${PROM_HOST}..."
