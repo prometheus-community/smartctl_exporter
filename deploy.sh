@@ -12,9 +12,6 @@ set -euo pipefail
 #
 # Environment variables:
 #   SSH_USER        - SSH user (default: root)
-#   GRAFANA_USER    - Grafana admin user (default: admin)
-#   GRAFANA_PASS    - Grafana admin password (default: admin)
-#   GRAFANA_HOST    - Override Grafana host (default: auto-detect from target)
 #   PROMETHEUS_HOST - Host running central Prometheus (default: first target)
 #
 # Notes:
@@ -29,9 +26,6 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SSH_USER="${SSH_USER:-root}"
-GRAFANA_USER="${GRAFANA_USER:-admin}"
-GRAFANA_PASS="${GRAFANA_PASS:-admin}"
-GRAFANA_HOST="${GRAFANA_HOST:-}"
 PROMETHEUS_HOST="${PROMETHEUS_HOST:-}"
 
 if [[ $# -eq 0 ]]; then
@@ -117,31 +111,14 @@ SMARTCTL_CHECK
         fi
     "
 
-    # Check if Grafana is running on this node and import dashboard
-    GRAFANA_TARGET="${GRAFANA_HOST:-$TARGET}"
+    # Install dashboard via file provisioning if Grafana is on this node
     if ssh "${SSH_USER}@${TARGET}" "systemctl is-active grafana-server >/dev/null 2>&1"; then
-        echo "==> Grafana detected on ${TARGET}, importing dashboard..."
-        sleep 5
-        # Import dashboard with instance regex cleared (we use IPs, not localhost)
-        python3 -c "
-import sys, json
-with open('${SCRIPT_DIR}/smartctl-farm-dashboard.json') as f:
-    d = json.load(f)
-for var in d.get('dashboard', d).get('templating', {}).get('list', []):
-    if var.get('name') == 'instance':
-        var['regex'] = ''
-d.setdefault('overwrite', True)
-if 'dashboard' in d:
-    d['dashboard']['id'] = None
-print(json.dumps(d))
-" | curl -sf -u "${GRAFANA_USER}:${GRAFANA_PASS}" \
-            -X POST -H "Content-Type: application/json" \
-            "http://${GRAFANA_TARGET}:3000/api/dashboards/db" \
-            -d @- \
-            && echo "    Dashboard imported." \
-            || echo "    WARNING: Dashboard import failed."
+        echo "==> Grafana detected on ${TARGET}, installing dashboard to /etc/grafana/dashboards/..."
+        scp "${SCRIPT_DIR}/smartctl-farm-dashboard.json" "${SSH_USER}@${TARGET}:/etc/grafana/dashboards/smartctl-farm-dashboard.json"
+        ssh "${SSH_USER}@${TARGET}" "chown grafana:grafana /etc/grafana/dashboards/smartctl-farm-dashboard.json"
+        echo "    Dashboard installed."
     else
-        echo "==> Grafana not running on ${TARGET}, skipping dashboard import."
+        echo "==> Grafana not running on ${TARGET}, skipping dashboard install."
     fi
 
     echo "==> ${TARGET} done. Exporter at http://${TARGET}:9633/metrics"
