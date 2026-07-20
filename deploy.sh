@@ -51,11 +51,35 @@ for TARGET in "$@"; do
     echo "==> Deploying to ${TARGET}"
     echo "========================================"
 
-    echo "==> Ensuring smartmontools is installed..."
-    ssh "${SSH_USER}@${TARGET}" "command -v smartctl >/dev/null 2>&1 || { echo 'Installing smartmontools...'; dnf install -y smartmontools >/dev/null 2>&1 || apt-get install -y smartmontools >/dev/null 2>&1; }"
-
-    echo "==> Checking smartctl version..."
-    ssh "${SSH_USER}@${TARGET}" "smartctl --version | head -1"
+    echo "==> Ensuring smartmontools >= 7.4 is installed..."
+    ssh "${SSH_USER}@${TARGET}" bash -s <<'SMARTCTL_CHECK'
+        if ! command -v smartctl >/dev/null 2>&1; then
+            echo "    Installing smartmontools..."
+            dnf install -y smartmontools 2>/dev/null || apt-get install -y smartmontools 2>/dev/null
+        fi
+        # Check version and update if below 7.4
+        SMARTCTL_VER=$(smartctl --version | head -1 | grep -oP '\d+\.\d+')
+        MAJOR=$(echo "$SMARTCTL_VER" | cut -d. -f1)
+        MINOR=$(echo "$SMARTCTL_VER" | cut -d. -f2)
+        if [[ "$MAJOR" -lt 7 ]] || { [[ "$MAJOR" -eq 7 ]] && [[ "$MINOR" -lt 4 ]]; }; then
+            echo "    smartmontools ${SMARTCTL_VER} is below 7.4, attempting update..."
+            if command -v dnf >/dev/null 2>&1; then
+                dnf update -y smartmontools
+            elif command -v apt-get >/dev/null 2>&1; then
+                apt-get update && apt-get install -y --only-upgrade smartmontools
+            fi
+            SMARTCTL_VER=$(smartctl --version | head -1 | grep -oP '\d+\.\d+')
+            MAJOR=$(echo "$SMARTCTL_VER" | cut -d. -f1)
+            MINOR=$(echo "$SMARTCTL_VER" | cut -d. -f2)
+            if [[ "$MAJOR" -lt 7 ]] || { [[ "$MAJOR" -eq 7 ]] && [[ "$MINOR" -lt 4 ]]; }; then
+                echo "    WARNING: smartmontools ${SMARTCTL_VER} still below 7.4. FARM log support requires >= 7.4."
+            else
+                echo "    Updated to smartmontools ${SMARTCTL_VER}."
+            fi
+        else
+            echo "    smartmontools ${SMARTCTL_VER} OK."
+        fi
+SMARTCTL_CHECK
 
     echo "==> Stopping existing service (if running)..."
     ssh "${SSH_USER}@${TARGET}" "systemctl stop smartctl_exporter 2>/dev/null || true"
@@ -202,7 +226,7 @@ else:
 
 with open(cfg, 'w') as f:
     f.write(content)
-PYEOF
+PYEOFq
 fi
 
 echo "==> Restarting Prometheus on ${PROM_HOST}..."
