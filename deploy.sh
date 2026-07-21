@@ -133,7 +133,7 @@ SMARTCTL_CHECK
         echo "==> Grafana detected on ${TARGET}, installing dashboard to /etc/grafana/dashboards/system/..."
         ssh "${SSH_USER}@${TARGET}" "mkdir -p /etc/grafana/dashboards/system"
         scp "${SCRIPT_DIR}/smartctl-farm-dashboard.json" "${SSH_USER}@${TARGET}:/etc/grafana/dashboards/system/smartctl-farm-dashboard.json"
-        ssh "${SSH_USER}@${TARGET}" "chown grafana:grafana /etc/grafana/dashboards/system/smartctl-farm-dashboard.json && chmod 640 /etc/grafana/dashboards/system/smartctl-farm-dashboard.json"
+        ssh "${SSH_USER}@${TARGET}" "chown grafana:grafana /etc/grafana/dashboards/system/smartctl-farm-dashboard.json && chmod 472 /etc/grafana/dashboards/system/smartctl-farm-dashboard.json"
         echo "    Dashboard installed."
     else
         echo "==> Grafana not running on ${TARGET}, skipping dashboard install."
