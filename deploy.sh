@@ -66,7 +66,24 @@ for TARGET in "$@"; do
             MAJOR=$(echo "$SMARTCTL_VER" | cut -d. -f1)
             MINOR=$(echo "$SMARTCTL_VER" | cut -d. -f2)
             if [[ "$MAJOR" -lt 7 ]] || { [[ "$MAJOR" -eq 7 ]] && [[ "$MINOR" -lt 4 ]]; }; then
-                echo "    WARNING: smartmontools ${SMARTCTL_VER} still below 7.4. FARM log support requires >= 7.4."
+                echo "    Distro package too old (${SMARTCTL_VER}), building smartmontools 7.4 from source..."
+                # Install build dependencies
+                if command -v dnf >/dev/null 2>&1; then
+                    dnf install -y gcc gcc-c++ make automake tar gzip
+                elif command -v apt-get >/dev/null 2>&1; then
+                    apt-get update && apt-get install -y build-essential automake tar gzip
+                fi
+                cd /tmp
+                curl -sLO https://sourceforge.net/projects/smartmontools/files/smartmontools/7.4/smartmontools-7.4.tar.gz/download
+                mv download smartmontools-7.4.tar.gz
+                tar xzf smartmontools-7.4.tar.gz
+                cd smartmontools-7.4
+                ./configure --prefix=/usr --sysconfdir=/etc
+                make -j"$(nproc)"
+                make install
+                cd /tmp && rm -rf smartmontools-7.4 smartmontools-7.4.tar.gz
+                SMARTCTL_VER=$(smartctl --version | head -1 | grep -oP '\d+\.\d+' | head -1)
+                echo "    Built and installed smartmontools ${SMARTCTL_VER} from source."
             else
                 echo "    Updated to smartmontools ${SMARTCTL_VER}."
             fi
@@ -113,9 +130,10 @@ SMARTCTL_CHECK
 
     # Install dashboard via file provisioning if Grafana is on this node
     if ssh "${SSH_USER}@${TARGET}" "systemctl is-active grafana-server >/dev/null 2>&1"; then
-        echo "==> Grafana detected on ${TARGET}, installing dashboard to /etc/grafana/dashboards/..."
-        scp "${SCRIPT_DIR}/smartctl-farm-dashboard.json" "${SSH_USER}@${TARGET}:/etc/grafana/dashboards/smartctl-farm-dashboard.json"
-        ssh "${SSH_USER}@${TARGET}" "chown grafana:grafana /etc/grafana/dashboards/smartctl-farm-dashboard.json"
+        echo "==> Grafana detected on ${TARGET}, installing dashboard to /etc/grafana/dashboards/system/..."
+        ssh "${SSH_USER}@${TARGET}" "mkdir -p /etc/grafana/dashboards/system"
+        scp "${SCRIPT_DIR}/smartctl-farm-dashboard.json" "${SSH_USER}@${TARGET}:/etc/grafana/dashboards/system/smartctl-farm-dashboard.json"
+        ssh "${SSH_USER}@${TARGET}" "chown grafana:grafana /etc/grafana/dashboards/system/smartctl-farm-dashboard.json && chmod 640 /etc/grafana/dashboards/system/smartctl-farm-dashboard.json"
         echo "    Dashboard installed."
     else
         echo "==> Grafana not running on ${TARGET}, skipping dashboard install."
