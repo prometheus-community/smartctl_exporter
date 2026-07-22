@@ -66,28 +66,9 @@ for TARGET in "$@"; do
             SMARTCTL_VER=$(smartctl --version | head -1 | grep -oP '\d+\.\d+' | head -1)
             MAJOR=$(echo "$SMARTCTL_VER" | cut -d. -f1)
             MINOR=$(echo "$SMARTCTL_VER" | cut -d. -f2)
-            if [[ "$MAJOR" -lt 7 ]] || { [[ "$MAJOR" -eq 7 ]] && [[ "$MINOR" -lt 4 ]]; }; then
-                echo "    Distro package too old (${SMARTCTL_VER}), building smartmontools 7.4 from source..."
-                # Install build dependencies
-                if command -v dnf >/dev/null 2>&1; then
-                    dnf install -y gcc gcc-c++ make automake tar gzip
-                elif command -v apt-get >/dev/null 2>&1; then
-                    apt-get update && apt-get install -y build-essential automake tar gzip
-                fi
-                cd /tmp
-                curl -sLO https://sourceforge.net/projects/smartmontools/files/smartmontools/7.4/smartmontools-7.4.tar.gz/download
-                mv download smartmontools-7.4.tar.gz
-                tar xzf smartmontools-7.4.tar.gz
-                cd smartmontools-7.4
-                ./configure --prefix=/usr --sysconfdir=/etc
-                make -j"$(nproc)"
-                make install
-                cd /tmp && rm -rf smartmontools-7.4 smartmontools-7.4.tar.gz
-                SMARTCTL_VER=$(smartctl --version | head -1 | grep -oP '\d+\.\d+' | head -1)
-                echo "    Built and installed smartmontools ${SMARTCTL_VER} from source."
-            else
-                echo "    Updated to smartmontools ${SMARTCTL_VER}."
-            fi
+
+            echo "    Updated to smartmontools ${SMARTCTL_VER}."
+ 
         else
             echo "    smartmontools ${SMARTCTL_VER} OK."
         fi
