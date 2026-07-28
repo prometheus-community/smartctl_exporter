@@ -504,13 +504,6 @@ smartctl_device_smartctl_exit_status{device="/dev/sda"} 0
 smartctl_device_smartctl_exit_status{device="/dev/sdb"} 0
 smartctl_device_smartctl_exit_status{device="/dev/sdc"} 0
 smartctl_device_smartctl_exit_status{device="/dev/sdd"} 0
-# HELP smartctl_device_status Device status
-# TYPE smartctl_device_status gauge
-smartctl_device_status{device="/dev/nvme0"} 0
-smartctl_device_status{device="/dev/sda"} 1
-smartctl_device_status{device="/dev/sdb"} 1
-smartctl_device_status{device="/dev/sdc"} 1
-smartctl_device_status{device="/dev/sdd"} 1
 # HELP smartctl_device_temperature Device temperature celsius
 # TYPE smartctl_device_temperature gauge
 smartctl_device_temperature{device="/dev/nvme0",temperature_type="current"} 37
