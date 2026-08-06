@@ -69,7 +69,7 @@ func (i *SMARTctlManagerCollector) Collect(ch chan<- prometheus.Metric) {
 		json := readData(i.logger, device)
 		if json.Exists() {
 			info.SetJSON(json)
-			smart := NewSMARTctl(i.logger, json, ch)
+			smart := NewSMARTctl(i.logger, json, ch, device)
 			smart.Collect()
 		}
 	}
@@ -87,7 +87,7 @@ func (i *SMARTctlManagerCollector) RescanForDevices() {
 		time.Sleep(*smartctlRescanInterval)
 		i.logger.Info("Rescanning for devices")
 		devices := scanDevices(i.logger)
-		devices = buildDevicesFromFlag(devices)
+		devices = buildDevicesFromFlag(i.logger, devices)
 		i.mutex.Lock()
 		i.Devices = devices
 		i.mutex.Unlock()
@@ -126,6 +126,9 @@ var (
 	smartctlPowerModeCheck = kingpin.Flag("smartctl.powermode-check",
 		"Whether or not to check powermode before fetching data",
 	).Default("standby").String()
+	smartctlVdevLabel = kingpin.Flag("smartctl.vdev-label",
+		"Use the udev ID_VDEV property as the device label when available",
+	).Default("false").Bool()
 )
 
 // scanDevices uses smartctl to gather the list of available devices.
@@ -148,19 +151,15 @@ func scanDevices(logger *slog.Logger) []Device {
 		if filter.ignored(deviceLabel) {
 			logger.Info("Ignoring device", "name", deviceLabel)
 		} else {
-			logger.Info("Found device", "name", deviceLabel)
-			device := Device{
-				Name:  deviceName,
-				Type:  deviceType,
-				Label: deviceLabel,
-			}
+			device := newDevice(logger, deviceName, deviceType)
+			logger.Info("Found device", "name", deviceLabel, "label", device.Label)
 			scanDeviceResult = append(scanDeviceResult, device)
 		}
 	}
 	return scanDeviceResult
 }
 
-func buildDevicesFromFlag(devices []Device) []Device {
+func buildDevicesFromFlag(logger *slog.Logger, devices []Device) []Device {
 	// TODO: deduplication?
 	for _, device := range *smartctlDevices {
 		deviceName, deviceType, _ := strings.Cut(device, ";")
@@ -168,11 +167,7 @@ func buildDevicesFromFlag(devices []Device) []Device {
 			deviceType = "auto"
 		}
 
-		devices = append(devices, Device{
-			Name:  deviceName,
-			Type:  deviceType,
-			Label: buildDeviceLabel(deviceName, deviceType),
-		})
+		devices = append(devices, newDevice(logger, deviceName, deviceType))
 	}
 	return devices
 }
@@ -218,7 +213,7 @@ func main() {
 
 	if len(*smartctlDevices) > 0 {
 		logger.Info("Devices specified", "devices", strings.Join(*smartctlDevices, ", "))
-		devices = buildDevicesFromFlag(devices)
+		devices = buildDevicesFromFlag(logger, devices)
 		logger.Info("Devices filtered", "count", len(devices))
 	}
 
