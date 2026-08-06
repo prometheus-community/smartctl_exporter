@@ -126,6 +126,9 @@ var (
 	smartctlPowerModeCheck = kingpin.Flag("smartctl.powermode-check",
 		"Whether or not to check powermode before fetching data",
 	).Default("standby").String()
+	smartctlFarmLog = kingpin.Flag("smartctl.farm-log",
+		"Collect Seagate FARM log metrics (requires smartmontools 7.4+)",
+	).Default("false").Bool()
 )
 
 // scanDevices uses smartctl to gather the list of available devices.
