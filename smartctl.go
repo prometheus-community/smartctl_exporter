@@ -102,7 +102,7 @@ func (smart *SMARTctl) Collect() {
 	smart.mineDeviceERC()
 	smart.mineSmartStatus()
 
-	if smart.device.interface_ == "nvme" {
+	if smart.device.interface_ == "nvme" || smart.device.protocol == "NVMe" {
 		smart.mineNvmePercentageUsed()
 		smart.mineNvmeAvailableSpare()
 		smart.mineNvmeAvailableSpareThreshold()
