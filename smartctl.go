@@ -114,6 +114,7 @@ func (smart *SMARTctl) Collect() {
 	}
 	// SCSI, SAS
 	if smart.device.interface_ == "scsi" {
+		smart.mineSCSIUsedEnduranceIndicator()
 		smart.mineSCSIGrownDefectList()
 		smart.mineSCSIErrorCounterLog()
 		smart.mineSCSIBytesRead()
@@ -586,6 +587,18 @@ func (smart *SMARTctl) mineSCSIGrownDefectList() {
 	}
 }
 
+func (smart *SMARTctl) mineSCSIUsedEnduranceIndicator() {
+	scsi_percentage_used_endurance_indicator := smart.json.Get("scsi_percentage_used_endurance_indicator")
+	if scsi_percentage_used_endurance_indicator.Exists() {
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricSCSIUsedEnduranceIndicator,
+			prometheus.GaugeValue,
+			scsi_percentage_used_endurance_indicator.Float(),
+			smart.device.device,
+		)
+	}
+}
+
 func (smart *SMARTctl) mineSCSIErrorCounterLog() {
 	SCSIHealth := smart.json.Get("scsi_error_counter_log")
 	if SCSIHealth.Exists() {
@@ -637,6 +650,29 @@ func (smart *SMARTctl) mineSCSIErrorCounterLog() {
 			SCSIHealth.Get("write.total_uncorrected_errors").Float(),
 			smart.device.device,
 		)
-		// TODO: Should we also export the verify category?
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricVerifyErrorsCorrectedByRereadsRewrites,
+			prometheus.GaugeValue,
+			SCSIHealth.Get("verify.errors_corrected_by_rereads_rewrites").Float(),
+			smart.device.device,
+		)
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricVerifyErrorsCorrectedByEccFast,
+			prometheus.GaugeValue,
+			SCSIHealth.Get("verify.errors_corrected_by_eccfast").Float(),
+			smart.device.device,
+		)
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricVerifyErrorsCorrectedByEccDelayed,
+			prometheus.GaugeValue,
+			SCSIHealth.Get("verify.errors_corrected_by_eccdelayed").Float(),
+			smart.device.device,
+		)
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricVerifyTotalUncorrectedErrors,
+			prometheus.GaugeValue,
+			SCSIHealth.Get("verify.total_uncorrected_errors").Float(),
+			smart.device.device,
+		)
 	}
 }
