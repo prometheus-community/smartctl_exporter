@@ -87,6 +87,7 @@ func (smart *SMARTctl) Collect() {
 	smart.logger.Debug("Collecting metrics from", "device", smart.device.device, "family", smart.device.family, "model", smart.device.model)
 	smart.mineExitStatus()
 	smart.mineDevice()
+	smart.minePowerMode()
 	smart.mineCapacity()
 	smart.mineBlockSize()
 	smart.mineInterfaceSpeed()
@@ -131,6 +132,23 @@ func (smart *SMARTctl) mineExitStatus() {
 }
 
 func (smart *SMARTctl) mineDevice() {
+	hasInfo := false
+	for _, key := range []string{
+		"model_name",
+		"scsi_vendor",
+		"scsi_product",
+		"serial_number",
+		"firmware_version",
+		"model_family",
+	} {
+		if smart.json.Get(key).Exists() {
+			hasInfo = true
+			break
+		}
+	}
+	if !hasInfo {
+		return
+	}
 	smart.ch <- prometheus.MustNewConstMetric(
 		metricDeviceModel,
 		prometheus.GaugeValue,
@@ -154,22 +172,43 @@ func (smart *SMARTctl) mineDevice() {
 	)
 }
 
+func (smart *SMARTctl) minePowerMode() {
+	powerMode := smart.json.Get("power_mode")
+	if powerMode.Exists() {
+		smart.ch <- prometheus.MustNewConstMetric(
+			metricDevicePowerMode,
+			prometheus.GaugeValue,
+			powerMode.Get("ata_value").Float(),
+			smart.device.device,
+		)
+	}
+}
+
 func (smart *SMARTctl) mineCapacity() {
 	// The user_capacity exists only when NVMe have single namespace. Otherwise,
 	// for NVMe devices with multiple namespaces, when device name used without
 	// namespace number (exporter case) user_capacity will be absent
-	smart.ch <- prometheus.MustNewConstMetric(
-		metricDeviceCapacityBlocks,
-		prometheus.GaugeValue,
-		smart.json.Get("user_capacity.blocks").Float(),
-		smart.device.device,
-	)
-	smart.ch <- prometheus.MustNewConstMetric(
-		metricDeviceCapacityBytes,
-		prometheus.GaugeValue,
-		smart.json.Get("user_capacity.bytes").Float(),
-		smart.device.device,
-	)
+	userCapacity := smart.json.Get("user_capacity")
+	if userCapacity.Exists() {
+		blocks := userCapacity.Get("blocks")
+		if blocks.Exists() {
+			smart.ch <- prometheus.MustNewConstMetric(
+				metricDeviceCapacityBlocks,
+				prometheus.GaugeValue,
+				blocks.Float(),
+				smart.device.device,
+			)
+		}
+		bytes := userCapacity.Get("bytes")
+		if bytes.Exists() {
+			smart.ch <- prometheus.MustNewConstMetric(
+				metricDeviceCapacityBytes,
+				prometheus.GaugeValue,
+				bytes.Float(),
+				smart.device.device,
+			)
+		}
+	}
 	nvme_total_capacity := smart.json.Get("nvme_total_capacity")
 	if nvme_total_capacity.Exists() {
 		smart.ch <- prometheus.MustNewConstMetric(
@@ -183,10 +222,14 @@ func (smart *SMARTctl) mineCapacity() {
 
 func (smart *SMARTctl) mineBlockSize() {
 	for _, blockType := range []string{"logical", "physical"} {
+		blockSize := smart.json.Get(fmt.Sprintf("%s_block_size", blockType))
+		if !blockSize.Exists() {
+			continue
+		}
 		smart.ch <- prometheus.MustNewConstMetric(
 			metricDeviceBlockSize,
 			prometheus.GaugeValue,
-			smart.json.Get(fmt.Sprintf("%s_block_size", blockType)).Float(),
+			blockSize.Float(),
 			smart.device.device,
 			blockType,
 		)
@@ -329,55 +372,79 @@ func (smart *SMARTctl) mineDeviceSCTStatus() {
 }
 
 func (smart *SMARTctl) mineNvmePercentageUsed() {
+	percentageUsed := smart.json.Get("nvme_smart_health_information_log.percentage_used")
+	if !percentageUsed.Exists() {
+		return
+	}
 	smart.ch <- prometheus.MustNewConstMetric(
 		metricDevicePercentageUsed,
 		prometheus.CounterValue,
-		smart.json.Get("nvme_smart_health_information_log.percentage_used").Float(),
+		percentageUsed.Float(),
 		smart.device.device,
 	)
 }
 
 func (smart *SMARTctl) mineNvmeAvailableSpare() {
+	availableSpare := smart.json.Get("nvme_smart_health_information_log.available_spare")
+	if !availableSpare.Exists() {
+		return
+	}
 	smart.ch <- prometheus.MustNewConstMetric(
 		metricDeviceAvailableSpare,
 		prometheus.CounterValue,
-		smart.json.Get("nvme_smart_health_information_log.available_spare").Float(),
+		availableSpare.Float(),
 		smart.device.device,
 	)
 }
 
 func (smart *SMARTctl) mineNvmeAvailableSpareThreshold() {
+	availableSpareThreshold := smart.json.Get("nvme_smart_health_information_log.available_spare_threshold")
+	if !availableSpareThreshold.Exists() {
+		return
+	}
 	smart.ch <- prometheus.MustNewConstMetric(
 		metricDeviceAvailableSpareThreshold,
 		prometheus.CounterValue,
-		smart.json.Get("nvme_smart_health_information_log.available_spare_threshold").Float(),
+		availableSpareThreshold.Float(),
 		smart.device.device,
 	)
 }
 
 func (smart *SMARTctl) mineNvmeCriticalWarning() {
+	criticalWarning := smart.json.Get("nvme_smart_health_information_log.critical_warning")
+	if !criticalWarning.Exists() {
+		return
+	}
 	smart.ch <- prometheus.MustNewConstMetric(
 		metricDeviceCriticalWarning,
 		prometheus.CounterValue,
-		smart.json.Get("nvme_smart_health_information_log.critical_warning").Float(),
+		criticalWarning.Float(),
 		smart.device.device,
 	)
 }
 
 func (smart *SMARTctl) mineNvmeMediaErrors() {
+	mediaErrors := smart.json.Get("nvme_smart_health_information_log.media_errors")
+	if !mediaErrors.Exists() {
+		return
+	}
 	smart.ch <- prometheus.MustNewConstMetric(
 		metricDeviceMediaErrors,
 		prometheus.CounterValue,
-		smart.json.Get("nvme_smart_health_information_log.media_errors").Float(),
+		mediaErrors.Float(),
 		smart.device.device,
 	)
 }
 
 func (smart *SMARTctl) mineNvmeNumErrLogEntries() {
+	numErrLogEntries := smart.json.Get("nvme_smart_health_information_log.num_err_log_entries")
+	if !numErrLogEntries.Exists() {
+		return
+	}
 	smart.ch <- prometheus.MustNewConstMetric(
 		metricDeviceNumErrLogEntries,
 		prometheus.CounterValue,
-		smart.json.Get("nvme_smart_health_information_log.num_err_log_entries").Float(),
+		numErrLogEntries.Float(),
 		smart.device.device,
 	)
 }
