@@ -64,7 +64,11 @@ func readFakeSMARTctl(logger *slog.Logger, device Device) gjson.Result {
 func readSMARTctl(logger *slog.Logger, device Device, wg *sync.WaitGroup) {
 	defer wg.Done()
 	start := time.Now()
-	var smartctlArgs = []string{"--json", "--info", "--health", "--attributes", "--tolerance=verypermissive", "--nocheck=" + *smartctlPowerModeCheck, "--format=brief", "--log=error", "--device=" + device.Type, device.Name}
+	var smartctlArgs = []string{"--json", "--info", "--health", "--attributes", "--tolerance=verypermissive", "--nocheck=" + *smartctlPowerModeCheck, "--format=brief", "--log=error"}
+	if *smartctlFarmLog {
+		smartctlArgs = append(smartctlArgs, "--log=farm")
+	}
+	smartctlArgs = append(smartctlArgs, "--device="+device.Type, device.Name)
 
 	logger.Debug("Calling smartctl with args", "args", strings.Join(smartctlArgs, " "))
 	out, err := exec.Command(*smartctlPath, smartctlArgs...).Output()
@@ -78,6 +82,10 @@ func readSMARTctl(logger *slog.Logger, device Device, wg *sync.WaitGroup) {
 	jsonOk := jsonIsOk(logger, json)
 	logger.Debug("Collected S.M.A.R.T. json data", "device", device, "duration", time.Since(start))
 	if rcOk && jsonOk {
+		if json.Get("device.name").String() == "" {
+			logger.Warn("Smartctl returned no device info, skipping cache", "device", device)
+			return
+		}
 		jsonCache.Store(device, JSONCache{JSON: json, LastCollect: time.Now()})
 	}
 }
@@ -110,11 +118,17 @@ func refreshAllDevices(logger *slog.Logger, devices []Device) {
 	}
 
 	var wg sync.WaitGroup
+	// Limit concurrent smartctl calls to avoid overwhelming the system
+	sem := make(chan struct{}, 8)
 	for _, device := range devices {
 		cacheValue, cacheOk := jsonCache.Load(device)
 		if !cacheOk || time.Now().After(cacheValue.(JSONCache).LastCollect.Add(*smartctlInterval)) {
 			wg.Add(1)
-			go readSMARTctl(logger, device, &wg)
+			sem <- struct{}{}
+			go func(d Device) {
+				defer func() { <-sem }()
+				readSMARTctl(logger, d, &wg)
+			}(device)
 		}
 	}
 	wg.Wait()
@@ -139,8 +153,15 @@ func resultCodeIsOk(logger *slog.Logger, device Device, SMARTCtlResult int64) bo
 	if SMARTCtlResult > 0 {
 		b := SMARTCtlResult
 		if (b & 1) != 0 {
-			logger.Error("Command line did not parse", "device", device)
-			result = false
+			if *smartctlFarmLog {
+				// When --log=farm is enabled, bit 0 may be set because the device
+				// does not support FARM logs. Downgrade to warning since SMART data
+				// is still valid.
+				logger.Warn("Command line did not parse (possibly unsupported --log=farm)", "device", device)
+			} else {
+				logger.Error("Command line did not parse", "device", device)
+				result = false
+			}
 		}
 		if (b & (1 << 1)) != 0 {
 			logger.Error("Device open failed, device did not return an IDENTIFY DEVICE structure, or device is in a low-power mode", "device", device)
@@ -175,7 +196,17 @@ func jsonIsOk(logger *slog.Logger, json gjson.Result) bool {
 	if messages.Exists() {
 		for _, message := range messages.Array() {
 			if message.Get("severity").String() == "error" {
-				logger.Error(message.Get("string").String())
+				msgStr := message.Get("string").String()
+				// FARM log errors are non-fatal: the device may not support FARM
+				// but still has valid SMART data
+				if *smartctlFarmLog &&
+					(strings.Contains(msgStr, "FARM") ||
+						strings.Contains(msgStr, "INVALID ARGUMENT TO -l: farm") ||
+						strings.Contains(msgStr, "VALID ARGUMENTS ARE:")) {
+					logger.Warn("FARM log not available", "msg", msgStr)
+					continue
+				}
+				logger.Error(msgStr)
 				return false
 			}
 		}
