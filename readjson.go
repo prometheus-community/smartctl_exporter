@@ -64,7 +64,7 @@ func readFakeSMARTctl(logger *slog.Logger, device Device) gjson.Result {
 func readSMARTctl(logger *slog.Logger, device Device, wg *sync.WaitGroup) {
 	defer wg.Done()
 	start := time.Now()
-	var smartctlArgs = []string{"--json", "--info", "--health", "--attributes", "--tolerance=verypermissive", "--nocheck=" + *smartctlPowerModeCheck, "--format=brief", "--log=error", "--device=" + device.Type, device.Name}
+	var smartctlArgs = []string{"--json", "--info", "--health", "--attributes", "--capabilities", "--tolerance=verypermissive", "--nocheck=" + *smartctlPowerModeCheck, "--format=brief", "--log=error", "--device=" + device.Type, device.Name}
 
 	logger.Debug("Calling smartctl with args", "args", strings.Join(smartctlArgs, " "))
 	out, err := exec.Command(*smartctlPath, smartctlArgs...).Output()
