@@ -1,3 +1,8 @@
+## 0.15.0 / 2026-09-01
+
+* [CHANGE] Update dependencies and build with Go 1.25
+* [ENHANCEMENT] Build arm64 container images #380
+
 ## 0.14.0 / 2025-04-22
 
 * [BUGFIX] `smart_status` exported if object is present #260
