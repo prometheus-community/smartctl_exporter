@@ -1,0 +1,49 @@
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      5
+    ],
+    "pre_release": false,
+    "svn_revision": "5714",
+    "platform_info": "x86_64-linux-6.12.43",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "--nocheck=standby",
+      "/dev/sdc",
+      "--json",
+      "--info",
+      "--health",
+      "--attributes",
+      "--tolerance=verypermissive",
+      "--format=brief",
+      "--log=error"
+    ],
+    "messages": [
+      {
+        "string": "Device is in STANDBY mode, exit(2)",
+        "severity": "information"
+      }
+    ],
+    "exit_status": 2
+  },
+  "local_time": {
+    "time_t": 1767052155,
+    "asctime": "Mon Dec 29 15:49:15 2025 PST"
+  },
+  "device": {
+    "name": "/dev/sdc",
+    "info_name": "/dev/sdc [SAT]",
+    "type": "sat",
+    "protocol": "ATA"
+  },
+  "power_mode": {
+    "ata_value": 0,
+    "name": "STANDBY"
+  }
+}
