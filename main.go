@@ -53,6 +53,10 @@ type SMARTctlManagerCollector struct {
 
 	logger *slog.Logger
 	mutex  sync.Mutex
+
+	lastRefreshCompleted time.Time
+	lastRefreshDuration  time.Duration
+	refresh              func(*slog.Logger, []Device)
 }
 
 // Describe sends the super-set of all possible descriptors of metrics
@@ -64,7 +68,12 @@ func (i *SMARTctlManagerCollector) Describe(ch chan<- *prometheus.Desc) {
 func (i *SMARTctlManagerCollector) Collect(ch chan<- prometheus.Metric) {
 	info := NewSMARTctlInfo(ch)
 	i.mutex.Lock()
-	refreshAllDevices(i.logger, i.Devices)
+	if i.shouldRefresh(time.Now()) {
+		started := time.Now()
+		i.refresh(i.logger, i.Devices)
+		i.lastRefreshCompleted = time.Now()
+		i.lastRefreshDuration = i.lastRefreshCompleted.Sub(started)
+	}
 	for _, device := range i.Devices {
 		json := readData(i.logger, device)
 		if json.Exists() {
@@ -80,6 +89,10 @@ func (i *SMARTctlManagerCollector) Collect(ch chan<- prometheus.Metric) {
 	)
 	info.Collect()
 	i.mutex.Unlock()
+}
+
+func (i *SMARTctlManagerCollector) shouldRefresh(now time.Time) bool {
+	return i.lastRefreshDuration < *smartctlInterval || !now.Before(i.lastRefreshCompleted.Add(*smartctlInterval))
 }
 
 func (i *SMARTctlManagerCollector) RescanForDevices() {
@@ -101,6 +114,9 @@ var (
 	smartctlInterval = kingpin.Flag("smartctl.interval",
 		"The interval between smartctl polls",
 	).Default("60s").Duration()
+	smartctlConcurrency = kingpin.Flag("smartctl.concurrency",
+		"Maximum number of smartctl commands to run concurrently",
+	).Default("1").Int()
 	smartctlRescanInterval = kingpin.Flag("smartctl.rescan",
 		"The interval between rescanning for new/disappeared devices. If the interval is smaller than 1s no rescanning takes place. If any devices are configured with smartctl.device also no rescanning takes place.",
 	).Default("10m").Duration()
@@ -199,6 +215,11 @@ func main() {
 	kingpin.Parse()
 	logger := promslog.New(promslogConfig)
 
+	if *smartctlConcurrency < 1 {
+		logger.Error("smartctl.concurrency must be greater than zero")
+		os.Exit(1)
+	}
+
 	if err := validatePowerMode(*smartctlPowerModeCheck); err != nil {
 		logger.Error(err.Error())
 		os.Exit(1)
@@ -225,6 +246,7 @@ func main() {
 	collector := SMARTctlManagerCollector{
 		Devices: devices,
 		logger:  logger,
+		refresh: refreshAllDevices,
 	}
 
 	if *smartctlScan && *smartctlRescanInterval >= 1*time.Second {

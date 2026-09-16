@@ -61,8 +61,7 @@ func readFakeSMARTctl(logger *slog.Logger, device Device) gjson.Result {
 }
 
 // Get json from smartctl and parse it
-func readSMARTctl(logger *slog.Logger, device Device, wg *sync.WaitGroup) {
-	defer wg.Done()
+func readSMARTctl(logger *slog.Logger, device Device) {
 	start := time.Now()
 	var smartctlArgs = []string{"--json", "--info", "--health", "--attributes", "--tolerance=verypermissive", "--nocheck=" + *smartctlPowerModeCheck, "--format=brief", "--log=error", "--device=" + device.Type, device.Name}
 
@@ -103,21 +102,42 @@ func readSMARTctlDevices(logger *slog.Logger) gjson.Result {
 	return parseJSON(string(out))
 }
 
-// Refresh all devices' json
+// refreshDevices runs the reader for each device with a bounded number of workers.
+func refreshDevices(logger *slog.Logger, devices []Device, concurrency int, reader func(*slog.Logger, Device)) {
+	jobs := make(chan Device)
+	var wg sync.WaitGroup
+
+	for range concurrency {
+		wg.Go(func() {
+			defer wg.Done()
+			for device := range jobs {
+				reader(logger, device)
+			}
+		})
+	}
+
+	for _, device := range devices {
+		jobs <- device
+	}
+	close(jobs)
+	wg.Wait()
+}
+
+// Refresh all devices' json.
 func refreshAllDevices(logger *slog.Logger, devices []Device) {
 	if *smartctlFakeData {
 		return
 	}
 
-	var wg sync.WaitGroup
+	devicesToRefresh := make([]Device, 0, len(devices))
 	for _, device := range devices {
 		cacheValue, cacheOk := jsonCache.Load(device)
 		if !cacheOk || time.Now().After(cacheValue.(JSONCache).LastCollect.Add(*smartctlInterval)) {
-			wg.Add(1)
-			go readSMARTctl(logger, device, &wg)
+			devicesToRefresh = append(devicesToRefresh, device)
 		}
 	}
-	wg.Wait()
+
+	refreshDevices(logger, devicesToRefresh, *smartctlConcurrency, readSMARTctl)
 }
 
 func readData(logger *slog.Logger, device Device) gjson.Result {
