@@ -72,8 +72,7 @@ func readSMARTctl(logger *slog.Logger, device Device, wg *sync.WaitGroup) {
 		logger.Warn("S.M.A.R.T. output reading", "err", err, "device", device)
 	}
 	// Accommodate a smartmontools pre-7.3 bug
-	cleaned_out := strings.TrimPrefix(string(out), "  Pending defect count:")
-	json := parseJSON(cleaned_out)
+	json := parseJSON(strings.TrimPrefix(string(out), "  Pending defect count:"))
 	rcOk := resultCodeIsOk(logger, device, json.Get("smartctl.exit_status").Int())
 	jsonOk := jsonIsOk(logger, json)
 	logger.Debug("Collected S.M.A.R.T. json data", "device", device, "duration", time.Since(start))
