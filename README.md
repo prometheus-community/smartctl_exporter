@@ -41,6 +41,7 @@ Flags:
       --smartctl.device-include=""
                                Regexp of devices to include in automatic scanning. (mutually exclusive to
                                device-exclude)
+      --smartctl.farm-log      Collect Seagate FARM log metrics (requires smartmontools 7.4+)
       --web.telemetry-path="/metrics"  
                                Path under which to expose metrics
       --web.systemd-socket     Use systemd socket activation listeners instead of port listeners (Linux only).
@@ -53,6 +54,16 @@ Flags:
       --log.format=logfmt      Output format of log messages. One of: [logfmt, json]
       --version                Show application version.
 ```
+
+    ### Seagate FARM metrics
+
+    Seagate Field Accessible Reliability Metrics (FARM) collection is disabled by
+    default. Enable it with `--smartctl.farm-log`. This adds `--log=farm` to the
+    smartctl invocation and exports workload, error, environment, and reliability
+    metrics under the `smartctl_device_farm_` prefix.
+
+    FARM collection requires smartmontools 7.4 or newer. Devices without FARM
+    support continue to export their regular SMART metrics.
 
 ## TLS and basic authentication
 
