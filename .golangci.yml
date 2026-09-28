@@ -2,6 +2,7 @@ version: "2"
 linters:
   enable:
     - misspell
+    - modernize
     - revive
     - sloglint
   disable:
@@ -10,11 +11,6 @@ linters:
     errcheck:
       exclude-functions:
         - (net/http.ResponseWriter).Write
-    revive:
-      rules:
-        - name: unused-parameter
-          severity: warning
-          disabled: true
   exclusions:
     generated: lax
     presets:
