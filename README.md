@@ -41,6 +41,7 @@ Flags:
       --smartctl.device-include=""
                                Regexp of devices to include in automatic scanning. (mutually exclusive to
                                device-exclude)
+      --smartctl.vdev-label    Use the udev ID_VDEV property as the device label when available
       --web.telemetry-path="/metrics"  
                                Path under which to expose metrics
       --web.systemd-socket     Use systemd socket activation listeners instead of port listeners (Linux only).
@@ -53,6 +54,17 @@ Flags:
       --log.format=logfmt      Output format of log messages. One of: [logfmt, json]
       --version                Show application version.
 ```
+
+  ### ZFS vdev labels
+
+  Use `--smartctl.vdev-label` to replace the normal device label, such as `sda`,
+  with the device's `ID_VDEV` udev property when available. This can expose a
+  stable physical slot or ZFS vdev label in metrics instead of a kernel-assigned
+  device name.
+
+  The exporter uses `udevadm` to query the property for both automatically
+  discovered and explicitly configured devices. If `udevadm` fails or the device
+  has no `ID_VDEV` property, the normal device label is retained.
 
 ## TLS and basic authentication
 

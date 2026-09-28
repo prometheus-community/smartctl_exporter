@@ -55,7 +55,7 @@ func buildDeviceLabel(inputName string, inputType string) string {
 }
 
 // NewSMARTctl is smartctl constructor
-func NewSMARTctl(logger *slog.Logger, json gjson.Result, ch chan<- prometheus.Metric) SMARTctl {
+func NewSMARTctl(logger *slog.Logger, json gjson.Result, ch chan<- prometheus.Metric, configuredDevice Device) SMARTctl {
 	var model_name string
 	if obj := json.Get("model_name"); obj.Exists() {
 		model_name = obj.String()
@@ -66,13 +66,17 @@ func NewSMARTctl(logger *slog.Logger, json gjson.Result, ch chan<- prometheus.Me
 	if model_name == "" {
 		model_name = "unknown"
 	}
+	deviceLabel := configuredDevice.Label
+	if deviceLabel == "" {
+		deviceLabel = buildDeviceLabel(json.Get("device.name").String(), json.Get("device.type").String())
+	}
 
 	return SMARTctl{
 		ch:     ch,
 		json:   json,
 		logger: logger,
 		device: SMARTDevice{
-			device:     buildDeviceLabel(json.Get("device.name").String(), json.Get("device.type").String()),
+			device:     deviceLabel,
 			serial:     strings.TrimSpace(json.Get("serial_number").String()),
 			family:     strings.TrimSpace(GetStringIfExists(json, "model_family", "unknown")),
 			model:      strings.TrimSpace(model_name),
