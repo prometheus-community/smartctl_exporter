@@ -391,6 +391,25 @@ var (
 		"Verify Total Uncorrected Errors",
 		[]string{
 			"device",
+	metricDeviceLastSelfTest = prometheus.NewDesc(
+		"smartctl_device_last_self_test",
+		"Device last SMART self test status",
+		[]string{
+			"device",
+			"type",
+			"lifetime_hours",
+		},
+		nil,
+	)
+	metricDeviceLastSelfTestInfo = prometheus.NewDesc(
+		"smartctl_device_last_self_test_info",
+		"Device last SMART self test info",
+		[]string{
+			"device",
+			"type",
+			"lifetime_hours",
+			"status",
+			"description",
 		},
 		nil,
 	)
