@@ -1,3 +1,11 @@
+## 0.15.0 / 2026-09-01
+
+* [FEATURE] Gather additional temperature values #304
+* [FEATURE] Add support new metrics: endurance, verify errors #306
+* [ENHANCEMENT] Handle NVMe devices behind bridges #342
+* [BUGFIX] Fix device label conflicts #322
+* [BUGFIX] Fix some 5xx errors from metrics endpoint #329
+
 ## 0.14.0 / 2025-04-22
 
 * [BUGFIX] `smart_status` exported if object is present #260
