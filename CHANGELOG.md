@@ -1,7 +1,10 @@
 ## 0.15.0 / 2026-09-01
 
-* [CHANGE] Update dependencies and build with Go 1.25
-* [ENHANCEMENT] Build arm64 container images #380
+* [FEATURE] Gather additional temperature values #304
+* [FEATURE] Add support new metrics: endurance, verify errors #306
+* [ENHANCEMENT] Handle NVMe devices behind bridges #342
+* [BUGFIX] Fix device label conflicts #322
+* [BUGFIX] Fix some 5xx errors from metrics endpoint #329
 
 ## 0.14.0 / 2025-04-22
 
