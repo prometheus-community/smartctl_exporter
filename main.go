@@ -18,6 +18,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -124,6 +125,7 @@ func (i *SMARTctlManagerCollector) RescanForDevices() {
 		time.Sleep(*smartctlRescanInterval)
 		i.logger.Info("Rescanning for devices")
 		devices := scanDevices(i.logger)
+		devices = append(devices, scanExtraDevices(i.logger, *smartctlExtraDevices)...)
 		devices = buildDevicesFromFlag(devices)
 		i.mutex.Lock()
 		i.Devices = devices
@@ -156,6 +158,10 @@ var (
 	smartctlScanDeviceTypes = kingpin.Flag(
 		"smartctl.scan-device-type",
 		"Device type to use during automatic scan. Special by-id value forces predictable device names. (repeatable)",
+	).Strings()
+	smartctlExtraDevices = kingpin.Flag(
+		"smartctl.extra-device",
+		"Extra device scan specification in the format '<directory>;<name-regex>;<device-type>'. Scans the directory for entries matching the regex and monitors them with the given device type (repeatable). Example: '/dev/spdk;^nvme\\d+$;nvme'",
 	).Strings()
 	smartctlFakeData = kingpin.Flag("smartctl.fake-data",
 		"The device to monitor (repeatable)",
@@ -195,6 +201,63 @@ func scanDevices(logger *slog.Logger) []Device {
 		}
 	}
 	return scanDeviceResult
+}
+
+// extraDeviceSpec holds the parsed form of a --smartctl.extra-device value.
+type extraDeviceSpec struct {
+	directory  string
+	nameRegexp *regexp.Regexp
+	deviceType string
+}
+
+// parseExtraDeviceSpec parses "<directory>;<name-regex>;<device-type>".
+func parseExtraDeviceSpec(s string) (extraDeviceSpec, error) {
+	parts := strings.SplitN(s, ";", 3)
+	if len(parts) != 3 {
+		return extraDeviceSpec{}, fmt.Errorf("extra-device %q: expected format '<directory>;<name-regex>;<device-type>'", s)
+	}
+	re, err := regexp.Compile(parts[1])
+	if err != nil {
+		return extraDeviceSpec{}, fmt.Errorf("extra-device %q: invalid name regex: %w", s, err)
+	}
+	return extraDeviceSpec{directory: parts[0], nameRegexp: re, deviceType: parts[2]}, nil
+}
+
+// scanExtraDevices reads each extra-device spec, enumerates matching entries in the
+// specified directory, applies the existing include/exclude filter, and returns Devices.
+func scanExtraDevices(logger *slog.Logger, specs []string) []Device {
+	filter := newDeviceFilter(*smartctlDeviceExclude, *smartctlDeviceInclude)
+	var result []Device
+	for _, raw := range specs {
+		spec, err := parseExtraDeviceSpec(raw)
+		if err != nil {
+			logger.Error("Skipping invalid extra-device spec", "spec", raw, "err", err)
+			continue
+		}
+		entries, err := os.ReadDir(spec.directory)
+		if err != nil {
+			logger.Error("Cannot read extra-device directory", "directory", spec.directory, "err", err)
+			continue
+		}
+		for _, entry := range entries {
+			if !spec.nameRegexp.MatchString(entry.Name()) {
+				continue
+			}
+			deviceName := spec.directory + "/" + entry.Name()
+			deviceLabel := buildDeviceLabel(deviceName, spec.deviceType)
+			if filter.ignored(deviceLabel) {
+				logger.Info("Ignoring extra device", "name", deviceLabel)
+				continue
+			}
+			logger.Info("Found extra device", "name", deviceLabel)
+			result = append(result, Device{
+				Name:  deviceName,
+				Type:  spec.deviceType,
+				Label: deviceLabel,
+			})
+		}
+	}
+	return result
 }
 
 func buildDevicesFromFlag(devices []Device) []Device {
@@ -253,6 +316,13 @@ func main() {
 		logger.Info("Number of devices found", "count", len(devices))
 	}
 
+	if len(*smartctlExtraDevices) > 0 {
+		logger.Info("Extra device specs specified", "specs", strings.Join(*smartctlExtraDevices, ", "))
+		extraDevices := scanExtraDevices(logger, *smartctlExtraDevices)
+		devices = append(devices, extraDevices...)
+		logger.Info("Extra devices found", "count", len(extraDevices))
+	}
+
 	if len(*smartctlDevices) > 0 {
 		logger.Info("Devices specified", "devices", strings.Join(*smartctlDevices, ", "))
 		devices = buildDevicesFromFlag(devices)
@@ -264,7 +334,7 @@ func main() {
 		logger:  logger,
 	}
 
-	if *smartctlScan && *smartctlRescanInterval >= 1*time.Second {
+	if (*smartctlScan || len(*smartctlExtraDevices) > 0) && *smartctlRescanInterval >= 1*time.Second {
 		logger.Info("Start background scan process")
 		logger.Info("Rescanning for devices every", "rescanInterval", *smartctlRescanInterval)
 		go collector.RescanForDevices()
