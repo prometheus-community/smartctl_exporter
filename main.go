@@ -87,6 +87,7 @@ func (i *SMARTctlManagerCollector) Describe(ch chan<- *prometheus.Desc) {
 	ch <- metricDeviceSelfTestLogErrorCount
 	ch <- metricDeviceERCSeconds
 	ch <- metricSCSIGrownDefectList
+	ch <- metricSCSIUsedEnduranceIndicator
 	ch <- metricReadErrorsCorrectedByRereadsRewrites
 	ch <- metricReadErrorsCorrectedByEccFast
 	ch <- metricReadErrorsCorrectedByEccDelayed
@@ -95,6 +96,10 @@ func (i *SMARTctlManagerCollector) Describe(ch chan<- *prometheus.Desc) {
 	ch <- metricWriteErrorsCorrectedByEccFast
 	ch <- metricWriteErrorsCorrectedByEccDelayed
 	ch <- metricWriteTotalUncorrectedErrors
+	ch <- metricVerifyErrorsCorrectedByRereadsRewrites
+	ch <- metricVerifyErrorsCorrectedByEccFast
+	ch <- metricVerifyErrorsCorrectedByEccDelayed
+	ch <- metricVerifyTotalUncorrectedErrors
 }
 
 // Collect is called by the Prometheus registry when collecting metrics.
