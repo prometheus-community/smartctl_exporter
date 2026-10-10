@@ -113,7 +113,7 @@ func (smart *SMARTctl) Collect() {
 		smart.mineNvmeBytesWritten()
 	}
 	// SCSI, SAS
-	if smart.device.interfaceType == "scsi" {
+	if smart.device.interfaceType == "scsi" || smart.device.protocol == "SCSI" {
 		smart.mineSCSIUsedEnduranceIndicator()
 		smart.mineSCSIGrownDefectList()
 		smart.mineSCSIErrorCounterLog()
