@@ -14,7 +14,13 @@
 package main
 
 import (
+	"io"
+	"log/slog"
+	"os"
+	"path/filepath"
+	"sync"
 	"testing"
+	"time"
 )
 
 func TestBuildDeviceLabel(t *testing.T) {
@@ -40,5 +46,91 @@ func TestBuildDeviceLabel(t *testing.T) {
 		if result != test.expectedLabel {
 			t.Errorf("deviceName=%v deviceType=%v expected=%v result=%v", test.deviceName, test.deviceType, test.expectedLabel, result)
 		}
+	}
+}
+
+// fakeSmartctl installs a shell script as smartctl and applies timeout.
+func fakeSmartctl(t *testing.T, body string, timeout time.Duration) {
+	t.Helper()
+	path := filepath.Join(t.TempDir(), "smartctl")
+	if err := os.WriteFile(path, []byte("#!/bin/sh\n"+body+"\n"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	oldPath, oldTimeout := *smartctlPath, *smartctlTimeout
+	*smartctlPath, *smartctlTimeout = path, timeout
+	t.Cleanup(func() { *smartctlPath, *smartctlTimeout = oldPath, oldTimeout })
+}
+
+func readOnce(device Device) {
+	var wg sync.WaitGroup
+	wg.Add(1)
+	readSMARTctl(slog.New(slog.NewTextHandler(io.Discard, nil)), device, &wg)
+}
+
+func scrapeOk(device Device) (ok, found bool) {
+	v, found := deviceScrapeOk.Load(device)
+	if !found {
+		return false, false
+	}
+	return v.(bool), true
+}
+
+func TestReadSMARTctlTimeout(t *testing.T) {
+	device := Device{Name: "/dev/hung", Type: "auto", Label: "hung"}
+	good := `echo '{"smartctl":{"exit_status":0}}'`
+
+	fakeSmartctl(t, good, time.Second)
+	readOnce(device)
+	if _, cached := jsonCache.Load(device); !cached {
+		t.Fatal("expected data to be cached after successful read")
+	}
+
+	// Hung smartctl: must return after the timeout and drop the stale data.
+	// Not covered: a process in D state that ignores SIGKILL.
+	fakeSmartctl(t, "exec sleep 30", 300*time.Millisecond)
+	start := time.Now()
+	readOnce(device)
+	if d := time.Since(start); d > 5*time.Second {
+		t.Fatalf("readSMARTctl took %v, timeout not applied", d)
+	}
+	if _, cached := jsonCache.Load(device); cached {
+		t.Error("stale data must be dropped after a failed read")
+	}
+	if ok, found := scrapeOk(device); !found || ok {
+		t.Errorf("expected scrape failure, got ok=%v found=%v", ok, found)
+	}
+
+	// Killed process eventually exits and releases the in-flight flag.
+	deadline := time.Now().Add(5 * time.Second)
+	for {
+		if _, running := inFlight.Load(device); !running {
+			break
+		}
+		if time.Now().After(deadline) {
+			t.Fatal("in-flight flag not released after process exit")
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+
+	// Recovery repopulates the cache.
+	fakeSmartctl(t, good, time.Second)
+	readOnce(device)
+	if _, cached := jsonCache.Load(device); !cached {
+		t.Error("expected cache to be repopulated after recovery")
+	}
+	if ok, _ := scrapeOk(device); !ok {
+		t.Error("expected scrape success after recovery")
+	}
+}
+
+func TestReadSMARTctlStandbyKeepsCache(t *testing.T) {
+	device := Device{Name: "/dev/standby", Type: "auto", Label: "standby"}
+	fakeSmartctl(t, `echo '{"smartctl":{"exit_status":0}}'`, time.Second)
+	readOnce(device)
+
+	fakeSmartctl(t, `echo '{"smartctl":{"exit_status":2,"messages":[{"severity":"information","string":"standby"}]}}'; exit 2`, time.Second)
+	readOnce(device)
+	if _, cached := jsonCache.Load(device); !cached {
+		t.Error("standby must not drop cached data")
 	}
 }

@@ -14,6 +14,8 @@
 package main
 
 import (
+	"bytes"
+	"errors"
 	"fmt"
 	"log/slog"
 	"os"
@@ -60,6 +62,61 @@ func readFakeSMARTctl(logger *slog.Logger, device Device) gjson.Result {
 	return parseJSON(string(jsonFile))
 }
 
+var errSmartctlTimeout = errors.New("smartctl timed out")
+
+// runSmartctl runs smartctl and returns its stdout. If --smartctl.timeout is
+// set and elapses, the process is killed and errSmartctlTimeout is returned
+// without waiting for it to exit: a process stuck in uninterruptible I/O (D
+// state) ignores SIGKILL, and waiting for it would block forever.
+// onExit, if not nil, is called once the process has really exited (or failed
+// to start).
+func runSmartctl(args []string, onExit func()) ([]byte, error) {
+	cmd := exec.Command(*smartctlPath, args...)
+	var stdout bytes.Buffer
+	cmd.Stdout = &stdout
+	if err := cmd.Start(); err != nil {
+		if onExit != nil {
+			onExit()
+		}
+		return nil, err
+	}
+	done := make(chan error, 1)
+	go func() {
+		err := cmd.Wait()
+		if onExit != nil {
+			onExit()
+		}
+		done <- err
+	}()
+
+	var timeout <-chan time.Time // nil (blocks forever) when no timeout is set
+	if *smartctlTimeout > 0 {
+		timer := time.NewTimer(*smartctlTimeout)
+		defer timer.Stop()
+		timeout = timer.C
+	}
+	select {
+	case err := <-done:
+		return stdout.Bytes(), err
+	case <-timeout:
+		_ = cmd.Process.Kill()
+		return nil, errSmartctlTimeout
+	}
+}
+
+// Devices with a smartctl process that has not exited yet.
+var inFlight sync.Map
+
+// Result of the last read of each device: true if ok, false if it failed.
+var deviceScrapeOk sync.Map
+
+// scrapeFailed drops the cached data of a device so that no stale metrics are
+// exported for it. The cache is populated again by the next successful read.
+func scrapeFailed(device Device) {
+	jsonCache.Delete(device)
+	deviceScrapeOk.Store(device, false)
+}
+
 // Get json from smartctl and parse it
 func readSMARTctl(logger *slog.Logger, device Device, wg *sync.WaitGroup) {
 	defer wg.Done()
@@ -67,9 +124,15 @@ func readSMARTctl(logger *slog.Logger, device Device, wg *sync.WaitGroup) {
 	var smartctlArgs = []string{"--json", "--info", "--health", "--attributes", "--capabilities", "--tolerance=verypermissive", "--nocheck=" + *smartctlPowerModeCheck, "--format=brief", "--log=error", "--device=" + device.Type, device.Name}
 
 	logger.Debug("Calling smartctl with args", "args", strings.Join(smartctlArgs, " "))
-	out, err := exec.Command(*smartctlPath, smartctlArgs...).Output()
+	out, err := runSmartctl(smartctlArgs, func() { inFlight.Delete(device) })
 	if err != nil {
 		logger.Warn("S.M.A.R.T. output reading", "err", err, "device", device)
+		var exitErr *exec.ExitError
+		if !errors.As(err, &exitErr) {
+			// Timeout or smartctl could not run: there is no output to use.
+			scrapeFailed(device)
+			return
+		}
 	}
 	// Accommodate a smartmontools pre-7.3 bug
 	json := parseJSON(strings.TrimPrefix(string(out), "  Pending defect count:"))
@@ -78,7 +141,12 @@ func readSMARTctl(logger *slog.Logger, device Device, wg *sync.WaitGroup) {
 	logger.Debug("Collected S.M.A.R.T. json data", "device", device, "duration", time.Since(start))
 	if rcOk && jsonOk {
 		jsonCache.Store(device, JSONCache{JSON: json, LastCollect: time.Now()})
+		deviceScrapeOk.Store(device, true)
+	} else if !jsonOk {
+		scrapeFailed(device)
 	}
+	// rc not ok without a json error is a device in standby/low-power mode: keep
+	// the previous state as before.
 }
 
 func readSMARTctlDevices(logger *slog.Logger) gjson.Result {
@@ -87,7 +155,7 @@ func readSMARTctlDevices(logger *slog.Logger) gjson.Result {
 	for _, d := range *smartctlScanDeviceTypes {
 		scanArgs = append(scanArgs, "--device", d)
 	}
-	out, err := exec.Command(*smartctlPath, scanArgs...).Output()
+	out, err := runSmartctl(scanArgs, nil)
 	if exiterr, ok := err.(*exec.ExitError); ok {
 		logger.Debug("Exit Status", "exit_code", exiterr.ExitCode())
 		// The smartctl command returns 2 if devices are sleeping, ignore this error.
@@ -112,6 +180,11 @@ func refreshAllDevices(logger *slog.Logger, devices []Device) {
 	for _, device := range devices {
 		cacheValue, cacheOk := jsonCache.Load(device)
 		if !cacheOk || time.Now().After(cacheValue.(JSONCache).LastCollect.Add(*smartctlInterval)) {
+			// Do not start another smartctl while the previous one is still stuck.
+			if _, running := inFlight.LoadOrStore(device, struct{}{}); running {
+				logger.Debug("smartctl still running, skipping", "device", device)
+				continue
+			}
 			wg.Add(1)
 			go readSMARTctl(logger, device, &wg)
 		}
@@ -126,7 +199,12 @@ func readData(logger *slog.Logger, device Device) gjson.Result {
 
 	cacheValue, found := jsonCache.Load(device)
 	if !found {
-		logger.Warn("device not found", "device", device)
+		// A failed read was already logged and its cache dropped.
+		if ok, failed := deviceScrapeOk.Load(device); failed && !ok.(bool) {
+			logger.Debug("no data for device, last read failed", "device", device)
+		} else {
+			logger.Warn("device not found", "device", device)
+		}
 		return gjson.Result{}
 	}
 	return cacheValue.(JSONCache).JSON
