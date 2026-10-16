@@ -127,8 +127,7 @@ func readSMARTctl(logger *slog.Logger, device Device, wg *sync.WaitGroup) {
 	out, err := runSmartctl(smartctlArgs, func() { inFlight.Delete(device) })
 	if err != nil {
 		logger.Warn("S.M.A.R.T. output reading", "err", err, "device", device)
-		var exitErr *exec.ExitError
-		if !errors.As(err, &exitErr) {
+		if _, isExit := errors.AsType[*exec.ExitError](err); !isExit {
 			// Timeout or smartctl could not run: there is no output to use.
 			scrapeFailed(device)
 			return

@@ -14,7 +14,6 @@
 package main
 
 import (
-	"io"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -64,7 +63,7 @@ func fakeSmartctl(t *testing.T, body string, timeout time.Duration) {
 func readOnce(device Device) {
 	var wg sync.WaitGroup
 	wg.Add(1)
-	readSMARTctl(slog.New(slog.NewTextHandler(io.Discard, nil)), device, &wg)
+	readSMARTctl(slog.New(slog.DiscardHandler), device, &wg)
 }
 
 func scrapeOk(device Device) (ok, found bool) {
