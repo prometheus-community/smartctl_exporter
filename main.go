@@ -163,6 +163,9 @@ var (
 	smartctlPowerModeCheck = kingpin.Flag("smartctl.powermode-check",
 		"Whether or not to check powermode before fetching data",
 	).Default("standby").String()
+	smartctlTemperatureHistory = kingpin.Flag("smartctl.temperature-history",
+		"Also read the SCT temperature history (--log=scttemphist): ATA disks report temperature limits there",
+	).Default("false").Bool()
 )
 
 // scanDevices uses smartctl to gather the list of available devices.

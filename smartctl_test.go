@@ -14,6 +14,7 @@
 package main
 
 import (
+	"reflect"
 	"testing"
 )
 
@@ -40,5 +41,27 @@ func TestBuildDeviceLabel(t *testing.T) {
 		if result != test.expectedLabel {
 			t.Errorf("deviceName=%v deviceType=%v expected=%v result=%v", test.deviceName, test.deviceType, test.expectedLabel, result)
 		}
+	}
+}
+
+func TestBuildSmartctlArgs(t *testing.T) {
+	device := Device{Name: "/dev/sda", Type: "sat"}
+	base := []string{"--json", "--info", "--health", "--attributes", "--capabilities", "--tolerance=verypermissive", "--nocheck=standby", "--format=brief", "--log=error"}
+
+	got := buildSmartctlArgs(device, "standby", false)
+	want := append(append([]string{}, base...), "--device=sat", "/dev/sda")
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("without temperature history: got %v, want %v", got, want)
+	}
+
+	got = buildSmartctlArgs(device, "standby", true)
+	want = append(append([]string{}, base...), "--log=scttemphist", "--device=sat", "/dev/sda")
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("with temperature history: got %v, want %v", got, want)
+	}
+
+	got = buildSmartctlArgs(Device{Name: "/dev/nvme0", Type: "nvme"}, "never", true)
+	if got[len(got)-2] != "--device=nvme" || got[len(got)-1] != "/dev/nvme0" {
+		t.Errorf("device arguments must stay last: %v", got)
 	}
 }

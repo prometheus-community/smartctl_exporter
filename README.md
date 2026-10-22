@@ -44,6 +44,8 @@ Flags:
                                  Device type to use during automatic scan. Special by-id value forces predictable device names. (repeatable)
       --smartctl.powermode-check="standby"
                                  Whether or not to check powermode before fetching data
+      --[no-]smartctl.temperature-history
+                                 Also read the SCT temperature history (--log=scttemphist): ATA disks report temperature limits there
       --web.telemetry-path="/metrics"
                                  Path under which to expose metrics
       --[no-]web.systemd-socket  Use systemd socket activation listeners instead of port listeners (Linux only).
