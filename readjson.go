@@ -60,11 +60,21 @@ func readFakeSMARTctl(logger *slog.Logger, device Device) gjson.Result {
 	return parseJSON(string(jsonFile))
 }
 
+// buildSmartctlArgs returns the smartctl command line for one device. With temperatureHistory the SCT
+// temperature history is read as well: ATA disks report their temperature limits in it.
+func buildSmartctlArgs(device Device, powerModeCheck string, temperatureHistory bool) []string {
+	args := []string{"--json", "--info", "--health", "--attributes", "--capabilities", "--tolerance=verypermissive", "--nocheck=" + powerModeCheck, "--format=brief", "--log=error"}
+	if temperatureHistory {
+		args = append(args, "--log=scttemphist")
+	}
+	return append(args, "--device="+device.Type, device.Name)
+}
+
 // Get json from smartctl and parse it
 func readSMARTctl(logger *slog.Logger, device Device, wg *sync.WaitGroup) {
 	defer wg.Done()
 	start := time.Now()
-	var smartctlArgs = []string{"--json", "--info", "--health", "--attributes", "--capabilities", "--tolerance=verypermissive", "--nocheck=" + *smartctlPowerModeCheck, "--format=brief", "--log=error", "--device=" + device.Type, device.Name}
+	smartctlArgs := buildSmartctlArgs(device, *smartctlPowerModeCheck, *smartctlTemperatureHistory)
 
 	logger.Debug("Calling smartctl with args", "args", strings.Join(smartctlArgs, " "))
 	out, err := exec.Command(*smartctlPath, smartctlArgs...).Output()

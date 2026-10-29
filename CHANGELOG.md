@@ -1,3 +1,7 @@
+## Unreleased
+
+* [FEATURE] `--smartctl.temperature-history` also reads the SCT temperature history, ATA disks report their temperature limits (`op_limit_max`, `limit_max`) there
+
 ## 0.15.0 / 2026-09-01
 
 * [FEATURE] Gather additional temperature values #304
