@@ -14,7 +14,7 @@ Example output you can show in [EXAMPLE.md](EXAMPLE.md)
 attach exported from smartctl json file**
 
 # Requirements
-`smartmontools` >= 7.0, because export to json [released in 7.0](https://www.smartmontools.org/browser/tags/RELEASE_7_0/smartmontools/NEWS#L11)
+`smartmontools` >= 7.0, because export to json [released in 7.0](https://github.com/smartmontools/smartmontools/blob/RELEASE_7_0/smartmontools/NEWS#L11)
 
 # Configuration
 ## Command line options
@@ -114,7 +114,7 @@ it's crucial for understanding how data flows from `smartctl` to
 If the data looks incorrect, check the
 [Smartmontools Frequently Asked Questions (FAQ)](https://www.smartmontools.org/wiki/FAQ).
 It's likely your question may already have an answer. If you still have
-questions, open an [issue]().
+questions, open an [issue](https://github.com/prometheus-community/smartctl_exporter/issues).
 
 ## Gathering smartctl data
 Follow these steps to gather smartctl data for troubleshooting purposes. If you
@@ -185,7 +185,7 @@ their response. `smartctl` needs to be run as root.
 [RFE: add O_RDRW mode for sat/scsi/ata devices](https://www.smartmontools.org/ticket/1064)
 
 > According to function `blk_verify_command()` from current kernel sources
-> (see [​block/scsi_ioctl.c](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/block/scsi_ioctl.c)),
+> (see [​block/scsi_ioctl.c](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/block/scsi_ioctl.c?h=v5.14)),
 > O_RDONLY or O_RDWR make no difference if device was opened as root (or with
 > CAP_SYS_RAWIO).
 >
