@@ -4,7 +4,7 @@
 * [BUGFIX] Fix register missing SCSI metric descriptors #397
 * [BUGFIX] Fix collect SCSI metrics for MegaRAID controllers #398
 * [ENHANCEMENT] Better logging for device and types #290
-* [ENHANCEMENT] Kingping check exporter arg's #290
+* [ENHANCEMENT] Kingpin check exporter arg's #290
 
 ## 0.15.0 / 2026-09-01
 
