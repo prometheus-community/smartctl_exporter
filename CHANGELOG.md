@@ -1,3 +1,11 @@
+## 0.16.0 / 2026-11-02
+
+* [FEATURE] Support for mine NVMe Volatile Memory Backup #293
+* [BUGFIX] Fix register missing SCSI metric descriptors #397
+* [BUGFIX] Fix collect SCSI metrics for MegaRAID controllers #398
+* [ENHANCEMENT] Better logging for device and types #290
+* [ENHANCEMENT] Kingping check exporter arg's #290
+
 ## 0.15.0 / 2026-09-01
 
 * [FEATURE] Gather additional temperature values #304
@@ -23,7 +31,7 @@
 ## 0.12.0 / 2024-03-03
 
 * [CHANGE] Better SCSI/SAS support, and removing confused metrics #168
-* [ENHANCEMENT] Impvoe the JSON collection script; now requires jq/yq #176
+* [ENHANCEMENT] Improve the JSON collection script; now requires jq/yq #176
 * [BUGFIX] Shell fixes for `collect-smartctl-json.sh` #178
 * [BUGFIX] Various fixes to `collect_fake_json.sh` #159
 
