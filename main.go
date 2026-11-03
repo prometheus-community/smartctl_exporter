@@ -163,6 +163,9 @@ var (
 	smartctlPowerModeCheck = kingpin.Flag("smartctl.powermode-check",
 		"Whether or not to check powermode before fetching data",
 	).Default("standby").String()
+	smartctlSSDStatistics = kingpin.Flag("smartctl.ata-ssd-statistics",
+		"Collect the ATA Solid State Device Statistics log using smartctl --log=devstat,7.",
+	).Default("false").Bool()
 )
 
 // scanDevices uses smartctl to gather the list of available devices.
