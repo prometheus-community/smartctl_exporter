@@ -167,17 +167,19 @@ func resultCodeIsOk(logger *slog.Logger, device Device, SMARTCtlResult int64) bo
 	return result
 }
 
-// Check json
+// Check json. An error message only rejects the data when smartctl did not
+// return a S.M.A.R.T. status, so a failed log read keeps the device's metrics.
 func jsonIsOk(logger *slog.Logger, json gjson.Result) bool {
-	messages := json.Get("smartctl.messages")
-	// logger.Debug(messages.String())
-	if messages.Exists() {
-		for _, message := range messages.Array() {
-			if message.Get("severity").String() == "error" {
-				logger.Error(message.Get("string").String())
-				return false
-			}
+	hasStatus := json.Get("smart_status").Exists()
+	for _, message := range json.Get("smartctl.messages").Array() {
+		if message.Get("severity").String() != "error" {
+			continue
 		}
+		if !hasStatus {
+			logger.Error(message.Get("string").String())
+			return false
+		}
+		logger.Warn(message.Get("string").String())
 	}
 	return true
 }
