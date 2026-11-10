@@ -42,6 +42,7 @@ Flags:
                                  Regexp of devices to exclude from automatic scanning. (mutually exclusive to device-exclude)
       --smartctl.scan-device-type=SMARTCTL.SCAN-DEVICE-TYPE ...
                                  Device type to use during automatic scan. Special by-id value forces predictable device names. (repeatable)
+      --smartctl.timeout=0s      Timeout for each smartctl invocation. A device that exceeds it is skipped. 0 disables the timeout
       --smartctl.powermode-check="standby"
                                  Whether or not to check powermode before fetching data
       --web.telemetry-path="/metrics"

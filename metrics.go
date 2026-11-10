@@ -218,6 +218,14 @@ var (
 		},
 		nil,
 	)
+	metricDeviceScrapeSuccess = prometheus.NewDesc(
+		"smartctl_device_scrape_success",
+		"1 if the last smartctl read of the device succeeded, 0 if it failed or timed out",
+		[]string{
+			"device",
+		},
+		nil,
+	)
 	metricDeviceExitStatus = prometheus.NewDesc(
 		"smartctl_device_smartctl_exit_status",
 		"Exit status of smartctl on device",
