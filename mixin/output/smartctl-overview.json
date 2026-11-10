@@ -1,0 +1,1235 @@
+{
+   "panels": [
+      {
+         "gridPos": {
+            "h": 4,
+            "w": 24,
+            "x": 0,
+            "y": 0
+         },
+         "id": 31,
+         "options": {
+            "content": "<div style=\"background: linear-gradient(135deg, #0d1117 0%, #1a1f2e 60%, #0f172a 100%); padding: 18px 28px; display: flex; align-items: center; gap: 22px; border-radius: 6px; border-left: 4px solid #3b82f6;\">\n  <div>\n    <div style=\"color: #e2e8f0; margin: 0; font-size: 26px; font-weight: 700;\">S.M.A.R.T. Disk Health Monitoring</div>\n    <div style=\"color: #64748b; margin: 5px 0 0; font-size: 13px;\">Self-Monitoring, Analysis and Reporting Technology &mdash; real-time disk diagnostics &amp; predictive failure analysis</div>\n  </div>\n</div>",
+            "mode": "html"
+         },
+         "transparent": true,
+         "type": "text"
+      },
+      {
+         "collapsed": false,
+         "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 4
+         },
+         "id": 100,
+         "panels": [ ],
+         "title": "Overview",
+         "type": "row"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+         },
+         "description": "Exit status from smartctl command for all devices selected. Indicates if metrics are collected properly.",
+         "fieldConfig": {
+            "defaults": {
+               "mappings": [
+                  {
+                     "options": {
+                        "0": {
+                           "index": 0,
+                           "text": "Running"
+                        }
+                     },
+                     "type": "value"
+                  },
+                  {
+                     "options": {
+                        "from": 1,
+                        "result": {
+                           "index": 1,
+                           "text": "smartctl errors"
+                        },
+                        "to": null
+                     },
+                     "type": "range"
+                  }
+               ],
+               "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                     {
+                        "color": "blue"
+                     },
+                     {
+                        "color": "red",
+                        "value": 1
+                     }
+                  ]
+               },
+               "unit": "short"
+            },
+            "overrides": [ ]
+         },
+         "gridPos": {
+            "h": 3,
+            "w": 4,
+            "x": 0,
+            "y": 5
+         },
+         "id": 19,
+         "options": {
+            "colorMode": "background",
+            "graphMode": "none",
+            "reduceOptions": {
+               "calcs": [
+                  "max"
+               ],
+               "fields": "",
+               "values": false
+            },
+            "textMode": "value",
+            "wideLayout": true
+         },
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "${DS_PROMETHEUS}"
+               },
+               "editorMode": "code",
+               "exemplar": false,
+               "expr": "max(smartctl_device_smartctl_exit_status{job=\"smartctl\", instance=~\"$instance\"} > 0 or vector(0))",
+               "instant": false,
+               "legendFormat": "__auto",
+               "range": true,
+               "refId": "Probe status"
+            }
+         ],
+         "title": "SMART probe",
+         "type": "stat"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+         },
+         "description": "Number of seconds each disk has been powered on",
+         "fieldConfig": {
+            "defaults": {
+               "color": {
+                  "fixedColor": "text",
+                  "mode": "fixed"
+               },
+               "decimals": 1,
+               "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                     {
+                        "color": "text"
+                     }
+                  ]
+               },
+               "unit": "s"
+            },
+            "overrides": [ ]
+         },
+         "gridPos": {
+            "h": 7,
+            "w": 8,
+            "x": 4,
+            "y": 5
+         },
+         "id": 7,
+         "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "reduceOptions": {
+               "calcs": [
+                  "lastNotNull"
+               ],
+               "fields": "",
+               "values": false
+            },
+            "textMode": "auto",
+            "wideLayout": true
+         },
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "${DS_PROMETHEUS}"
+               },
+               "editorMode": "code",
+               "exemplar": false,
+               "expr": "max by (instance, device)(smartctl_device_power_on_seconds{job=\"smartctl\", instance=~\"$instance\"})",
+               "instant": true,
+               "legendFormat": "{{instance}} - {{device}}",
+               "range": false,
+               "refId": "On-time"
+            }
+         ],
+         "title": "Disk power-on time",
+         "type": "stat"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+         },
+         "description": "Disk temperatures over time for each device",
+         "fieldConfig": {
+            "defaults": {
+               "color": {
+                  "mode": "palette-classic"
+               },
+               "custom": {
+                  "axisPlacement": "auto",
+                  "drawStyle": "line",
+                  "fillOpacity": 10,
+                  "lineInterpolation": "smooth",
+                  "lineWidth": 1,
+                  "pointSize": 5,
+                  "showPoints": "auto",
+                  "spanNulls": false,
+                  "stacking": {
+                     "group": "A",
+                     "mode": "none"
+                  },
+                  "thresholdsStyle": {
+                     "mode": "dashed"
+                  }
+               },
+               "max": 70,
+               "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                     {
+                        "color": "blue"
+                     },
+                     {
+                        "color": "yellow",
+                        "value": 50
+                     },
+                     {
+                        "color": "red",
+                        "value": 60
+                     }
+                  ]
+               },
+               "unit": "celsius"
+            },
+            "overrides": [ ]
+         },
+         "gridPos": {
+            "h": 9,
+            "w": 12,
+            "x": 12,
+            "y": 5
+         },
+         "id": 6,
+         "options": {
+            "legend": {
+               "calcs": [
+                  "lastNotNull",
+                  "median"
+               ],
+               "displayMode": "list",
+               "placement": "bottom",
+               "showLegend": true
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "${DS_PROMETHEUS}"
+               },
+               "editorMode": "code",
+               "exemplar": false,
+               "expr": "sum by (instance, device)(smartctl_device_temperature{job=\"smartctl\", instance=~\"$instance\", temperature_type=\"current\"}) and on(instance, device) smartctl_device{model_name!=\"IET VIRTUAL-DISK\"}",
+               "instant": false,
+               "legendFormat": "{{instance}}/{{device}}",
+               "range": true,
+               "refId": "Temperature"
+            }
+         ],
+         "title": "Disk temperature",
+         "type": "timeseries"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+         },
+         "description": "Number of disks with failing SMART status. Indicates disk death.",
+         "fieldConfig": {
+            "defaults": {
+               "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                     {
+                        "color": "transparent"
+                     },
+                     {
+                        "color": "red",
+                        "value": 1
+                     }
+                  ]
+               },
+               "unit": "short"
+            },
+            "overrides": [ ]
+         },
+         "gridPos": {
+            "h": 4,
+            "w": 4,
+            "x": 0,
+            "y": 8
+         },
+         "id": 20,
+         "options": {
+            "colorMode": "background",
+            "graphMode": "area",
+            "reduceOptions": {
+               "calcs": [
+                  "lastNotNull"
+               ],
+               "fields": "",
+               "values": false
+            },
+            "textMode": "value_and_name",
+            "wideLayout": true
+         },
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "${DS_PROMETHEUS}"
+               },
+               "editorMode": "code",
+               "exemplar": false,
+               "expr": "count by (instance)(smartctl_device{job=\"smartctl\", instance=~\"$instance\"}) - count by (instance)(smartctl_device_smart_status{job=\"smartctl\", instance=~\"$instance\"} == 1)",
+               "instant": true,
+               "legendFormat": "__auto",
+               "range": false,
+               "refId": "Failing disks"
+            }
+         ],
+         "title": "Failed disks count",
+         "type": "stat"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "color": {
+                  "mode": "thresholds"
+               },
+               "custom": {
+                  "align": "auto",
+                  "cellOptions": {
+                     "type": "auto"
+                  },
+                  "filterable": true
+               },
+               "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                     {
+                        "color": "green"
+                     },
+                     {
+                        "color": "red",
+                        "value": 80
+                     }
+                  ]
+               }
+            },
+            "overrides": [ ]
+         },
+         "gridPos": {
+            "h": 9,
+            "w": 12,
+            "x": 0,
+            "y": 12
+         },
+         "id": 30,
+         "options": {
+            "cellHeight": "sm",
+            "enablePagination": true,
+            "showHeader": true
+         },
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "${DS_PROMETHEUS}"
+               },
+               "editorMode": "code",
+               "exemplar": false,
+               "expr": "smartctl_device{job=\"smartctl\", instance=~\"$instance\", model_name!=\"IET VIRTUAL-DISK\"}",
+               "format": "table",
+               "instant": true,
+               "legendFormat": "__auto",
+               "range": false,
+               "refId": "Devices"
+            }
+         ],
+         "title": "Devices in scope",
+         "transformations": [
+            {
+               "id": "organize",
+               "options": {
+                  "excludeByName": {
+                     "Time": true,
+                     "Value": true,
+                     "__name__": true,
+                     "ata_additional_product_id": true,
+                     "ata_version": true,
+                     "container": true,
+                     "firmware_version": true,
+                     "interface": true,
+                     "job": true,
+                     "k8s_cluster_name": true,
+                     "model_family": true,
+                     "namespace": true,
+                     "pod": true,
+                     "protocol": true,
+                     "sata_version": true
+                  },
+                  "indexByName": {
+                     "Time": 0,
+                     "Value": 15,
+                     "__name__": 1,
+                     "ata_additional_product_id": 2,
+                     "ata_version": 3,
+                     "device": 5,
+                     "firmware_version": 6,
+                     "form_factor": 7,
+                     "instance": 4,
+                     "interface": 8,
+                     "job": 9,
+                     "model_family": 10,
+                     "model_name": 11,
+                     "protocol": 12,
+                     "sata_version": 13,
+                     "serial_number": 14
+                  }
+               }
+            }
+         ],
+         "type": "table"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+         },
+         "description": "Detailed prefailured checks below thresholds. Indicates the disks are wearing out and need to be replaced with no immediate failure.",
+         "fieldConfig": {
+            "defaults": {
+               "color": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+               },
+               "custom": {
+                  "align": "auto",
+                  "cellOptions": {
+                     "type": "auto"
+                  },
+                  "filterable": true
+               },
+               "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                     {
+                        "color": "transparent"
+                     }
+                  ]
+               }
+            },
+            "overrides": [
+               {
+                  "matcher": {
+                     "id": "byName",
+                     "options": "attribute_name"
+                  },
+                  "properties": [
+                     {
+                        "id": "custom.cellOptions",
+                        "value": {
+                           "type": "pill"
+                        }
+                     }
+                  ]
+               }
+            ]
+         },
+         "gridPos": {
+            "h": 7,
+            "w": 12,
+            "x": 12,
+            "y": 14
+         },
+         "id": 25,
+         "options": {
+            "cellHeight": "sm",
+            "enablePagination": true,
+            "frameIndex": 1,
+            "showHeader": true,
+            "sortBy": [
+               {
+                  "desc": false,
+                  "displayName": "attribute_id"
+               }
+            ]
+         },
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "${DS_PROMETHEUS}"
+               },
+               "editorMode": "code",
+               "exemplar": false,
+               "expr": "max by(instance, device, attribute_name)(smartctl_device_attribute{job=\"smartctl\", instance=~\"$instance\", attribute_flags_short=~\"P.....\", attribute_value_type=\"value\"}) <= max by(instance, device, attribute_name)(smartctl_device_attribute{job=\"smartctl\", instance=~\"$instance\", attribute_flags_short=~\"P.....\", attribute_value_type=\"thresh\"})",
+               "format": "table",
+               "instant": true,
+               "legendFormat": "__auto",
+               "range": false,
+               "refId": "Prefailure checks"
+            }
+         ],
+         "title": "Prefailure checks below thresholds",
+         "transformations": [
+            {
+               "id": "organize",
+               "options": {
+                  "excludeByName": {
+                     "Time": true,
+                     "Value": true
+                  },
+                  "indexByName": {
+                     "Time": 0,
+                     "Value": 4,
+                     "attribute_name": 3,
+                     "device": 2,
+                     "instance": 1
+                  },
+                  "renameByName": {
+                     "attribute_name": ""
+                  }
+               }
+            }
+         ],
+         "type": "table"
+      },
+      {
+         "collapsed": false,
+         "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 21
+         },
+         "id": 101,
+         "panels": [ ],
+         "title": "HDD / SSD",
+         "type": "row"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+         },
+         "description": "Disks with any error logs, unrecoverable/reallocated/pending sectors on HDD. Could indicate imminent failure or data corruption.",
+         "fieldConfig": {
+            "defaults": {
+               "color": {
+                  "mode": "thresholds"
+               },
+               "custom": {
+                  "align": "auto",
+                  "cellOptions": {
+                     "type": "auto"
+                  },
+                  "filterable": true
+               },
+               "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                     {
+                        "color": "transparent"
+                     },
+                     {
+                        "color": "red",
+                        "value": 1
+                     }
+                  ]
+               }
+            },
+            "overrides": [ ]
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 0,
+            "y": 22
+         },
+         "id": 26,
+         "options": {
+            "cellHeight": "sm",
+            "enablePagination": true,
+            "showHeader": true
+         },
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "${DS_PROMETHEUS}"
+               },
+               "editorMode": "code",
+               "exemplar": false,
+               "expr": "sum by (instance, device)(max_over_time(smartctl_device_attribute{job=\"smartctl\", instance=~\"$instance\", attribute_name=~\"Offline_Uncorrectable|Current_Pending_Sector|Reallocated_Sector_Ct\", attribute_value_type=\"raw\"}[$__range])) > 0",
+               "format": "table",
+               "instant": true,
+               "legendFormat": "{{instance}} - {{device}}",
+               "range": false,
+               "refId": "Failing HDD"
+            }
+         ],
+         "title": "Failing HDDs",
+         "transformations": [
+            {
+               "id": "organize",
+               "options": {
+                  "excludeByName": {
+                     "Time": true,
+                     "Value": true
+                  },
+                  "renameByName": {
+                     "device": "Device",
+                     "instance": "Instance"
+                  }
+               }
+            }
+         ],
+         "type": "table"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+         },
+         "description": "Remaining life measured for SSDs",
+         "fieldConfig": {
+            "defaults": {
+               "color": {
+                  "mode": "thresholds"
+               },
+               "max": 100,
+               "min": 0,
+               "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                     {
+                        "color": "red"
+                     },
+                     {
+                        "color": "yellow",
+                        "value": 10
+                     },
+                     {
+                        "color": "blue",
+                        "value": 30
+                     }
+                  ]
+               },
+               "unit": "percent"
+            },
+            "overrides": [ ]
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 6,
+            "y": 22
+         },
+         "id": 29,
+         "options": {
+            "orientation": "auto",
+            "reduceOptions": {
+               "calcs": [
+                  "lastNotNull"
+               ],
+               "fields": "",
+               "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true,
+            "textMode": "auto"
+         },
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "${DS_PROMETHEUS}"
+               },
+               "editorMode": "code",
+               "exemplar": false,
+               "expr": "smartctl_device_attribute{job=\"smartctl\", instance=~\"$instance\", attribute_name=\"Media_Wearout_Indicator\", attribute_value_type=\"value\"}",
+               "instant": true,
+               "legendFormat": "{{instance}} - {{device}}",
+               "range": false,
+               "refId": "SSD wearout"
+            }
+         ],
+         "title": "SSD wearout indicator",
+         "type": "gauge"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+         },
+         "description": "Uncorrectable sectors. Any value > 0 indicates data loss or corruption risk",
+         "fieldConfig": {
+            "defaults": {
+               "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                     {
+                        "color": "text"
+                     },
+                     {
+                        "color": "red",
+                        "value": 1
+                     }
+                  ]
+               },
+               "unit": "short"
+            },
+            "overrides": [ ]
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 12,
+            "y": 22
+         },
+         "id": 12,
+         "options": {
+            "colorMode": "background",
+            "graphMode": "none",
+            "reduceOptions": {
+               "calcs": [
+                  "lastNotNull"
+               ],
+               "fields": "",
+               "values": false
+            },
+            "textMode": "auto",
+            "wideLayout": true
+         },
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "${DS_PROMETHEUS}"
+               },
+               "editorMode": "code",
+               "exemplar": false,
+               "expr": "smartctl_device_attribute{job=\"smartctl\", instance=~\"$instance\", attribute_name=\"Offline_Uncorrectable\", attribute_value_type=\"raw\"}",
+               "instant": false,
+               "legendFormat": "{{instance}} - {{device}}",
+               "range": true,
+               "refId": "Offline sectors"
+            }
+         ],
+         "title": "Offline uncorrectable sectors",
+         "type": "stat"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+         },
+         "description": "Sectors waiting to be reallocated. Any value > 0 is concerning and may indicate imminent disk failure",
+         "fieldConfig": {
+            "defaults": {
+               "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                     {
+                        "color": "text"
+                     },
+                     {
+                        "color": "red",
+                        "value": 1
+                     }
+                  ]
+               },
+               "unit": "short"
+            },
+            "overrides": [ ]
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 18,
+            "y": 22
+         },
+         "id": 11,
+         "options": {
+            "colorMode": "background",
+            "graphMode": "none",
+            "reduceOptions": {
+               "calcs": [
+                  "lastNotNull"
+               ],
+               "fields": "",
+               "values": false
+            },
+            "textMode": "auto",
+            "wideLayout": true
+         },
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "${DS_PROMETHEUS}"
+               },
+               "editorMode": "code",
+               "exemplar": false,
+               "expr": "smartctl_device_attribute{job=\"smartctl\", instance=~\"$instance\", attribute_name=\"Current_Pending_Sector\", attribute_value_type=\"raw\"}",
+               "instant": false,
+               "legendFormat": "{{instance}} - {{device}}",
+               "range": true,
+               "refId": "Pending sectors"
+            }
+         ],
+         "title": "Current pending sectors",
+         "type": "stat"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+         },
+         "description": "Count of reallocated sectors. Any value > 0 indicates disk is wearing out. Steep increase indicates potential imminent failure.",
+         "fieldConfig": {
+            "defaults": {
+               "color": {
+                  "mode": "palette-classic"
+               },
+               "custom": {
+                  "axisPlacement": "auto",
+                  "drawStyle": "line",
+                  "fillOpacity": 10,
+                  "lineInterpolation": "smooth",
+                  "lineWidth": 1,
+                  "pointSize": 5,
+                  "showPoints": "auto",
+                  "spanNulls": false,
+                  "stacking": {
+                     "group": "A",
+                     "mode": "none"
+                  },
+                  "thresholdsStyle": {
+                     "mode": "off"
+                  }
+               },
+               "max": null,
+               "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                     {
+                        "color": "green"
+                     },
+                     {
+                        "color": "yellow",
+                        "value": 5
+                     },
+                     {
+                        "color": "red",
+                        "value": 50
+                     }
+                  ]
+               },
+               "unit": "short"
+            },
+            "overrides": [ ]
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 30
+         },
+         "id": 10,
+         "options": {
+            "legend": {
+               "calcs": [
+                  "lastNotNull",
+                  "max"
+               ],
+               "displayMode": "table",
+               "placement": "bottom",
+               "showLegend": true
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "${DS_PROMETHEUS}"
+               },
+               "editorMode": "code",
+               "exemplar": false,
+               "expr": "sum by (instance, device)(smartctl_device_attribute{job=\"smartctl\", instance=~\"$instance\", attribute_name=\"Reallocated_Sector_Ct\", attribute_value_type=\"raw\"})",
+               "instant": false,
+               "legendFormat": "{{instance}} - {{device}}",
+               "range": true,
+               "refId": "Reallocated sectors"
+            }
+         ],
+         "title": "Reallocated sectors",
+         "type": "timeseries"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+         },
+         "description": "Count of errors logged by the disk controller",
+         "fieldConfig": {
+            "defaults": {
+               "color": {
+                  "mode": "palette-classic"
+               },
+               "custom": {
+                  "axisPlacement": "auto",
+                  "drawStyle": "line",
+                  "fillOpacity": 10,
+                  "lineInterpolation": "smooth",
+                  "lineWidth": 1,
+                  "pointSize": 5,
+                  "showPoints": "auto",
+                  "spanNulls": false,
+                  "stacking": {
+                     "group": "A",
+                     "mode": "none"
+                  },
+                  "thresholdsStyle": {
+                     "mode": "off"
+                  }
+               },
+               "max": null,
+               "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                     {
+                        "color": "green"
+                     },
+                     {
+                        "color": "yellow",
+                        "value": 1
+                     },
+                     {
+                        "color": "red",
+                        "value": 10
+                     }
+                  ]
+               },
+               "unit": "short"
+            },
+            "overrides": [ ]
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 30
+         },
+         "id": 13,
+         "options": {
+            "legend": {
+               "calcs": [
+                  "lastNotNull",
+                  "max"
+               ],
+               "displayMode": "table",
+               "placement": "bottom",
+               "showLegend": true
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "${DS_PROMETHEUS}"
+               },
+               "editorMode": "code",
+               "exemplar": false,
+               "expr": "sum by (instance, device)(smartctl_device_error_log_count{job=\"smartctl\", instance=~\"$instance\"})",
+               "instant": false,
+               "legendFormat": "{{instance}} - {{device}}",
+               "range": true,
+               "refId": "Errors"
+            }
+         ],
+         "title": "Error log count",
+         "type": "timeseries"
+      },
+      {
+         "collapsed": false,
+         "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 38
+         },
+         "id": 102,
+         "panels": [ ],
+         "title": "NVMe",
+         "type": "row"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+         },
+         "description": "Percentage of NVMe device life used. Values approaching 100% indicate end of life",
+         "fieldConfig": {
+            "defaults": {
+               "color": {
+                  "mode": "thresholds"
+               },
+               "max": 100,
+               "min": 0,
+               "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                     {
+                        "color": "blue"
+                     },
+                     {
+                        "color": "yellow",
+                        "value": 80
+                     },
+                     {
+                        "color": "red",
+                        "value": 95
+                     }
+                  ]
+               },
+               "unit": "percent"
+            },
+            "overrides": [ ]
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 0,
+            "y": 39
+         },
+         "id": 15,
+         "options": {
+            "orientation": "auto",
+            "reduceOptions": {
+               "calcs": [
+                  "lastNotNull"
+               ],
+               "fields": "",
+               "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true,
+            "textMode": "auto"
+         },
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "${DS_PROMETHEUS}"
+               },
+               "editorMode": "code",
+               "exemplar": false,
+               "expr": "smartctl_device_percentage_used{job=\"smartctl\", instance=~\"$instance\"}",
+               "instant": true,
+               "legendFormat": "{{instance}} - {{device}}",
+               "range": false,
+               "refId": "NVMe life"
+            }
+         ],
+         "title": "NVMe percentage used",
+         "type": "gauge"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+         },
+         "description": "Media errors for NVMe devices. Any value > 0 indicates potential issues",
+         "fieldConfig": {
+            "defaults": {
+               "color": {
+                  "mode": "palette-classic"
+               },
+               "custom": {
+                  "axisPlacement": "auto",
+                  "drawStyle": "line",
+                  "fillOpacity": 10,
+                  "lineInterpolation": "smooth",
+                  "lineWidth": 1,
+                  "pointSize": 5,
+                  "showPoints": "auto",
+                  "spanNulls": false,
+                  "stacking": {
+                     "group": "A",
+                     "mode": "none"
+                  },
+                  "thresholdsStyle": {
+                     "mode": "off"
+                  }
+               },
+               "max": null,
+               "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                     {
+                        "color": "blue"
+                     },
+                     {
+                        "color": "red",
+                        "value": 1
+                     }
+                  ]
+               },
+               "unit": "short"
+            },
+            "overrides": [ ]
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 6,
+            "y": 39
+         },
+         "id": 14,
+         "options": {
+            "legend": {
+               "calcs": [
+                  "lastNotNull",
+                  "max"
+               ],
+               "displayMode": "table",
+               "placement": "bottom",
+               "showLegend": true
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "${DS_PROMETHEUS}"
+               },
+               "editorMode": "code",
+               "exemplar": false,
+               "expr": "sum by (instance, device)(smartctl_device_media_errors{job=\"smartctl\", instance=~\"$instance\"})",
+               "instant": false,
+               "legendFormat": "{{instance}} - {{device}}",
+               "range": true,
+               "refId": "NVme errors"
+            }
+         ],
+         "title": "NVMe media errors",
+         "type": "timeseries"
+      }
+   ],
+   "refresh": "",
+   "schemaVersion": 39,
+   "tags": [
+      "smartctl-mixin"
+   ],
+   "templating": {
+      "list": [
+         {
+            "current": {
+               "text": "Prometheus",
+               "value": "Prometheus"
+            },
+            "hide": 0,
+            "label": "Prometheus datasource",
+            "name": "DS_PROMETHEUS",
+            "query": "prometheus",
+            "type": "datasource"
+         },
+         {
+            "current": {
+               "selected": false,
+               "text": "All",
+               "value": "$__all"
+            },
+            "datasource": {
+               "type": "prometheus",
+               "uid": "${DS_PROMETHEUS}"
+            },
+            "includeAll": true,
+            "label": "Instance",
+            "multi": true,
+            "name": "instance",
+            "options": [ ],
+            "query": "label_values(smartctl_device_smart_status{job=\"smartctl\"}, instance)",
+            "refresh": 1,
+            "sort": 1,
+            "type": "query"
+         }
+      ]
+   },
+   "time": {
+      "from": "now-12h",
+      "to": "now"
+   },
+   "timepicker": {
+      "refresh_intervals": [
+         "5s",
+         "10s",
+         "30s",
+         "1m",
+         "5m",
+         "15m",
+         "30m",
+         "1h",
+         "2h",
+         "1d"
+      ]
+   },
+   "timezone": "browser",
+   "title": "SMART Disk Health Monitoring",
+   "uid": "smartctl-overview",
+   "version": 1
+}
