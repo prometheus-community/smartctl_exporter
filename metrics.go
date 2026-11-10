@@ -234,6 +234,14 @@ var (
 		},
 		nil,
 	)
+	metricDevicePowerMode = prometheus.NewDesc(
+		"smartctl_device_power_mode",
+		"Device power mode from ATA CHECK POWER MODE command (ata_value: -1=sleep, 0x00=0=standby, 0x01=1=standby_y, 0x40=64=active_nv_down, 0x41=65=active_nv_up, 0x80=128=idle, 0x81=129=idle_a, 0x82=130=idle_b, 0x83=131=idle_c, 0xff=255=active_or_idle). Source: https://github.com/smartmontools/smartmontools/blob/RELEASE_7_5/smartmontools/ataprint.cpp#L3401-L3431",
+		[]string{
+			"device",
+		},
+		nil,
+	)
 	metricDeviceStatistics = prometheus.NewDesc(
 		"smartctl_device_statistics",
 		"Device statistics",
