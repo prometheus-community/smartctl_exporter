@@ -319,14 +319,22 @@ func (smart *SMARTctl) minePowerCycleCount() {
 
 func (smart *SMARTctl) mineDeviceSCTStatus() {
 	status := smart.json.Get("ata_sct_status")
-	if status.Exists() {
-		smart.ch <- prometheus.MustNewConstMetric(
-			metricDeviceState,
-			prometheus.GaugeValue,
-			status.Get("device_state").Float(),
-			smart.device.device,
-		)
+	if !status.Exists() {
+		return
 	}
+	// smartctl writes device_state as {"value": N, "string": "..."}.
+	// gjson's Float() on an object is 0, so read .value when present.
+	state := status.Get("device_state")
+	value := state.Get("value")
+	if !value.Exists() {
+		value = state
+	}
+	smart.ch <- prometheus.MustNewConstMetric(
+		metricDeviceState,
+		prometheus.GaugeValue,
+		value.Float(),
+		smart.device.device,
+	)
 }
 
 func (smart *SMARTctl) mineNvmePercentageUsed() {
