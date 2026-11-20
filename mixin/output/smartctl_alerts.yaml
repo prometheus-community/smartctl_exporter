@@ -1,0 +1,96 @@
+"groups":
+- "interval": "10m"
+  "name": "smartctl"
+  "rules":
+  - "alert": "SmartDeviceTemperatureWarning"
+    "annotations":
+      "description": "Device temperature warning on {{ $labels.instance }} drive {{ $labels.device }} over 60°C. VALUE = {{ $value }}. LABELS = {{ $labels }}"
+      "summary": "SMART device temperature warning (instance {{ $labels.instance }})"
+    "expr": |
+      (
+        avg_over_time(smartctl_device_temperature{job="smartctl", temperature_type="current"}[5m])
+          unless on (instance, device) smartctl_device_temperature{job="smartctl", temperature_type="drive_trip"}
+      ) > 60
+    "for": "10m"
+    "labels":
+      "severity": "warning"
+  - "alert": "SmartDeviceTemperatureCritical"
+    "annotations":
+      "description": "Device temperature critical on {{ $labels.instance }} drive {{ $labels.device }} over 70°C. VALUE = {{ $value }}. LABELS = {{ $labels }}"
+      "summary": "SMART device temperature critical (instance {{ $labels.instance }})"
+    "expr": |
+      (
+        max_over_time(smartctl_device_temperature{job="smartctl", temperature_type="current"}[5m])
+          unless on (instance, device) smartctl_device_temperature{job="smartctl", temperature_type="drive_trip"}
+      ) > 70
+    "for": "10m"
+    "labels":
+      "severity": "critical"
+  - "alert": "SmartDeviceTemperatureOverTripValue"
+    "annotations":
+      "description": "Device temperature over trip value on {{ $labels.instance }} drive {{ $labels.device }}. VALUE = {{ $value }}. LABELS = {{ $labels }}"
+      "summary": "SMART device temperature over trip value (instance {{ $labels.instance }})"
+    "expr": |
+      max_over_time(smartctl_device_temperature{job="smartctl", temperature_type="current"}[10m])
+        > on (device, instance) smartctl_device_temperature{job="smartctl", temperature_type="drive_trip"}
+    "for": "10m"
+    "labels":
+      "severity": "critical"
+  - "alert": "SmartDeviceTemperatureNearingTripValue"
+    "annotations":
+      "description": "Device temperature nearing trip value on {{ $labels.instance }} drive {{ $labels.device }}. VALUE = {{ $value }}. LABELS = {{ $labels }}"
+      "summary": "SMART device temperature nearing trip value (instance {{ $labels.instance }})"
+    "expr": |
+      max_over_time(smartctl_device_temperature{job="smartctl", temperature_type="current"}[10m])
+        > on (device, instance) (smartctl_device_temperature{job="smartctl", temperature_type="drive_trip"} * 0.800000)
+    "for": "10m"
+    "labels":
+      "severity": "warning"
+  - "alert": "SmartStatus"
+    "annotations":
+      "description": "Device has a SMART status failure on {{ $labels.instance }} drive {{ $labels.device }}. VALUE = {{ $value }}. LABELS = {{ $labels }}"
+      "summary": "SMART status (instance {{ $labels.instance }})"
+    "expr": "smartctl_device_smart_status{job=\"smartctl\"} != 1"
+    "for": "10m"
+    "labels":
+      "severity": "critical"
+  - "alert": "SmartCriticalWarning"
+    "annotations":
+      "description": "Disk controller has critical warning on {{ $labels.instance }} drive {{ $labels.device }}. VALUE = {{ $value }}. LABELS = {{ $labels }}"
+      "summary": "SMART critical warning (instance {{ $labels.instance }})"
+    "expr": "smartctl_device_critical_warning{job=\"smartctl\"} > 0"
+    "for": "10m"
+    "labels":
+      "severity": "critical"
+  - "alert": "SmartMediaErrors"
+    "annotations":
+      "description": "Disk controller detected media errors on {{ $labels.instance }} drive {{ $labels.device }}. VALUE = {{ $value }}. LABELS = {{ $labels }}"
+      "summary": "SMART media errors (instance {{ $labels.instance }})"
+    "expr": "smartctl_device_media_errors{job=\"smartctl\"} > 0"
+    "for": "10m"
+    "labels":
+      "severity": "critical"
+  - "alert": "SmartWearoutIndicator"
+    "annotations":
+      "description": "Device is wearing out on {{ $labels.instance }} drive {{ $labels.device }}. VALUE = {{ $value }}. LABELS = {{ $labels }}"
+      "summary": "SMART Wearout Indicator (instance {{ $labels.instance }})"
+    "expr": "smartctl_device_available_spare{job=\"smartctl\"} < smartctl_device_available_spare_threshold{job=\"smartctl\"}"
+    "for": "10m"
+    "labels":
+      "severity": "critical"
+  - "alert": "SmartDeviceSSDWearingOut"
+    "annotations":
+      "description": "Less than 10% lifetime remaining on SSD on {{ $labels.instance }} drive {{ $labels.device }}. VALUE = {{ $value }}. LABELS = {{ $labels }}"
+      "summary": "SSD is wearing out (instance {{ $labels.instance }})"
+    "expr": "smartctl_device_attribute{job=\"smartctl\", attribute_name=\"Media_Wearout_Indicator\", attribute_value_type=\"value\"} < 10"
+    "for": "10m"
+    "labels":
+      "severity": "warning"
+  - "alert": "SmartErrorLogs"
+    "annotations":
+      "description": "Device logged warnings on {{ $labels.instance }} (drive {{ $labels.device }}). VALUE = {{ $value }}. LABELS = {{ $labels }}"
+      "summary": "SMART Warning Logs on {{ $labels.instance }}"
+    "expr": "smartctl_device_error_log_count{job=\"smartctl\"} > 0"
+    "for": "10m"
+    "labels":
+      "severity": "critical"
