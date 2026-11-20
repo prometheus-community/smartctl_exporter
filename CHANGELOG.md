@@ -1,3 +1,8 @@
+## Unreleased
+
+* [FEATURE] Add `--smartctl.timeout` so one hung disk no longer blocks `/metrics`, and `smartctl_device_scrape_success` metric #399
+* [CHANGE] Cached data of a device is dropped when reading it fails
+
 ## 0.15.0 / 2026-09-01
 
 * [FEATURE] Gather additional temperature values #304
