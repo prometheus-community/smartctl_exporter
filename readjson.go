@@ -68,7 +68,10 @@ func readSMARTctl(logger *slog.Logger, device Device, wg *sync.WaitGroup) {
 
 	logger.Debug("Calling smartctl with args", "args", strings.Join(smartctlArgs, " "))
 	out, err := exec.Command(*smartctlPath, smartctlArgs...).Output()
-	if err != nil {
+	if exiterr, ok := err.(*exec.ExitError); ok && int64(exiterr.ExitCode())&^quietExitStatusMask() == 0 {
+		// Only quiet bits are set, which resultCodeIsOk logs at debug level.
+		logger.Debug("S.M.A.R.T. output reading", "err", err, "device", device)
+	} else if err != nil {
 		logger.Warn("S.M.A.R.T. output reading", "err", err, "device", device)
 	}
 	// Accommodate a smartmontools pre-7.3 bug
@@ -132,6 +135,28 @@ func readData(logger *slog.Logger, device Device) gjson.Result {
 	return cacheValue.(JSONCache).JSON
 }
 
+// quietExitStatusMask returns the smartctl exit status bits that are logged at debug level instead of warning level.
+func quietExitStatusMask() int64 {
+	var mask int64
+	for _, bit := range *smartctlQuietExitStatusBits {
+		mask |= 1 << bit
+	}
+	return mask
+}
+
+// exitStatusWarnings are the messages for the smartctl exit status bits that don't prevent reading the data.
+var exitStatusWarnings = []struct {
+	bit     int
+	message string
+}{
+	{2, "Some SMART or other ATA command to the disk failed, or there was a checksum error in a SMART data structure"},
+	{3, "SMART status check returned 'DISK FAILING'"},
+	{4, "We found prefail Attributes <= threshold"},
+	{5, "SMART status check returned 'DISK OK' but we found that some (usage or prefail) Attributes have been <= threshold at some time in the past"},
+	{6, "The device error log contains records of errors"},
+	{7, "The device self-test log contains records of errors. [ATA only] Failed self-tests outdated by a newer successful extended self-test are ignored"},
+}
+
 // Parse smartctl return code
 func resultCodeIsOk(logger *slog.Logger, device Device, SMARTCtlResult int64) bool {
 	result := true
@@ -145,23 +170,16 @@ func resultCodeIsOk(logger *slog.Logger, device Device, SMARTCtlResult int64) bo
 			logger.Error("Device open failed, device did not return an IDENTIFY DEVICE structure, or device is in a low-power mode", "device", device)
 			result = false
 		}
-		if (b & (1 << 2)) != 0 {
-			logger.Warn("Some SMART or other ATA command to the disk failed, or there was a checksum error in a SMART data structure", "device", device)
-		}
-		if (b & (1 << 3)) != 0 {
-			logger.Warn("SMART status check returned 'DISK FAILING'", "device", device)
-		}
-		if (b & (1 << 4)) != 0 {
-			logger.Warn("We found prefail Attributes <= threshold", "device", device)
-		}
-		if (b & (1 << 5)) != 0 {
-			logger.Warn("SMART status check returned 'DISK OK' but we found that some (usage or prefail) Attributes have been <= threshold at some time in the past", "device", device)
-		}
-		if (b & (1 << 6)) != 0 {
-			logger.Warn("The device error log contains records of errors", "device", device)
-		}
-		if (b & (1 << 7)) != 0 {
-			logger.Warn("The device self-test log contains records of errors. [ATA only] Failed self-tests outdated by a newer successful extended self-test are ignored", "device", device)
+		quiet := quietExitStatusMask()
+		for _, w := range exitStatusWarnings {
+			if (b & (1 << w.bit)) == 0 {
+				continue
+			}
+			if (quiet & (1 << w.bit)) != 0 {
+				logger.Debug(w.message, "device", device)
+			} else {
+				logger.Warn(w.message, "device", device)
+			}
 		}
 	}
 	return result

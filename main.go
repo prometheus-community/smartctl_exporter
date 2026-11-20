@@ -163,6 +163,9 @@ var (
 	smartctlPowerModeCheck = kingpin.Flag("smartctl.powermode-check",
 		"Whether or not to check powermode before fetching data",
 	).Default("standby").String()
+	smartctlQuietExitStatusBits = kingpin.Flag("smartctl.quiet-exit-status-bit",
+		"Log the smartctl exit status bit (2-7) at debug level instead of warning level, e.g. 6 for records in the device error log. The exit status is still exported in smartctl_device_smartctl_exit_status. (repeatable)",
+	).Ints()
 )
 
 // scanDevices uses smartctl to gather the list of available devices.
@@ -223,6 +226,16 @@ func validatePowerMode(mode string) error {
 	}
 }
 
+func validateQuietExitStatusBits(bits []int) error {
+	for _, bit := range bits {
+		// Bits 0 and 1 mean that no data could be read, so they are always logged as errors.
+		if bit < 2 || bit > 7 {
+			return fmt.Errorf("invalid quiet exit status bit: %d. Must be between 2 and 7", bit)
+		}
+	}
+	return nil
+}
+
 func main() {
 	metricsPath := kingpin.Flag(
 		"web.telemetry-path", "Path under which to expose metrics",
@@ -237,6 +250,10 @@ func main() {
 	logger := promslog.New(promslogConfig)
 
 	if err := validatePowerMode(*smartctlPowerModeCheck); err != nil {
+		logger.Error(err.Error())
+		os.Exit(1)
+	}
+	if err := validateQuietExitStatusBits(*smartctlQuietExitStatusBits); err != nil {
 		logger.Error(err.Error())
 		os.Exit(1)
 	}

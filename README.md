@@ -44,6 +44,8 @@ Flags:
                                  Device type to use during automatic scan. Special by-id value forces predictable device names. (repeatable)
       --smartctl.powermode-check="standby"
                                  Whether or not to check powermode before fetching data
+      --smartctl.quiet-exit-status-bit=SMARTCTL.QUIET-EXIT-STATUS-BIT ...
+                                 Log the smartctl exit status bit (2-7) at debug level instead of warning level, e.g. 6 for records in the device error log. The exit status is still exported in smartctl_device_smartctl_exit_status. (repeatable)
       --web.telemetry-path="/metrics"
                                  Path under which to expose metrics
       --[no-]web.systemd-socket  Use systemd socket activation listeners instead of port listeners (Linux only).
