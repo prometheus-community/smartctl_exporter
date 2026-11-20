@@ -44,6 +44,8 @@ Flags:
                                  Device type to use during automatic scan. Special by-id value forces predictable device names. (repeatable)
       --smartctl.powermode-check="standby"
                                  Whether or not to check powermode before fetching data
+      --[no-]smartctl.ata-ssd-statistics
+                                 Collect the ATA Solid State Device Statistics log using smartctl --log=devstat,7.
       --web.telemetry-path="/metrics"
                                  Path under which to expose metrics
       --[no-]web.systemd-socket  Use systemd socket activation listeners instead of port listeners (Linux only).
@@ -56,6 +58,29 @@ Flags:
       --log.format=logfmt        Output format of log messages. One of: [logfmt, json]
       --[no-]version             Show application version.
 ```
+
+## ATA SSD endurance statistics
+
+Some ATA SSDs report their percentage of endurance used in the Solid State
+Device Statistics log rather than in the SMART attribute table. Enable
+`--smartctl.ata-ssd-statistics` to request this page with `--log=devstat,7`:
+
+```sh
+smartctl_exporter --smartctl.ata-ssd-statistics
+```
+
+The existing device-statistics collector exposes the values reported by
+supported devices, for example:
+
+```promql
+smartctl_device_statistics{statistic_table="Solid State Device Statistics",statistic_name="Percentage Used Endurance Indicator"}
+```
+
+This option is disabled by default. It requests only ATA device-statistics
+page 7; it does not enable `--xall` or request additional self-test or SCT logs.
+The configured `--smartctl.powermode-check` and device-discovery command are
+unchanged. The endurance-used indicator is a device-reported estimate and may
+exceed 100; it is not calculated from vendor-specific SMART attributes.
 
 ## TLS and basic authentication
 
