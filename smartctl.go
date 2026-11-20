@@ -109,6 +109,7 @@ func (smart *SMARTctl) Collect() {
 		smart.mineNvmeCriticalWarning()
 		smart.mineNvmeMediaErrors()
 		smart.mineNvmeNumErrLogEntries()
+		smart.mineNvmeVolatileMemoryBackupFailed()
 		smart.mineNvmeBytesRead()
 		smart.mineNvmeBytesWritten()
 	}
@@ -381,6 +382,21 @@ func (smart *SMARTctl) mineNvmeNumErrLogEntries() {
 		smart.json.Get("nvme_smart_health_information_log.num_err_log_entries").Float(),
 		smart.device.device,
 	)
+}
+
+func (smart *SMARTctl) mineNvmeVolatileMemoryBackupFailed() {
+	nvmeStatus := smart.json.Get("smart_status.nvme")
+	if nvmeStatus.Exists() {
+		volatileMemoryBackupFailed := nvmeStatus.Get("volatile_memory_backup_failed")
+		if volatileMemoryBackupFailed.Exists() {
+			smart.ch <- prometheus.MustNewConstMetric(
+				metricDeviceVolatileMemoryBackupFailed,
+				prometheus.CounterValue,
+				volatileMemoryBackupFailed.Float(),
+				smart.device.device,
+			)
+		}
+	}
 }
 
 // https://nvmexpress.org/wp-content/uploads/NVM-Express-NVM-Command-Set-Specification-1.0d-2023.12.28-Ratified.pdf
