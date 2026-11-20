@@ -14,7 +14,12 @@
 package main
 
 import (
+	"log/slog"
 	"testing"
+
+	"github.com/prometheus/client_golang/prometheus"
+	dto "github.com/prometheus/client_model/go"
+	"github.com/tidwall/gjson"
 )
 
 func TestBuildDeviceLabel(t *testing.T) {
@@ -41,4 +46,66 @@ func TestBuildDeviceLabel(t *testing.T) {
 			t.Errorf("deviceName=%v deviceType=%v expected=%v result=%v", test.deviceName, test.deviceType, test.expectedLabel, result)
 		}
 	}
+}
+
+func TestMineDeviceSCTStatusReadsObjectValue(t *testing.T) {
+	raw := `{
+		"serial_number": "WD-TEST",
+		"model_name": "WDC WD10EADS",
+		"device": {"type": "sat", "protocol": "ATA"},
+		"ata_sct_status": {
+			"device_state": {"value": 4, "string": "SMART Off-line Data Collection executing in background"}
+		}
+	}`
+	got := collectSCTStatus(t, raw)
+	if got != 4 {
+		t.Fatalf("smartctl_device_state = %v, want 4; Float() on the object would have been 0", got)
+	}
+}
+
+func TestMineDeviceSCTStatusNumericFallback(t *testing.T) {
+	raw := `{
+		"serial_number": "WD-TEST",
+		"model_name": "WDC WD10EADS",
+		"device": {"type": "sat", "protocol": "ATA"},
+		"ata_sct_status": {"device_state": 1}
+	}`
+	got := collectSCTStatus(t, raw)
+	if got != 1 {
+		t.Fatalf("smartctl_device_state = %v, want 1", got)
+	}
+}
+
+func TestMineDeviceSCTStatusAbsent(t *testing.T) {
+	raw := `{"serial_number":"WD-TEST","model_name":"WDC","device":{"type":"sat","protocol":"ATA"}}`
+	ch := make(chan prometheus.Metric, 8)
+	smart := NewSMARTctl(slog.Default(), gjson.Parse(raw), ch, Device{Name: "/dev/sda", Type: "sat", Label: "sda"})
+	smart.mineDeviceSCTStatus()
+	close(ch)
+	for range ch {
+		t.Fatal("did not expect a metric when ata_sct_status is missing")
+	}
+}
+
+func collectSCTStatus(t *testing.T, raw string) float64 {
+	t.Helper()
+	ch := make(chan prometheus.Metric, 8)
+	smart := NewSMARTctl(slog.Default(), gjson.Parse(raw), ch, Device{Name: "/dev/sda", Type: "sat", Label: "sda"})
+	smart.mineDeviceSCTStatus()
+	close(ch)
+	var m prometheus.Metric
+	for v := range ch {
+		if m != nil {
+			t.Fatalf("got more than one metric")
+		}
+		m = v
+	}
+	if m == nil {
+		t.Fatal("expected a smartctl_device_state metric")
+	}
+	pb := &dto.Metric{}
+	if err := m.Write(pb); err != nil {
+		t.Fatalf("write metric: %v", err)
+	}
+	return pb.GetGauge().GetValue()
 }
