@@ -440,7 +440,7 @@ func (smart *SMARTctl) mineNvmeBytesWritten() {
 
 func (smart *SMARTctl) mineSCSIBytesRead() {
 	SCSIHealth := smart.json.Get("scsi_error_counter_log")
-	if SCSIHealth.Exists() {
+	if SCSIHealth.Get("read").Exists() {
 		smart.ch <- prometheus.MustNewConstMetric(
 			metricDeviceBytesRead,
 			prometheus.CounterValue,
@@ -455,7 +455,7 @@ func (smart *SMARTctl) mineSCSIBytesRead() {
 
 func (smart *SMARTctl) mineSCSIBytesWritten() {
 	SCSIHealth := smart.json.Get("scsi_error_counter_log")
-	if SCSIHealth.Exists() {
+	if SCSIHealth.Get("write").Exists() {
 		smart.ch <- prometheus.MustNewConstMetric(
 			metricDeviceBytesWritten,
 			prometheus.CounterValue,
@@ -602,77 +602,83 @@ func (smart *SMARTctl) mineSCSIUsedEnduranceIndicator() {
 func (smart *SMARTctl) mineSCSIErrorCounterLog() {
 	SCSIHealth := smart.json.Get("scsi_error_counter_log")
 	if SCSIHealth.Exists() {
-		smart.ch <- prometheus.MustNewConstMetric(
-			metricReadErrorsCorrectedByRereadsRewrites,
-			prometheus.GaugeValue,
-			SCSIHealth.Get("read.errors_corrected_by_rereads_rewrites").Float(),
-			smart.device.device,
-		)
-		smart.ch <- prometheus.MustNewConstMetric(
-			metricReadErrorsCorrectedByEccFast,
-			prometheus.GaugeValue,
-			SCSIHealth.Get("read.errors_corrected_by_eccfast").Float(),
-			smart.device.device,
-		)
-		smart.ch <- prometheus.MustNewConstMetric(
-			metricReadErrorsCorrectedByEccDelayed,
-			prometheus.GaugeValue,
-			SCSIHealth.Get("read.errors_corrected_by_eccdelayed").Float(),
-			smart.device.device,
-		)
-		smart.ch <- prometheus.MustNewConstMetric(
-			metricReadTotalUncorrectedErrors,
-			prometheus.GaugeValue,
-			SCSIHealth.Get("read.total_uncorrected_errors").Float(),
-			smart.device.device,
-		)
-		smart.ch <- prometheus.MustNewConstMetric(
-			metricWriteErrorsCorrectedByRereadsRewrites,
-			prometheus.GaugeValue,
-			SCSIHealth.Get("write.errors_corrected_by_rereads_rewrites").Float(),
-			smart.device.device,
-		)
-		smart.ch <- prometheus.MustNewConstMetric(
-			metricWriteErrorsCorrectedByEccFast,
-			prometheus.GaugeValue,
-			SCSIHealth.Get("write.errors_corrected_by_eccfast").Float(),
-			smart.device.device,
-		)
-		smart.ch <- prometheus.MustNewConstMetric(
-			metricWriteErrorsCorrectedByEccDelayed,
-			prometheus.GaugeValue,
-			SCSIHealth.Get("write.errors_corrected_by_eccdelayed").Float(),
-			smart.device.device,
-		)
-		smart.ch <- prometheus.MustNewConstMetric(
-			metricWriteTotalUncorrectedErrors,
-			prometheus.GaugeValue,
-			SCSIHealth.Get("write.total_uncorrected_errors").Float(),
-			smart.device.device,
-		)
-		smart.ch <- prometheus.MustNewConstMetric(
-			metricVerifyErrorsCorrectedByRereadsRewrites,
-			prometheus.GaugeValue,
-			SCSIHealth.Get("verify.errors_corrected_by_rereads_rewrites").Float(),
-			smart.device.device,
-		)
-		smart.ch <- prometheus.MustNewConstMetric(
-			metricVerifyErrorsCorrectedByEccFast,
-			prometheus.GaugeValue,
-			SCSIHealth.Get("verify.errors_corrected_by_eccfast").Float(),
-			smart.device.device,
-		)
-		smart.ch <- prometheus.MustNewConstMetric(
-			metricVerifyErrorsCorrectedByEccDelayed,
-			prometheus.GaugeValue,
-			SCSIHealth.Get("verify.errors_corrected_by_eccdelayed").Float(),
-			smart.device.device,
-		)
-		smart.ch <- prometheus.MustNewConstMetric(
-			metricVerifyTotalUncorrectedErrors,
-			prometheus.GaugeValue,
-			SCSIHealth.Get("verify.total_uncorrected_errors").Float(),
-			smart.device.device,
-		)
+		if SCSIHealth.Get("read").Exists() {
+			smart.ch <- prometheus.MustNewConstMetric(
+				metricReadErrorsCorrectedByRereadsRewrites,
+				prometheus.GaugeValue,
+				SCSIHealth.Get("read.errors_corrected_by_rereads_rewrites").Float(),
+				smart.device.device,
+			)
+			smart.ch <- prometheus.MustNewConstMetric(
+				metricReadErrorsCorrectedByEccFast,
+				prometheus.GaugeValue,
+				SCSIHealth.Get("read.errors_corrected_by_eccfast").Float(),
+				smart.device.device,
+			)
+			smart.ch <- prometheus.MustNewConstMetric(
+				metricReadErrorsCorrectedByEccDelayed,
+				prometheus.GaugeValue,
+				SCSIHealth.Get("read.errors_corrected_by_eccdelayed").Float(),
+				smart.device.device,
+			)
+			smart.ch <- prometheus.MustNewConstMetric(
+				metricReadTotalUncorrectedErrors,
+				prometheus.GaugeValue,
+				SCSIHealth.Get("read.total_uncorrected_errors").Float(),
+				smart.device.device,
+			)
+		}
+		if SCSIHealth.Get("write").Exists() {
+			smart.ch <- prometheus.MustNewConstMetric(
+				metricWriteErrorsCorrectedByRereadsRewrites,
+				prometheus.GaugeValue,
+				SCSIHealth.Get("write.errors_corrected_by_rereads_rewrites").Float(),
+				smart.device.device,
+			)
+			smart.ch <- prometheus.MustNewConstMetric(
+				metricWriteErrorsCorrectedByEccFast,
+				prometheus.GaugeValue,
+				SCSIHealth.Get("write.errors_corrected_by_eccfast").Float(),
+				smart.device.device,
+			)
+			smart.ch <- prometheus.MustNewConstMetric(
+				metricWriteErrorsCorrectedByEccDelayed,
+				prometheus.GaugeValue,
+				SCSIHealth.Get("write.errors_corrected_by_eccdelayed").Float(),
+				smart.device.device,
+			)
+			smart.ch <- prometheus.MustNewConstMetric(
+				metricWriteTotalUncorrectedErrors,
+				prometheus.GaugeValue,
+				SCSIHealth.Get("write.total_uncorrected_errors").Float(),
+				smart.device.device,
+			)
+		}
+		if SCSIHealth.Get("verify").Exists() {
+			smart.ch <- prometheus.MustNewConstMetric(
+				metricVerifyErrorsCorrectedByRereadsRewrites,
+				prometheus.GaugeValue,
+				SCSIHealth.Get("verify.errors_corrected_by_rereads_rewrites").Float(),
+				smart.device.device,
+			)
+			smart.ch <- prometheus.MustNewConstMetric(
+				metricVerifyErrorsCorrectedByEccFast,
+				prometheus.GaugeValue,
+				SCSIHealth.Get("verify.errors_corrected_by_eccfast").Float(),
+				smart.device.device,
+			)
+			smart.ch <- prometheus.MustNewConstMetric(
+				metricVerifyErrorsCorrectedByEccDelayed,
+				prometheus.GaugeValue,
+				SCSIHealth.Get("verify.errors_corrected_by_eccdelayed").Float(),
+				smart.device.device,
+			)
+			smart.ch <- prometheus.MustNewConstMetric(
+				metricVerifyTotalUncorrectedErrors,
+				prometheus.GaugeValue,
+				SCSIHealth.Get("verify.total_uncorrected_errors").Float(),
+				smart.device.device,
+			)
+		}
 	}
 }
